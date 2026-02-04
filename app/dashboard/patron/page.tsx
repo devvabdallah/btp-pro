@@ -4,32 +4,36 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getQuotes, getQuoteStats } from '@/lib/quotes-actions'
 import { supabase } from '@/lib/supabaseClient'
+import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
 export default function PatronDashboard() {
   const [quotes, setQuotes] = useState<any[]>([])
   const [stats, setStats] = useState<any>(null)
   const [entrepriseCode, setEntrepriseCode] = useState<string | null>(null)
   const [entrepriseError, setEntrepriseError] = useState<string | null>(null)
+  const [devisEnAttente, setDevisEnAttente] = useState<number>(0)
+  const [chantiersEnCours, setChantiersEnCours] = useState<number>(0)
+  const [nbClients, setNbClients] = useState<number>(0)
+  const [caMois, setCaMois] = useState<number>(0)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
-      // Récupérer les devis et les stats
-      const [quotesResult, statsResult] = await Promise.all([
-        getQuotes(),
-        getQuoteStats(),
-      ])
-
-      setQuotes(quotesResult.success ? quotesResult.quotes || [] : [])
-      setStats(statsResult.success ? statsResult.stats : null)
-
-      // Récupérer le code entreprise
+      setLoading(true)
+      
       try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
+        const supabase = createSupabaseBrowserClient()
+
+        // 1. Récupérer l'utilisateur
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        
+        if (userError || !user) {
           setEntrepriseError('Utilisateur non connecté')
+          setLoading(false)
           return
         }
 
+        // 2. Récupérer le profil avec entreprise_id
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('entreprise_id')
@@ -38,23 +42,84 @@ export default function PatronDashboard() {
 
         if (profileError || !profile || !profile.entreprise_id) {
           setEntrepriseError('Entreprise non trouvée')
+          setLoading(false)
           return
         }
 
+        const entrepriseId = profile.entreprise_id
+
+        // 3. Récupérer le code entreprise
         const { data: entreprise, error: entrepriseError } = await supabase
           .from('entreprises')
           .select('code')
-          .eq('id', profile.entreprise_id)
+          .eq('id', entrepriseId)
           .single()
 
         if (entrepriseError || !entreprise || !entreprise.code) {
           setEntrepriseError('Code entreprise manquant')
-          return
+        } else {
+          setEntrepriseCode(entreprise.code)
         }
 
-        setEntrepriseCode(entreprise.code)
+        // 4. Récupérer les devis et les stats en parallèle
+        const [quotesResult, statsResult] = await Promise.all([
+          getQuotes(),
+          getQuoteStats(),
+        ])
+
+        const allQuotes = quotesResult.success ? quotesResult.quotes || [] : []
+        const quoteStats = statsResult.success ? statsResult.stats : null
+
+        setQuotes(allQuotes)
+        setStats(quoteStats)
+
+        // 5. Compter les devis en attente (statut "envoye")
+        const devisEnvoye = quoteStats?.envoye || 0
+        setDevisEnAttente(devisEnvoye)
+
+        // 6. Compter les chantiers en cours (statut "en_cours")
+        const { count: chantiersCount, error: chantiersError } = await supabase
+          .from('chantiers')
+          .select('*', { count: 'exact', head: true })
+          .eq('entreprise_id', entrepriseId)
+          .eq('status', 'en_cours')
+
+        if (!chantiersError) {
+          setChantiersEnCours(chantiersCount || 0)
+        }
+
+        // 7. Compter les clients
+        const { count: clientsCount, error: clientsError } = await supabase
+          .from('clients')
+          .select('*', { count: 'exact', head: true })
+          .eq('entreprise_id', entrepriseId)
+
+        if (!clientsError) {
+          setNbClients(clientsCount || 0)
+        }
+
+        // 8. Calculer le CA du mois (somme des devis acceptés du mois en cours)
+        const now = new Date()
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59)
+
+        const { data: quotesAcceptees, error: caError } = await supabase
+          .from('quotes')
+          .select('amount_ht')
+          .eq('entreprise_id', entrepriseId)
+          .eq('status', 'accepte')
+          .gte('created_at', startOfMonth.toISOString())
+          .lte('created_at', endOfMonth.toISOString())
+
+        if (!caError && quotesAcceptees) {
+          const totalCA = quotesAcceptees.reduce((sum, q) => sum + (parseFloat(q.amount_ht) || 0), 0)
+          setCaMois(totalCA)
+        }
       } catch (err) {
-        setEntrepriseError('Erreur lors du chargement du code entreprise')
+        console.error('Erreur lors du chargement:', err)
+        setEntrepriseError('Erreur lors du chargement des données')
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -101,11 +166,7 @@ export default function PatronDashboard() {
     )
   }
 
-  // Calculer le CA du mois (mock pour l'instant)
-  const caMois = stats?.accepte ? stats.accepte * 1500 : 0 // Exemple simple
-  const devisEnAttente = stats?.envoye || 0
-  const chantiersEnCours = 3 // Mock
-  const nbClients = quotes.length > 0 ? new Set(quotes.map(q => q.client)).size : 0
+  // Les valeurs sont maintenant dans les états : caMois, devisEnAttente, chantiersEnCours, nbClients
 
   return (
     <div>
@@ -180,7 +241,9 @@ export default function PatronDashboard() {
       <div>
         <h2 className="text-2xl font-bold text-white mb-6">Derniers devis</h2>
         <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-          {quotes.length === 0 ? (
+          {loading ? (
+            <p className="text-gray-400 text-center py-8">Chargement...</p>
+          ) : quotes.length === 0 ? (
             <p className="text-gray-400 text-center py-8">Aucun devis pour le moment.</p>
           ) : (
             <div className="space-y-3">
@@ -198,7 +261,7 @@ export default function PatronDashboard() {
                     <p className="text-gray-400 text-sm">{quote.client} • {formatDate(quote.created_at)}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-bold text-white">{formatAmount(quote.amount_ht)}</p>
+                    <p className="text-lg font-bold text-white">{formatAmount(quote.amount_ht || 0)}</p>
                   </div>
                 </Link>
               ))}
