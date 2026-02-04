@@ -14,6 +14,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [loading, setLoading] = useState(true)
   const [userRole, setUserRole] = useState<'patron' | 'employe' | null>(null)
   const [isCompanyActive, setIsCompanyActive] = useState<boolean | null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     async function checkAuth() {
@@ -61,6 +62,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     checkAuth()
   }, [router])
 
+  // Empêcher le scroll du body quand le menu mobile est ouvert
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileMenuOpen])
+
+  // Fermer le menu mobile lors de la navigation
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [pathname])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0e27] flex items-center justify-center">
@@ -94,46 +112,102 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navItems = isPatron ? patronNavItems : employeNavItems
 
+  // Composant Sidebar réutilisable
+  const SidebarContent = () => (
+    <>
+      <div className="p-6 border-b border-[#2a2f4a]">
+        <Logo size="md" showText={true} />
+      </div>
+
+      <nav className="flex-1 p-4 space-y-2">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`block px-4 py-3 rounded-xl transition-colors ${
+                isActive
+                  ? 'bg-gradient-to-r from-yellow-400/20 to-orange-500/20 text-white border border-yellow-500/30'
+                  : 'text-gray-400 hover:text-white hover:bg-[#1a1f3a]'
+              }`}
+            >
+              {item.label}
+            </Link>
+          )
+        })}
+      </nav>
+
+      <div className="p-4 border-t border-[#2a2f4a]">
+        <LogoutButton />
+      </div>
+    </>
+  )
+
   return (
     <div className="min-h-screen bg-[#0a0e27] flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-[#111827] border-r border-[#2a2f4a] flex flex-col fixed h-screen">
-        <div className="p-6 border-b border-[#2a2f4a]">
-          <Logo size="md" showText={true} />
+      {/* Header mobile (visible uniquement sur mobile) */}
+      <header className="md:hidden fixed top-0 left-0 right-0 z-40 bg-[#111827] border-b border-[#2a2f4a] px-4 py-3 flex items-center justify-between">
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          className="p-2 text-gray-400 hover:text-white transition-colors"
+          aria-label="Ouvrir le menu"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <div className="flex-1 flex justify-center">
+          <Logo size="sm" showText={true} />
         </div>
+        <div className="w-10" /> {/* Spacer pour centrer le logo */}
+      </header>
 
-        <nav className="flex-1 p-4 space-y-2">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`block px-4 py-3 rounded-xl transition-colors ${
-                  isActive
-                    ? 'bg-gradient-to-r from-yellow-400/20 to-orange-500/20 text-white border border-yellow-500/30'
-                    : 'text-gray-400 hover:text-white hover:bg-[#1a1f3a]'
-                }`}
-              >
-                {item.label}
-              </Link>
-            )
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-[#2a2f4a]">
-          <LogoutButton />
-        </div>
+      {/* Sidebar Desktop (visible uniquement >= md) */}
+      <aside className="hidden md:flex w-64 bg-[#111827] border-r border-[#2a2f4a] flex-col fixed h-screen">
+        <SidebarContent />
       </aside>
 
+      {/* Overlay mobile (visible uniquement sur mobile quand menu ouvert) */}
+      {mobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="md:hidden fixed inset-0 bg-black/50 z-50"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          {/* Sidebar mobile */}
+          <aside className="md:hidden fixed left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-[#111827] border-r border-[#2a2f4a] flex flex-col z-50 overflow-y-auto">
+            <div className="p-4 border-b border-[#2a2f4a] flex items-center justify-between">
+              <Logo size="sm" showText={true} />
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 text-gray-400 hover:text-white transition-colors"
+                aria-label="Fermer le menu"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <SidebarContent />
+          </aside>
+        </>
+      )}
+
       {/* Main content */}
-      <main className="flex-1 ml-64">
-        {/* Header avec badge statut */}
-        <header className="w-full px-4 md:px-8 py-4 border-b border-[#2a2f4a] bg-[#0a0e27]">
+      <main className="flex-1 w-full md:ml-64 pt-14 md:pt-0">
+        {/* Header avec badge statut (desktop) */}
+        <header className="hidden md:block w-full px-4 md:px-8 py-4 border-b border-[#2a2f4a] bg-[#0a0e27]">
           <div className="max-w-7xl mx-auto flex items-center justify-end">
             <CompanyStatusBadge />
           </div>
         </header>
+
+        {/* Header mobile avec badge statut */}
+        <div className="md:hidden w-full px-4 py-3 border-b border-[#2a2f4a] bg-[#0a0e27] flex items-center justify-end">
+          <CompanyStatusBadge />
+        </div>
         
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
           {children}

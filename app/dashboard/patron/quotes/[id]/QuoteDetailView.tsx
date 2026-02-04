@@ -7,7 +7,11 @@ import Input from '@/components/ui/Input'
 type QuoteStatus = 'brouillon' | 'envoye' | 'accepte' | 'refuse'
 
 interface QuoteDetailViewProps {
-  quote: any
+  quote: any | null
+  loading?: boolean
+  error?: string | null
+  quoteNotFound?: boolean
+  quoteId?: string | null
   formatDate: (dateString: string) => string
   getStatusBadge: (status: string) => JSX.Element
   formatAmount: (amount: number) => string
@@ -37,6 +41,10 @@ interface QuoteDetailViewProps {
 
 export default function QuoteDetailView({
   quote,
+  loading = false,
+  error = null,
+  quoteNotFound = false,
+  quoteId = null,
   formatDate,
   getStatusBadge,
   formatAmount,
@@ -63,6 +71,101 @@ export default function QuoteDetailView({
   addEditedLine,
   removeEditedLine,
 }: QuoteDetailViewProps) {
+  // Garde si quoteId n'est pas disponible
+  if (!quoteId) {
+    return (
+      <main className="min-h-screen bg-[#0a0e27]">
+        <div className="max-w-4xl mx-auto px-4 py-12 md:px-8">
+          <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a] text-center">
+            <p className="text-red-400 text-xl mb-6">Devis introuvable</p>
+            <Link href="/dashboard/patron/devis">
+              <Button variant="primary" size="md" className="min-h-[48px] px-6 text-base font-semibold">
+                Retour aux devis
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  // État de chargement
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#0a0e27] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white text-lg mb-4">Chargement du devis…</p>
+        </div>
+      </main>
+    )
+  }
+
+  // Erreur de chargement
+  if (error) {
+    return (
+      <main className="min-h-screen bg-[#0a0e27]">
+        <header className="w-full px-4 py-6 md:px-8 border-b border-[#2a2f4a]">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
+                <span className="text-2xl font-bold text-[#0a0e27]">B</span>
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
+            </div>
+            <Link href="/dashboard/patron/devis">
+              <Button variant="secondary" size="sm" className="min-h-[48px] px-6 text-base font-semibold">
+                Retour aux devis
+              </Button>
+            </Link>
+          </div>
+        </header>
+        <div className="max-w-4xl mx-auto px-4 py-12 md:px-8">
+          <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a] text-center">
+            <p className="text-red-400 text-xl mb-6">{error}</p>
+            <Link href="/dashboard/patron/devis">
+              <Button variant="primary" size="md" className="min-h-[48px] px-6 text-base font-semibold">
+                Retour aux devis
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  // Devis introuvable
+  if (quoteNotFound || !quote) {
+    return (
+      <main className="min-h-screen bg-[#0a0e27]">
+        <header className="w-full px-4 py-6 md:px-8 border-b border-[#2a2f4a]">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
+                <span className="text-2xl font-bold text-[#0a0e27]">B</span>
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
+            </div>
+            <Link href="/dashboard/patron/devis">
+              <Button variant="secondary" size="sm" className="min-h-[48px] px-6 text-base font-semibold">
+                Retour aux devis
+              </Button>
+            </Link>
+          </div>
+        </header>
+        <div className="max-w-4xl mx-auto px-4 py-12 md:px-8">
+          <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a] text-center">
+            <p className="text-white text-xl mb-6">Devis introuvable</p>
+            <Link href="/dashboard/patron/devis">
+              <Button variant="primary" size="md" className="min-h-[48px] px-6 text-base font-semibold">
+                Retour aux devis
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   const displayQuote = isEditing && editedQuote ? editedQuote : quote
   
   const getTotalHT = () => {
