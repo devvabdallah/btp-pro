@@ -802,6 +802,17 @@ export default function QuoteDetailPage() {
       total: formatAmountForPrint(line.total_ht || 0)
     }))
 
+    // Générer le HTML des lignes avant le template principal
+    const linesHtml = formattedLines.map((line) => `
+      <tr>
+        <td>${line.description}</td>
+        <td class="text-right">${line.quantity}</td>
+        <td>${line.unit}</td>
+        <td class="text-right">${line.unitPrice}</td>
+        <td class="text-right">${line.total}</td>
+      </tr>
+    `).join('')
+
     // Créer le HTML pour l'impression
     const printWindow = window.open('', '_blank')
     if (!printWindow) return
@@ -973,15 +984,7 @@ export default function QuoteDetailPage() {
       </tr>
     </thead>
     <tbody>
-      ${formattedLines.map(line => `
-      <tr>
-        <td>${line.description}</td>
-        <td class="text-right">${line.quantity}</td>
-        <td>${line.unit}</td>
-        <td class="text-right">${line.unitPrice}</td>
-        <td class="text-right">${line.total}</td>
-      </tr>
-      `).join('')}
+      ${linesHtml}
     </tbody>
   </table>
   ` : ''}
