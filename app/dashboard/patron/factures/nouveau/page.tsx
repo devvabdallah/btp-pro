@@ -6,126 +6,28 @@ import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { useQuoteCatalogue } from '@/lib/hooks/useQuoteCatalogue'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
-interface DraftQuoteLine {
+interface DraftInvoiceLine {
   id: string
   description: string
-  quantite: number
-  unite: string
-  prix_unitaire: number
+  quantity: number
+  unit: string
+  unit_price_ht: number
 }
 
-export default function NouveauDevisPage() {
+export default function NouvelleFacturePage() {
   const router = useRouter()
-  const { saveLinesAsModels, getSuggestions } = useQuoteCatalogue()
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [isCompanyActive, setIsCompanyActive] = useState<boolean | null>(null)
 
+  const [title, setTitle] = useState('')
   const [clientName, setClientName] = useState('')
   const [clientContact, setClientContact] = useState('')
-  const [chantierName, setChantierName] = useState('')
   const [description, setDescription] = useState('')
-  const [lines, setLines] = useState<DraftQuoteLine[]>([])
+  const [lines, setLines] = useState<DraftInvoiceLine[]>([])
   const [tva, setTva] = useState(20)
-
-  // Fonction stub pour générer des lignes depuis la description
-  function generateDraftLinesFromDescription(description: string): DraftQuoteLine[] {
-    const baseLines: DraftQuoteLine[] = [
-      {
-        id: crypto.randomUUID(),
-        description: 'Préparation du chantier et protection des surfaces',
-        quantite: 1,
-        unite: 'lot',
-        prix_unitaire: 0,
-      },
-      {
-        id: crypto.randomUUID(),
-        description: 'Fourniture et pose de matériaux',
-        quantite: 1,
-        unite: 'lot',
-        prix_unitaire: 0,
-      },
-      {
-        id: crypto.randomUUID(),
-        description: 'Travaux de finition',
-        quantite: 1,
-        unite: 'lot',
-        prix_unitaire: 0,
-      },
-      {
-        id: crypto.randomUUID(),
-        description: 'Nettoyage de fin de chantier',
-        quantite: 1,
-        unite: 'lot',
-        prix_unitaire: 0,
-      },
-    ]
-
-    // Si la description contient certains mots-clés, adapter les lignes
-    const descLower = description.toLowerCase()
-    if (descLower.includes('peinture')) {
-      baseLines[1].description = 'Fourniture et application de peinture'
-    }
-    if (descLower.includes('plomberie')) {
-      baseLines[1].description = 'Fourniture et pose de plomberie'
-    }
-    if (descLower.includes('électricité')) {
-      baseLines[1].description = 'Fourniture et pose d\'électricité'
-    }
-
-    return baseLines
-  }
-
-  const handleGenerateLines = () => {
-    if (!description.trim()) {
-      setError('Veuillez saisir une description du chantier.')
-      return
-    }
-
-    const generatedLines = generateDraftLinesFromDescription(description)
-    setLines(generatedLines)
-    setError('')
-  }
-
-  const addLine = () => {
-    setLines([
-      ...lines,
-      {
-        id: crypto.randomUUID(),
-        description: '',
-        quantite: 1,
-        unite: 'pièce',
-        prix_unitaire: 0,
-      },
-    ])
-  }
-
-  const removeLine = (id: string) => {
-    setLines(lines.filter((line) => line.id !== id))
-  }
-
-  const updateLine = (id: string, field: keyof DraftQuoteLine, value: string | number) => {
-    setLines(
-      lines.map((line) =>
-        line.id === id ? { ...line, [field]: value } : line
-      )
-    )
-  }
-
-  const getLineTotal = (line: DraftQuoteLine) => {
-    return line.quantite * line.prix_unitaire
-  }
-
-  const getTotalHT = () => {
-    return lines.reduce((sum, line) => sum + getLineTotal(line), 0)
-  }
-
-  const getTotalTTC = () => {
-    return getTotalHT() * (1 + tva / 100)
-  }
 
   // Vérifier le statut de l'entreprise au chargement
   useEffect(() => {
@@ -166,6 +68,43 @@ export default function NouveauDevisPage() {
     checkCompanyStatus()
   }, [])
 
+  const addLine = () => {
+    setLines([
+      ...lines,
+      {
+        id: crypto.randomUUID(),
+        description: '',
+        quantity: 1,
+        unit: 'pièce',
+        unit_price_ht: 0,
+      },
+    ])
+  }
+
+  const removeLine = (id: string) => {
+    setLines(lines.filter((line) => line.id !== id))
+  }
+
+  const updateLine = (id: string, field: keyof DraftInvoiceLine, value: string | number) => {
+    setLines(
+      lines.map((line) =>
+        line.id === id ? { ...line, [field]: value } : line
+      )
+    )
+  }
+
+  const getLineTotal = (line: DraftInvoiceLine) => {
+    return line.quantity * line.unit_price_ht
+  }
+
+  const getTotalHT = () => {
+    return lines.reduce((sum, line) => sum + getLineTotal(line), 0)
+  }
+
+  const getTotalTTC = () => {
+    return getTotalHT() * (1 + tva / 100)
+  }
+
   const handleSave = async () => {
     setLoading(true)
     setError('')
@@ -192,13 +131,7 @@ export default function NouveauDevisPage() {
       if (profileError || !profile || !profile.entreprise_id) {
         const errorMsg = profileError?.message || 'Profil introuvable'
         setError(`Erreur: ${errorMsg}`)
-        console.error('Profile error:', {
-          context: 'create_quote',
-          message: profileError?.message,
-          details: profileError?.details,
-          hint: profileError?.hint,
-          code: profileError?.code
-        })
+        console.error('Profile error:', profileError)
         setLoading(false)
         return
       }
@@ -214,85 +147,85 @@ export default function NouveauDevisPage() {
         return
       }
 
-      // 3. Préparer le payload
-      const totalHT = getTotalHT()
-      const payload = {
-        entreprise_id: profile.entreprise_id,
-        title: chantierName.trim() || 'Devis sans titre',
-        client: clientName.trim(),
-        contact: clientContact.trim() || null,
-        description: description.trim() || null,
-        amount_ht: totalHT,
-        status: 'brouillon' as const
+      // 3. Validation minimale
+      if (!title.trim()) {
+        setError('Veuillez saisir un titre pour la facture.')
+        setLoading(false)
+        return
       }
 
-      console.log('QUOTE PAYLOAD', payload)
+      if (!clientName.trim()) {
+        setError('Veuillez saisir le nom du client.')
+        setLoading(false)
+        return
+      }
 
-      // 4. Insérer dans la table quotes
-      const { data, error: insertError } = await supabase
-        .from('quotes')
-        .insert(payload)
+      // 4. Calculer le total HT
+      const totalHT = getTotalHT()
+
+      // 5. Créer la facture
+      const { data: invoiceData, error: invoiceError } = await supabase
+        .from('invoices')
+        .insert({
+          entreprise_id: profile.entreprise_id,
+          title: title.trim(),
+          client: clientName.trim(),
+          contact: clientContact.trim() || null,
+          description: description.trim() || null,
+          amount_ht: totalHT,
+          status: 'draft'
+        })
         .select('id')
         .single()
 
-      if (insertError) {
-        const errorMsg = insertError.message + (insertError.details ? ` - ${insertError.details}` : '')
+      if (invoiceError) {
+        const errorMsg = invoiceError.message + (invoiceError.details ? ` - ${invoiceError.details}` : '')
         setError(errorMsg)
         console.error({
-          context: 'create_quote',
-          message: insertError.message,
-          details: insertError.details,
-          hint: insertError.hint,
-          code: insertError.code
+          context: 'create_invoice',
+          message: invoiceError.message,
+          details: invoiceError.details,
+          hint: invoiceError.hint,
+          code: invoiceError.code
         })
         setLoading(false)
         return
       }
 
-      // 5. Insérer les lignes dans quote_lines
-      if (lines.length > 0) {
-        // Filtrer les lignes vides (description vide) et construire le payload
-        const linesPayload = lines
-          .filter((line) => line.description.trim() !== '')
-          .map((line) => ({
-            quote_id: data.id,
-            description: line.description.trim(),
-            quantity: line.quantite,
-            unit: line.unite,
-            unit_price_ht: line.prix_unitaire,
-            total_ht: line.quantite * line.prix_unitaire
-          }))
+      // 6. Insérer les lignes de facture (seulement celles avec description)
+      const linesToInsert = lines
+        .filter((line) => line.description.trim())
+        .map((line) => ({
+          invoice_id: invoiceData.id,
+          description: line.description.trim(),
+          quantity: line.quantity || 0,
+          unit: line.unit || 'pièce',
+          unit_price_ht: line.unit_price_ht || 0,
+          total_ht: getLineTotal(line)
+        }))
 
-        // Insérer les lignes seulement s'il y en a
-        if (linesPayload.length > 0) {
-          const { error: linesError } = await supabase
-            .from('quote_lines')
-            .insert(linesPayload)
+      if (linesToInsert.length > 0) {
+        const { error: linesError } = await supabase
+          .from('invoice_lines')
+          .insert(linesToInsert)
 
-          if (linesError) {
-            const errorMsg = linesError.message + (linesError.details ? ` - ${linesError.details}` : '')
-            setError(`Erreur enregistrement lignes: ${errorMsg}`)
-            console.error({
-              context: 'create_quote_lines',
-              message: linesError.message,
-              details: linesError.details,
-              hint: linesError.hint,
-              code: linesError.code
-            })
-            setLoading(false)
-            return
-          }
+        if (linesError) {
+          const errorMsg = linesError.message + (linesError.details ? ` - ${linesError.details}` : '')
+          setError(`Erreur enregistrement lignes: ${errorMsg}`)
+          console.error({
+            context: 'create_invoice_lines',
+            message: linesError.message,
+            details: linesError.details,
+            hint: linesError.hint,
+            code: linesError.code
+          })
+          setLoading(false)
+          return
         }
       }
 
-      // 6. Succès
-      console.log('QUOTE CREATED', data)
-
-      // Sauvegarder dans le catalogue (conservé pour compatibilité)
-      saveLinesAsModels(lines)
-
-      // Rediriger vers la liste des devis
-      router.push('/dashboard/patron/devis')
+      // 7. Succès - rediriger vers la page détail
+      router.push(`/dashboard/patron/factures/${invoiceData.id}`)
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Une erreur inattendue est survenue'
       setError(errorMsg)
@@ -302,10 +235,10 @@ export default function NouveauDevisPage() {
   }
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto px-4 md:px-6">
       <div className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">Créer un devis</h1>
-        <p className="text-gray-400">Remplissez les informations pour créer un nouveau devis.</p>
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">Créer une facture</h1>
+        <p className="text-gray-400">Remplissez les informations pour créer une nouvelle facture.</p>
       </div>
 
       <div className="space-y-8">
@@ -314,6 +247,14 @@ export default function NouveauDevisPage() {
           <h2 className="text-2xl font-bold text-white mb-6">Informations de base</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input
+              label="Titre de la facture"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              placeholder="Ex: Facture travaux rénovation"
+            />
+            <Input
               label="Nom du client"
               type="text"
               value={clientName}
@@ -321,62 +262,42 @@ export default function NouveauDevisPage() {
               required
               placeholder="Nom complet"
             />
-            <Input
-              label="Contact client (optionnel)"
-              type="text"
-              value={clientContact}
-              onChange={(e) => setClientContact(e.target.value)}
-              placeholder="Téléphone ou email"
-            />
             <div className="md:col-span-2">
               <Input
-                label="Nom du chantier"
+                label="Contact client (optionnel)"
                 type="text"
-                value={chantierName}
-                onChange={(e) => setChantierName(e.target.value)}
-                required
-                placeholder="Ex: Rénovation salle de bain"
+                value={clientContact}
+                onChange={(e) => setClientContact(e.target.value)}
+                placeholder="Téléphone ou email"
               />
             </div>
           </div>
         </div>
 
-        {/* Description du chantier */}
+        {/* Description */}
         <div className="bg-[#1a1f3a] rounded-3xl p-6 md:p-8 border border-[#2a2f4a]">
-          <h2 className="text-2xl font-bold text-white mb-4">Description du chantier</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Description des travaux</h2>
           <textarea
-            className="w-full px-4 py-3 bg-[#0f1429] border border-gray-600 rounded-2xl text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all resize-none mb-4"
+            className="w-full px-4 py-3 bg-[#0f1429] border border-gray-600 rounded-2xl text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all resize-none"
             rows={5}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Décrivez les travaux à réaliser..."
+            placeholder="Décrivez les travaux facturés..."
           />
-          <Button
-            type="button"
-            variant="primary"
-            size="lg"
-            onClick={handleGenerateLines}
-            disabled={!description.trim()}
-          >
-            Préparer mon devis automatiquement
-          </Button>
         </div>
 
-        {/* Lignes de devis */}
-        {lines.length > 0 && (
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 md:p-8 border border-[#2a2f4a]">
-            <div className="mb-4">
-              <p className="text-gray-300 text-sm mb-6">
-                Ce devis est automatiquement pré-rempli pour vous faire gagner du temps. Vous pouvez ajuster librement les quantités et les prix avant validation.
-              </p>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <h2 className="text-2xl font-bold text-white">Lignes de devis</h2>
-                <Button type="button" variant="secondary" size="md" onClick={addLine} className="min-h-[44px] px-6">
-                  + Ajouter une ligne
-                </Button>
-              </div>
-            </div>
+        {/* Lignes de facture */}
+        <div className="bg-[#1a1f3a] rounded-3xl p-6 md:p-8 border border-[#2a2f4a]">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-2xl font-bold text-white">Lignes de facture</h2>
+            <Button type="button" variant="secondary" size="md" onClick={addLine} className="min-h-[44px] px-6">
+              + Ajouter une ligne
+            </Button>
+          </div>
 
+          {lines.length === 0 ? (
+            <p className="text-gray-400 text-center py-8">Aucune ligne pour le moment. Cliquez sur "Ajouter une ligne" pour commencer.</p>
+          ) : (
             <div className="space-y-4">
               {lines.map((line, index) => (
                 <div
@@ -392,9 +313,7 @@ export default function NouveauDevisPage() {
                       <input
                         type="text"
                         value={line.description}
-                        onChange={(e) => {
-                          updateLine(line.id, 'description', e.target.value)
-                        }}
+                        onChange={(e) => updateLine(line.id, 'description', e.target.value)}
                         className="w-full px-4 py-3 bg-[#020617] border border-gray-600 rounded-xl text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                         placeholder="Description de la tâche"
                       />
@@ -406,8 +325,8 @@ export default function NouveauDevisPage() {
                         </label>
                         <input
                           type="number"
-                          value={line.quantite}
-                          onChange={(e) => updateLine(line.id, 'quantite', parseFloat(e.target.value) || 0)}
+                          value={line.quantity}
+                          onChange={(e) => updateLine(line.id, 'quantity', parseFloat(e.target.value) || 0)}
                           className="w-full px-4 py-3 bg-[#020617] border border-gray-600 rounded-xl text-base text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
                           min="0"
                           step="0.01"
@@ -419,8 +338,8 @@ export default function NouveauDevisPage() {
                         </label>
                         <input
                           type="text"
-                          value={line.unite}
-                          onChange={(e) => updateLine(line.id, 'unite', e.target.value)}
+                          value={line.unit}
+                          onChange={(e) => updateLine(line.id, 'unit', e.target.value)}
                           className="w-full px-4 py-3 bg-[#020617] border border-gray-600 rounded-xl text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                           placeholder="pièce"
                         />
@@ -433,8 +352,8 @@ export default function NouveauDevisPage() {
                         </label>
                         <input
                           type="number"
-                          value={line.prix_unitaire}
-                          onChange={(e) => updateLine(line.id, 'prix_unitaire', parseFloat(e.target.value) || 0)}
+                          value={line.unit_price_ht}
+                          onChange={(e) => updateLine(line.id, 'unit_price_ht', parseFloat(e.target.value) || 0)}
                           className="w-full px-4 py-3 bg-[#020617] border border-gray-600 rounded-xl text-base text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
                           min="0"
                           step="0.01"
@@ -471,9 +390,7 @@ export default function NouveauDevisPage() {
                       <input
                         type="text"
                         value={line.description}
-                        onChange={(e) => {
-                          updateLine(line.id, 'description', e.target.value)
-                        }}
+                        onChange={(e) => updateLine(line.id, 'description', e.target.value)}
                         className="w-full px-4 py-2 bg-[#020617] border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                         placeholder="Description de la tâche"
                       />
@@ -484,8 +401,8 @@ export default function NouveauDevisPage() {
                       </label>
                       <input
                         type="number"
-                        value={line.quantite}
-                        onChange={(e) => updateLine(line.id, 'quantite', parseFloat(e.target.value) || 0)}
+                        value={line.quantity}
+                        onChange={(e) => updateLine(line.id, 'quantity', parseFloat(e.target.value) || 0)}
                         className="w-full px-4 py-2 bg-[#020617] border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
                         min="0"
                         step="0.01"
@@ -497,8 +414,8 @@ export default function NouveauDevisPage() {
                       </label>
                       <input
                         type="text"
-                        value={line.unite}
-                        onChange={(e) => updateLine(line.id, 'unite', e.target.value)}
+                        value={line.unit}
+                        onChange={(e) => updateLine(line.id, 'unit', e.target.value)}
                         className="w-full px-4 py-2 bg-[#020617] border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                         placeholder="m, pièce..."
                       />
@@ -509,8 +426,8 @@ export default function NouveauDevisPage() {
                       </label>
                       <input
                         type="number"
-                        value={line.prix_unitaire}
-                        onChange={(e) => updateLine(line.id, 'prix_unitaire', parseFloat(e.target.value) || 0)}
+                        value={line.unit_price_ht}
+                        onChange={(e) => updateLine(line.id, 'unit_price_ht', parseFloat(e.target.value) || 0)}
                         className="w-full px-4 py-2 bg-[#020617] border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
                         min="0"
                         step="0.01"
@@ -541,23 +458,23 @@ export default function NouveauDevisPage() {
                 </div>
               ))}
             </div>
-            
-            {/* Total HT visible */}
-            {lines.length > 0 && (
-              <div className="mt-6 pt-6 border-t-2 border-[#2a2f4a]">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-white">Total HT:</span>
-                  <span className="text-xl md:text-2xl font-bold text-white">
-                    {new Intl.NumberFormat('fr-FR', {
-                      style: 'currency',
-                      currency: 'EUR',
-                    }).format(getTotalHT())}
-                  </span>
-                </div>
+          )}
+          
+          {/* Total HT visible */}
+          {lines.length > 0 && (
+            <div className="mt-6 pt-6 border-t-2 border-[#2a2f4a]">
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-semibold text-white">Total HT:</span>
+                <span className="text-xl md:text-2xl font-bold text-white">
+                  {new Intl.NumberFormat('fr-FR', {
+                    style: 'currency',
+                    currency: 'EUR',
+                  }).format(getTotalHT())}
+                </span>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+        </div>
 
         {/* Résumé */}
         {lines.length > 0 && (
@@ -615,18 +532,18 @@ export default function NouveauDevisPage() {
               variant="primary"
               size="lg"
               onClick={handleSave}
-              disabled={loading || lines.length === 0 || isCompanyActive === false}
+              disabled={loading || !title.trim() || !clientName.trim() || isCompanyActive === false}
               className="w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Enregistrement...' : 'Enregistrer le devis'}
+              {loading ? 'Création...' : 'Créer la facture'}
             </Button>
             {isCompanyActive === false && (
               <p className="mt-2 text-sm text-red-300">
-                Essai expiré : abonnez-vous pour créer de nouveaux devis.
+                Essai expiré : abonnez-vous pour créer de nouvelles factures.
               </p>
             )}
           </div>
-          <Link href="/dashboard/patron" className="w-full sm:w-auto">
+          <Link href="/dashboard/patron/factures" className="w-full sm:w-auto">
             <Button type="button" variant="secondary" size="lg" className="w-full sm:w-auto">
               Annuler
             </Button>
@@ -636,4 +553,3 @@ export default function NouveauDevisPage() {
     </div>
   )
 }
-

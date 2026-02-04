@@ -7,6 +7,7 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import ErrorMessage from '@/components/ui/ErrorMessage'
+import QuoteDetailView from './QuoteDetailView'
 
 type QuoteStatus = 'brouillon' | 'envoye' | 'accepte' | 'refuse'
 
@@ -52,6 +53,11 @@ export default function QuoteDetailPage() {
   const [invoiceSuccess, setInvoiceSuccess] = useState<string | null>(null)
   const [isCompanyActive, setIsCompanyActive] = useState<boolean | null>(null)
   const [existingInvoiceId, setExistingInvoiceId] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedQuote, setEditedQuote] = useState<any>(null)
+  const [editedLines, setEditedLines] = useState<any[]>([])
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!quoteId) return
@@ -91,21 +97,9 @@ export default function QuoteDetailPage() {
 
       // 2.5 Vérifier si l'entreprise est active (abonnement/essai)
       try {
-        const { data, error: activeError } = await supabase.rpc('is_company_active')
-
-        if (!activeError && data !== null && data !== undefined) {
-          // Interpréter data de façon robuste
-          let active = false
-          if (typeof data === 'boolean') {
-            active = data
-          } else if (data && typeof (data as any).active === 'boolean') {
-            active = (data as any).active
-          }
-          setIsCompanyActive(active)
-        } else {
-          // Si la RPC échoue, on laisse null (comportement par défaut)
-          setIsCompanyActive(null)
-        }
+        const { checkCompanyActive } = await import('@/lib/subscription-check')
+        const { active } = await checkCompanyActive(supabase)
+        setIsCompanyActive(active)
       } catch (err) {
         // En cas d'erreur, on laisse null (comportement par défaut)
         setIsCompanyActive(null)
@@ -146,7 +140,9 @@ export default function QuoteDetailPage() {
       }
 
       setQuote(quoteData)
-
+      // Initialiser les états d'édition avec les données chargées
+      setEditedQuote({ ...quoteData })
+      
       // 4. Charger les infos entreprise depuis quote.entreprise_id (source fiable)
       if (quoteData?.entreprise_id) {
         try {
@@ -206,7 +202,20 @@ export default function QuoteDetailPage() {
           .order('created_at', { ascending: true })
 
         if (!linesError && linesData) {
-          setQuoteLines(linesData || [])
+          const lines = linesData || []
+          setQuoteLines(lines)
+          // Initialiser les lignes éditées
+          setEditedLines(lines.map((line: any) => ({
+            id: line.id || crypto.randomUUID(),
+            description: line.description || '',
+            quantity: line.quantity || 0,
+            unit: line.unit || 'pièce',
+            unit_price_ht: line.unit_price_ht || 0,
+            total_ht: line.total_ht || 0
+          })))
+        } else {
+          setQuoteLines([])
+          setEditedLines([])
         }
         // Si la table n'existe pas, on ignore l'erreur (pas de lignes)
       } catch (err) {
@@ -227,7 +236,7 @@ export default function QuoteDetailPage() {
           <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a] text-center">
             <p className="text-red-400 text-xl mb-6">Devis introuvable</p>
             <Link href="/dashboard/patron/devis">
-              <Button variant="primary" size="md">
+              <Button variant="primary" size="md" className="min-h-[48px] px-6 text-base font-semibold">
                 Retour aux devis
               </Button>
             </Link>
@@ -261,7 +270,7 @@ export default function QuoteDetailPage() {
               <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
             </div>
             <Link href="/dashboard/patron/devis">
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm" className="min-h-[48px] px-6 text-base font-semibold">
                 Retour aux devis
               </Button>
             </Link>
@@ -271,7 +280,7 @@ export default function QuoteDetailPage() {
           <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a] text-center">
             <p className="text-red-400 text-xl mb-6">{error}</p>
             <Link href="/dashboard/patron/devis">
-              <Button variant="primary" size="md">
+              <Button variant="primary" size="md" className="min-h-[48px] px-6 text-base font-semibold">
                 Retour aux devis
               </Button>
             </Link>
@@ -294,7 +303,7 @@ export default function QuoteDetailPage() {
               <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
             </div>
             <Link href="/dashboard/patron/devis">
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm" className="min-h-[48px] px-6 text-base font-semibold">
                 Retour aux devis
               </Button>
             </Link>
@@ -304,7 +313,7 @@ export default function QuoteDetailPage() {
           <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a] text-center">
             <p className="text-white text-xl mb-6">Devis introuvable</p>
             <Link href="/dashboard/patron/devis">
-              <Button variant="primary" size="md">
+              <Button variant="primary" size="md" className="min-h-[48px] px-6 text-base font-semibold">
                 Retour aux devis
               </Button>
             </Link>
@@ -376,16 +385,16 @@ export default function QuoteDetailPage() {
     }
 
     setUpdatingStatus(true)
-      setStatusError(null)
+    setStatusError(null)
 
-      try {
-        const { error: updateError } = await supabase
-          .from('quotes')
-          .update({ status: newStatus })
-          .eq('id', quote.id)
-          .eq('entreprise_id', quote.entreprise_id)
+    try {
+      const { error: updateError } = await supabase
+        .from('quotes')
+        .update({ status: newStatus })
+        .eq('id', quote.id)
+        .eq('entreprise_id', quote.entreprise_id)
 
-        if (updateError) {
+      if (updateError) {
         setStatusError(updateError.message || 'Erreur lors de la mise à jour du statut.')
         setUpdatingStatus(false)
         return
@@ -395,12 +404,12 @@ export default function QuoteDetailPage() {
       setQuote({ ...quote, status: newStatus })
       setUpdatingStatus(false)
       router.refresh()
-      } catch (err) {
+    } catch (err) {
       console.error('Unexpected error updating status:', err)
       setStatusError('Erreur lors de la mise à jour du statut.')
       setUpdatingStatus(false)
     }
-  }
+  };
 
   // Transformer le devis en facture
   const handleCreateInvoice = async () => {
@@ -438,22 +447,8 @@ export default function QuoteDetailPage() {
       }
 
       // Vérification abonnement / essai
-      const { data, error: activeError } = await supabase.rpc('is_company_active')
-
-      if (activeError) {
-        console.error('[transform_invoice] RPC is_company_active error:', activeError)
-        setInvoiceError("Impossible de vérifier l'abonnement. Réessayez.")
-        setCreatingInvoice(false)
-        return
-      }
-
-      // Interpréter data de façon robuste
-      let active = false
-      if (typeof data === 'boolean') {
-        active = data
-      } else if (data && typeof (data as any).active === 'boolean') {
-        active = (data as any).active
-      }
+      const { checkCompanyActive } = await import('@/lib/subscription-check')
+      const { active } = await checkCompanyActive(supabase)
 
       if (!active) {
         setInvoiceError("Votre essai est expiré. Abonnez-vous pour continuer.")
@@ -546,7 +541,7 @@ export default function QuoteDetailPage() {
       setInvoiceError('Erreur lors de la création de la facture.')
       setCreatingInvoice(false)
     }
-  }
+  };
 
   // Helper pour formater les montants dans le PDF
   const formatAmountForPrint = (amount: number): string => {
@@ -566,6 +561,206 @@ export default function QuoteDetailPage() {
       'refuse': 'Refusé'
     }
     return labels[status] || status
+  }
+
+  // Handlers pour l'édition
+  const handleEdit = () => {
+    setIsEditing(true)
+    setEditedQuote({ ...quote })
+    setEditedLines(quoteLines.map((line: any) => ({
+      id: line.id || crypto.randomUUID(),
+      description: line.description || '',
+      quantity: line.quantity || 0,
+      unit: line.unit || 'pièce',
+      unit_price_ht: line.unit_price_ht || 0,
+      total_ht: line.total_ht || 0
+    })))
+    setSaveError(null)
+  }
+
+  const handleCancel = () => {
+    setIsEditing(false)
+    setEditedQuote({ ...quote })
+    setEditedLines(quoteLines.map((line: any) => ({
+      id: line.id || crypto.randomUUID(),
+      description: line.description || '',
+      quantity: line.quantity || 0,
+      unit: line.unit || 'pièce',
+      unit_price_ht: line.unit_price_ht || 0,
+      total_ht: line.total_ht || 0
+    })))
+    setSaveError(null)
+  }
+
+  const handleSave = async () => {
+    if (!quote?.id || !quote?.entreprise_id) {
+      setSaveError('Devis introuvable')
+      return
+    }
+
+    setSaving(true)
+    setSaveError(null)
+
+    try {
+      const supabase = createSupabaseBrowserClient()
+
+      // 1. Calculer le total HT depuis les lignes
+      const totalHT = editedLines.reduce((sum, line) => {
+        const qty = parseFloat(line.quantity) || 0
+        const price = parseFloat(line.unit_price_ht) || 0
+        return sum + (qty * price)
+      }, 0)
+
+      // 2. Mettre à jour le devis
+      const { error: updateError } = await supabase
+        .from('quotes')
+        .update({
+          title: editedQuote.title?.trim() || 'Devis sans titre',
+          client: editedQuote.client?.trim() || '',
+          contact: editedQuote.contact?.trim() || null,
+          description: editedQuote.description?.trim() || null,
+          amount_ht: totalHT,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', quote.id)
+        .eq('entreprise_id', quote.entreprise_id)
+
+      if (updateError) {
+        setSaveError(`Erreur lors de la mise à jour: ${updateError.message}`)
+        setSaving(false)
+        return
+      }
+
+      // 3. Supprimer toutes les lignes existantes
+      const { error: deleteError } = await supabase
+        .from('quote_lines')
+        .delete()
+        .eq('quote_id', quote.id)
+
+      if (deleteError) {
+        console.error('Error deleting lines:', deleteError)
+        // Ne pas bloquer si la suppression échoue (peut-être pas de lignes)
+      }
+
+      // 4. Insérer les nouvelles lignes (seulement celles avec description)
+      const linesToInsert = editedLines
+        .filter((line) => line.description?.trim())
+        .map((line) => {
+          const qty = parseFloat(line.quantity) || 0
+          const price = parseFloat(line.unit_price_ht) || 0
+          return {
+            quote_id: quote.id,
+            description: line.description.trim(),
+            quantity: qty,
+            unit: line.unit?.trim() || 'pièce',
+            unit_price_ht: price,
+            total_ht: qty * price
+          }
+        })
+
+      if (linesToInsert.length > 0) {
+        const { error: insertError } = await supabase
+          .from('quote_lines')
+          .insert(linesToInsert)
+
+        if (insertError) {
+          setSaveError(`Erreur lors de la sauvegarde des lignes: ${insertError.message}`)
+          setSaving(false)
+          return
+        }
+      }
+
+      // 5. Recharger les données
+      router.refresh()
+      
+      // Recharger manuellement les données
+      const { data: updatedQuote } = await supabase
+        .from('quotes')
+        .select('id, entreprise_id, title, client, contact, description, amount_ht, status, created_at, number')
+        .eq('id', quote.id)
+        .single()
+
+      if (updatedQuote) {
+        setQuote(updatedQuote)
+        setEditedQuote({ ...updatedQuote })
+      }
+
+      const { data: updatedLines } = await supabase
+        .from('quote_lines')
+        .select('id, quote_id, description, quantity, unit, unit_price_ht, total_ht, created_at')
+        .eq('quote_id', quote.id)
+        .order('created_at', { ascending: true })
+
+      if (updatedLines) {
+        setQuoteLines(updatedLines)
+        setEditedLines(updatedLines.map((line: any) => ({
+          id: line.id || crypto.randomUUID(),
+          description: line.description || '',
+          quantity: line.quantity || 0,
+          unit: line.unit || 'pièce',
+          unit_price_ht: line.unit_price_ht || 0,
+          total_ht: line.total_ht || 0
+        })))
+      }
+
+      setIsEditing(false)
+      setSaving(false)
+    } catch (err) {
+      console.error('Unexpected error saving quote:', err)
+      setSaveError('Erreur lors de la sauvegarde')
+      setSaving(false)
+    }
+  }
+
+  const updateEditedQuote = (field: string, value: any) => {
+    setEditedQuote({ ...editedQuote, [field]: value })
+  }
+
+  const updateEditedLine = (index: number, field: string, value: any) => {
+    const updated = [...editedLines]
+    updated[index] = { ...updated[index], [field]: value }
+    // Recalculer total_ht si quantity ou unit_price_ht change
+    if (field === 'quantity' || field === 'unit_price_ht') {
+      const qty = parseFloat(updated[index].quantity) || 0
+      const price = parseFloat(updated[index].unit_price_ht) || 0
+      updated[index].total_ht = qty * price
+    }
+    setEditedLines(updated)
+    
+    // Recalculer le total HT du devis
+    const totalHT = updated.reduce((sum, line) => {
+      const qty = parseFloat(line.quantity) || 0
+      const price = parseFloat(line.unit_price_ht) || 0
+      return sum + (qty * price)
+    }, 0)
+    setEditedQuote({ ...editedQuote, amount_ht: totalHT })
+  }
+
+  const addEditedLine = () => {
+    setEditedLines([
+      ...editedLines,
+      {
+        id: crypto.randomUUID(),
+        description: '',
+        quantity: 1,
+        unit: 'pièce',
+        unit_price_ht: 0,
+        total_ht: 0
+      }
+    ])
+  }
+
+  const removeEditedLine = (index: number) => {
+    setEditedLines(editedLines.filter((_, i) => i !== index))
+    
+    // Recalculer le total HT
+    const updated = editedLines.filter((_, i) => i !== index)
+    const totalHT = updated.reduce((sum, line) => {
+      const qty = parseFloat(line.quantity) || 0
+      const price = parseFloat(line.unit_price_ht) || 0
+      return sum + (qty * price)
+    }, 0)
+    setEditedQuote({ ...editedQuote, amount_ht: totalHT })
   }
 
   // Générer et télécharger le PDF
@@ -820,196 +1015,36 @@ export default function QuoteDetailPage() {
         printWindow.close()
       }, 1000)
     }, 250)
+  };
 
   return (
-    <main className="min-h-screen bg-[#0a0e27]">
-      {/* Header */}
-      <header className="w-full px-4 py-6 md:px-8 border-b border-[#2a2f4a]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
-              <span className="text-2xl font-bold text-[#0a0e27]">B</span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
-          </div>
-          <Link href="/dashboard/patron">
-            <Button variant="secondary" size="sm">
-              Retour aux devis
-            </Button>
-          </Link>
-        </div>
-      </header>
-
-      {/* Contenu principal */}
-      <div className="max-w-4xl mx-auto px-4 py-12 md:px-8">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              {quote.title}
-            </h2>
-            <p className="text-gray-400">
-              Créé le {formatDate(quote.created_at)}
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {getStatusBadge(quote.status)}
-          </div>
-        </div>
-
-        {/* Bouton principal "Facturer ce devis" */}
-        {quote && (
-          existingInvoiceId ? (
-            <div className="mb-8 bg-blue-500/20 border border-blue-500/50 rounded-3xl p-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                  <p className="text-blue-300 font-semibold mb-1">Ce devis est déjà facturé</p>
-                  <p className="text-gray-400 text-sm">Une facture a déjà été créée à partir de ce devis.</p>
-                </div>
-                <Link href={`/dashboard/patron/factures/${existingInvoiceId}`}>
-                  <Button variant="primary" size="md">
-                    Voir la facture
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          ) : (
-            <div className="mb-8">
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={handleCreateInvoice}
-                disabled={creatingInvoice || isCompanyActive === false || !quote}
-                className="w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {creatingInvoice ? 'Création de la facture...' : '💰 Facturer ce devis'}
-              </Button>
-              
-              {/* Message si entreprise inactive */}
-              {isCompanyActive === false && (
-                <p className="mt-3 text-sm text-red-300">
-                  Essai expiré : abonnez-vous pour facturer ce devis.
-                </p>
-              )}
-              
-              {/* Message d'erreur */}
-              {invoiceError && (
-                <div className="mt-4 bg-red-500/20 border border-red-500/50 rounded-xl p-3">
-                  <p className="text-red-400 text-sm whitespace-pre-line">{invoiceError}</p>
-                </div>
-              )}
-            </div>
-          )
-        )
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Informations client */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-            <h3 className="text-lg font-semibold text-white mb-4">Client</h3>
-            <p className="text-gray-200 mb-2">{quote.client}</p>
-            {quote.contact && (
-              <p className="text-gray-400 text-sm">{quote.contact}</p>
-            )}
-          </div>
-
-          {/* Montant */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-            <h3 className="text-lg font-semibold text-white mb-4">Montant</h3>
-            <p className="text-2xl font-bold text-white">{formatAmount(quote.amount_ht)}</p>
-            <p className="text-gray-400 text-sm mt-1">Hors taxes</p>
-          </div>
-
-          {/* Statut */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-            <h3 className="text-lg font-semibold text-white mb-4">Statut</h3>
-            {getStatusBadge(quote.status)}
-          </div>
-        </div>
-
-        {/* Description */}
-        {quote.description && (
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a] mb-8">
-            <h3 className="text-lg font-semibold text-white mb-4">Description des travaux</h3>
-            <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">
-              {quote.description}
-            </p>
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-          <h3 className="text-lg font-semibold text-white mb-4">Actions</h3>
-          
-          {/* Messages d'erreur statut */}
-          {statusError && (
-            <div className="mb-4 bg-red-500/20 border border-red-500/50 rounded-xl p-3">
-              <p className="text-red-400 text-sm">{statusError}</p>
-            </div>
-          )}
-
-          {/* Boutons changement de statut */}
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-3">
-              {quote.status === 'brouillon' && (
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={() => handleStatusChange('envoye')}
-                  disabled={updatingStatus}
-                >
-                  Marquer comme envoyé
-                </Button>
-              )}
-              
-              {quote.status === 'envoye' && (
-                <>
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={() => handleStatusChange('accepte')}
-                    disabled={updatingStatus}
-                    className="bg-green-500 hover:bg-green-600"
-                  >
-                    Marquer comme accepté
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="md"
-                    onClick={() => handleStatusChange('refuse')}
-                    disabled={updatingStatus}
-                    className="border-red-500/50 text-red-300 hover:bg-red-500/10"
-                  >
-                    Marquer comme refusé
-                  </Button>
-                </>
-              )}
-
-              {(quote.status === 'accepte' || quote.status === 'refuse') && (
-                <Button
-                  variant="secondary"
-                  size="md"
-                  onClick={() => handleStatusChange('brouillon')}
-                  disabled={updatingStatus}
-                >
-                  Remettre en brouillon
-                </Button>
-              )}
-            </div>
-          </div>
-          
-          {/* Télécharger en PDF */}
-          <div className="mt-6 pt-6 border-t border-[#2a2f4a]">
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={handlePrintPdf}
-              className="w-full sm:w-auto mb-4"
-            >
-              📄 Télécharger en PDF
-            </Button>
-          </div>
-
-        </div>
-      </div>
-    </main>
+    <QuoteDetailView
+      quote={quote}
+      formatDate={formatDate}
+      getStatusBadge={getStatusBadge}
+      formatAmount={formatAmount}
+      existingInvoiceId={existingInvoiceId}
+      handleCreateInvoice={handleCreateInvoice}
+      creatingInvoice={creatingInvoice}
+      isCompanyActive={isCompanyActive}
+      invoiceError={invoiceError}
+      statusError={statusError}
+      handleStatusChange={handleStatusChange}
+      updatingStatus={updatingStatus}
+      handlePrintPdf={handlePrintPdf}
+      isEditing={isEditing}
+      editedQuote={editedQuote}
+      editedLines={editedLines}
+      quoteLines={quoteLines}
+      saving={saving}
+      saveError={saveError}
+      onEdit={handleEdit}
+      onCancel={handleCancel}
+      onSave={handleSave}
+      updateEditedQuote={updateEditedQuote}
+      updateEditedLine={updateEditedLine}
+      addEditedLine={addEditedLine}
+      removeEditedLine={removeEditedLine}
+    />
   )
 }

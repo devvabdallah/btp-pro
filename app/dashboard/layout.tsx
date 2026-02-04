@@ -43,16 +43,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       // Vérifier si l'entreprise est active (pour patrons et employés)
       if (profile.entreprise_id) {
         try {
-          const { data: isActive, error } = await supabase.rpc('is_company_active', {
-            entreprise_id: profile.entreprise_id,
-          })
-
-          if (!error && isActive !== null && isActive !== undefined) {
-            setIsCompanyActive(isActive === true)
-          } else {
-            // Si le RPC échoue, on laisse null (afficher le menu par défaut)
-            setIsCompanyActive(null)
-          }
+          const { checkCompanyActive } = await import('@/lib/subscription-check')
+          const { active } = await checkCompanyActive(supabase, profile.entreprise_id)
+          setIsCompanyActive(active)
         } catch (err) {
           // En cas d'erreur, on laisse null (afficher le menu par défaut)
           setIsCompanyActive(null)

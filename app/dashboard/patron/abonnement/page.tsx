@@ -15,6 +15,7 @@ export default function AbonnementPage() {
   const [entrepriseId, setEntrepriseId] = useState<string | null>(null)
   const [daysRemaining, setDaysRemaining] = useState<number | null>(null)
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null)
+  const [loadingCheckout, setLoadingCheckout] = useState(false)
 
   // Helper pour vérifier si l'entreprise est active avec plusieurs tentatives de noms de paramètres
   async function checkCompanyActive(supabase: any, entrepriseIdValue: string): Promise<boolean | null> {
@@ -218,6 +219,46 @@ export default function AbonnementPage() {
 
   const status = getSubscriptionStatus()
 
+  // Handler pour créer une session Stripe Checkout
+  const handleSubscribe = async () => {
+    setLoadingCheckout(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Erreur lors de la création de la session')
+      }
+
+      const { url } = await response.json()
+
+      if (url) {
+        // Rediriger vers Stripe Checkout
+        window.location.href = url
+      } else {
+        throw new Error('URL de paiement non reçue')
+      }
+    } catch (err) {
+      console.error('[Abonnement] Erreur checkout:', err)
+      setError(err instanceof Error ? err.message : 'Erreur lors du démarrage du paiement')
+      setLoadingCheckout(false)
+    }
+  }
+
+  // Handler pour gérer l'abonnement (redirection vers Stripe Customer Portal)
+  const handleManageSubscription = async () => {
+    // Pour l'instant, rediriger vers la page d'abonnement Stripe
+    // TODO: Implémenter Stripe Customer Portal si nécessaire
+    setError('Gestion de l\'abonnement à venir')
+  }
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto">
@@ -305,28 +346,31 @@ export default function AbonnementPage() {
             <Button
               variant="primary"
               size="lg"
-              onClick={() => router.push('/pricing')}
+              onClick={handleManageSubscription}
+              disabled={loadingCheckout}
               className="w-full sm:w-auto"
             >
-              Gérer mon abonnement
+              {loadingCheckout ? 'Chargement...' : 'Gérer mon abonnement'}
             </Button>
           ) : status === 'unknown' ? (
             <Button
               variant="primary"
               size="lg"
-              onClick={() => router.push('/pricing')}
+              onClick={handleSubscribe}
+              disabled={loadingCheckout}
               className="w-full sm:w-auto"
             >
-              Aller au paiement
+              {loadingCheckout ? 'Chargement...' : 'Aller au paiement'}
             </Button>
           ) : (
             <Button
               variant="primary"
               size="lg"
-              onClick={() => router.push('/pricing')}
+              onClick={handleSubscribe}
+              disabled={loadingCheckout}
               className="w-full sm:w-auto"
             >
-              S'abonner
+              {loadingCheckout ? 'Chargement...' : 'S\'abonner'}
             </Button>
           )}
           <Link href="/dashboard/patron" className="w-full sm:w-auto">

@@ -58,15 +58,9 @@ export default function FacturesPage() {
 
         // 2.5 Vérifier si l'entreprise est active (abonnement/essai)
         try {
-          const { data: isActive, error: activeError } = await supabase
-            .rpc('is_company_active', { entreprise_id: profile.entreprise_id })
-
-          if (!activeError && isActive !== null && isActive !== undefined) {
-            setIsCompanyActive(Boolean(isActive))
-          } else {
-            // Si erreur => laisser null (ne pas bloquer)
-            setIsCompanyActive(null)
-          }
+          const { checkCompanyActive } = await import('@/lib/subscription-check')
+          const { active } = await checkCompanyActive(supabase, profile.entreprise_id)
+          setIsCompanyActive(active)
         } catch (err) {
           // En cas d'erreur, laisser null (comportement par défaut)
           setIsCompanyActive(null)
@@ -128,7 +122,7 @@ export default function FacturesPage() {
     }
     return (
       <span
-        className={`px-3 py-1 rounded-full text-xs font-semibold border ${styles[status as keyof typeof styles] || styles.draft}`}
+        className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${styles[status as keyof typeof styles] || styles.draft}`}
       >
         {labels[status as keyof typeof labels] || status}
       </span>
@@ -137,12 +131,12 @@ export default function FacturesPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 md:px-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-4 md:mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
         <h1 className="text-4xl md:text-5xl font-bold text-white">Mes factures</h1>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full md:w-auto">
           <Link 
             href="/dashboard/patron/factures/nouveau" 
-            className={isCompanyActive === false ? 'pointer-events-none opacity-50 cursor-not-allowed' : ''}
+            className={isCompanyActive === false ? 'pointer-events-none opacity-50 cursor-not-allowed' : 'w-full md:w-auto'}
             onClick={(e) => {
               if (isCompanyActive === false) {
                 e.preventDefault()
@@ -151,15 +145,15 @@ export default function FacturesPage() {
           >
             <Button 
               variant="primary" 
-              size="md"
+              size="lg"
               disabled={isCompanyActive === false}
-              className="disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full md:w-auto min-h-[48px] px-8 text-base md:text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Créer une facture
             </Button>
           </Link>
           {isCompanyActive === false && (
-            <p className="mt-2 text-sm text-red-300">
+            <p className="mt-2 text-sm text-red-300 text-center md:text-left">
               Essai expiré : abonnez-vous pour créer de nouvelles factures.
             </p>
           )}
@@ -190,24 +184,34 @@ export default function FacturesPage() {
               href={`/dashboard/patron/factures/${invoice.id}`}
               className="block cursor-pointer hover:opacity-90 transition-opacity"
             >
-              <div className="bg-[#1a1f3a] rounded-3xl p-6 md:p-6 border-2 md:border border-[#2a2f4a] min-h-[80px] md:min-h-[84px] flex items-center">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 md:gap-2 w-full">
+              <div className="bg-[#0f1429] rounded-2xl p-5 md:p-6 border-2 border-[#2a2f4a] hover:border-yellow-500/50 transition-all min-h-[90px] md:min-h-[100px] flex items-center">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 w-full">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 md:mb-1.5 leading-tight">
-                      {invoice.client}
-                    </h3>
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-2">
+                      <h3 className="text-xl md:text-2xl font-bold text-white leading-tight">
+                        {invoice.title || invoice.client}
+                      </h3>
+                      {getStatusBadge(invoice.status)}
+                    </div>
                     <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
-                      <span className="text-gray-100 text-base md:text-lg whitespace-nowrap font-medium">
+                      <span className="text-gray-300 text-sm md:text-base font-medium">
+                        {invoice.client}
+                      </span>
+                      <span className="hidden md:inline text-gray-500">•</span>
+                      <span className="text-gray-300 text-base md:text-lg font-semibold whitespace-nowrap">
                         {formatAmount(invoice.amount_ht)} HT
                       </span>
-                      <span className="hidden md:inline text-gray-400 mx-0.5">•</span>
-                      <span className="text-gray-100 text-base md:text-lg">
+                      <span className="hidden md:inline text-gray-500">•</span>
+                      <span className="text-gray-400 text-sm md:text-base">
                         {formatDate(invoice.created_at)}
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    {getStatusBadge(invoice.status)}
+                  <div className="text-left md:text-right">
+                    <p className="text-xl md:text-2xl font-bold text-white">
+                      {formatAmount(invoice.amount_ht)}
+                    </p>
+                    <p className="text-gray-400 text-xs md:text-sm mt-0.5">HT</p>
                   </div>
                 </div>
               </div>

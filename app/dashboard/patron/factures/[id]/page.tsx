@@ -522,7 +522,7 @@ export default function InvoiceDetailPage() {
             <p className="text-red-400">{error}</p>
           </div>
           <Link href="/dashboard/patron/factures">
-            <Button variant="secondary">Retour aux factures</Button>
+            <Button variant="secondary" className="min-h-[48px] px-6 text-base font-semibold">Retour aux factures</Button>
           </Link>
         </div>
       </main>
@@ -538,7 +538,7 @@ export default function InvoiceDetailPage() {
             <h2 className="text-2xl font-bold text-white mb-4">Facture introuvable</h2>
             <p className="text-gray-400 mb-6">La facture demandée n'existe pas ou n'est plus disponible.</p>
             <Link href="/dashboard/patron/factures">
-              <Button variant="secondary">Retour aux factures</Button>
+              <Button variant="secondary" className="min-h-[48px] px-6 text-base font-semibold">Retour aux factures</Button>
             </Link>
           </div>
         </div>
@@ -558,7 +558,7 @@ export default function InvoiceDetailPage() {
             <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
           </div>
           <Link href="/dashboard/patron/factures">
-            <Button variant="secondary" size="sm">
+            <Button variant="secondary" size="sm" className="min-h-[48px] px-6 text-base font-semibold">
               Retour aux factures
             </Button>
           </Link>
@@ -699,7 +699,7 @@ export default function InvoiceDetailPage() {
               variant="primary"
               size="md"
               onClick={handlePrintPdf}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto min-h-[48px] px-6 text-base font-semibold"
             >
               📄 Télécharger en PDF
             </Button>
@@ -715,7 +715,7 @@ export default function InvoiceDetailPage() {
                 size="md"
                 onClick={handleMarkPaid}
                 disabled={updating}
-                className="w-full sm:w-auto bg-green-500/20 hover:bg-green-500/30 border-green-500/50 text-green-300"
+                className="w-full sm:w-auto min-h-[48px] px-6 text-base font-semibold bg-green-500/20 hover:bg-green-500/30 border-green-500/50 text-green-300"
               >
                 {updating ? 'Mise à jour...' : '✅ Marquer comme payée'}
               </Button>

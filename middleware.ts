@@ -39,6 +39,13 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return response
 
+  // Bypass ADMIN : si la variable d'environnement est activée ET email match
+  const adminBypassEnabled = process.env.NEXT_PUBLIC_BTPPRO_ADMIN_BYPASS_SUBSCRIPTION === 'true'
+  if (adminBypassEnabled && user.email === 'abdallah.gabonn@gmail.com') {
+    console.log('[Middleware] Bypass ADMIN activé pour:', user.email)
+    return response
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('entreprise_id')
@@ -47,11 +54,32 @@ export async function middleware(request: NextRequest) {
 
   if (!profile?.entreprise_id) return response
 
-  const { data: isActive, error } = await supabase.rpc('is_company_active', {
-    entreprise_id: profile.entreprise_id,
-  })
+  // Vérifier l'abonnement avec fallback et bypass DEV
+  // Bypass DEV : si la variable d'environnement est activée, considérer comme actif
+  const bypassEnabled = process.env.NEXT_PUBLIC_BTPPRO_BYPASS_SUBSCRIPTION === 'true'
+  
+  if (bypassEnabled) {
+    return response
+  }
 
-  if (error || !isActive) {
+  try {
+    const { data, error } = await supabase.rpc('is_company_active', {
+      entreprise_id: profile.entreprise_id,
+    })
+
+    // En cas d'erreur ou si inactif, rediriger vers /abonnement-expire
+    if (error || !data) {
+      return NextResponse.redirect(new URL('/abonnement-expire', request.url))
+    }
+
+    // Interpréter le résultat
+    const isActive = typeof data === 'boolean' ? data : Boolean(data)
+    if (!isActive) {
+      return NextResponse.redirect(new URL('/abonnement-expire', request.url))
+    }
+  } catch (err) {
+    // En cas d'exception, rediriger vers /abonnement-expire (sécurité par défaut)
+    console.error('[Middleware] Error checking subscription:', err)
     return NextResponse.redirect(new URL('/abonnement-expire', request.url))
   }
 

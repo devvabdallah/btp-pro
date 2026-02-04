@@ -128,15 +128,9 @@ export default function ChantierDetailPage() {
         // 2.5 Vérifier si l'entreprise est active (abonnement/essai)
         try {
           const supabaseClient = createSupabaseBrowserClient()
-          const { data: isActive, error: activeError } = await supabaseClient
-            .rpc('is_company_active', { entreprise_id: profile.entreprise_id })
-
-          if (!activeError && isActive !== null && isActive !== undefined) {
-            setIsCompanyActive(Boolean(isActive))
-          } else {
-            // Si erreur => laisser null (ne pas bloquer)
-            setIsCompanyActive(null)
-          }
+          const { checkCompanyActive } = await import('@/lib/subscription-check')
+          const { active } = await checkCompanyActive(supabaseClient, profile.entreprise_id)
+          setIsCompanyActive(active)
         } catch (err) {
           // En cas d'erreur, laisser null (comportement par défaut)
           setIsCompanyActive(null)

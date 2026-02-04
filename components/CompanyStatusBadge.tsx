@@ -33,15 +33,10 @@ export default function CompanyStatusBadge() {
         }
 
         // Appeler RPC is_company_active
-        const { data: isActive, error: activeError } = await supabase
-          .rpc('is_company_active', { entreprise_id: profile.entreprise_id })
+        const { checkCompanyActive } = await import('@/lib/subscription-check')
+        const { active } = await checkCompanyActive(supabase, profile.entreprise_id)
 
-        if (activeError) {
-          setStatus('error')
-          return
-        }
-
-        if (isActive === true) {
+        if (active === true) {
           // Vérifier si c'est un essai (optionnel, seulement si l'info existe déjà)
           try {
             const { data: entreprise, error: entrepriseError } = await supabase

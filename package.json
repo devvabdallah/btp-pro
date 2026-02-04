@@ -6,7 +6,10 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:e2e": "cross-env DOTENV_CONFIG_PATH=.env.local.test node -r dotenv/config ./node_modules/@playwright/test/cli.js test",
+    "test:e2e:ui": "cross-env DOTENV_CONFIG_PATH=.env.local.test node -r dotenv/config ./node_modules/@playwright/test/cli.js test --ui",
+    "generate-icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.15.0",
@@ -14,16 +17,21 @@
     "@supabase/supabase-js": "^2.39.3",
     "next": "14.2.5",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "stripe": "^14.21.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.40.0",
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
     "autoprefixer": "^10.4.17",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.6.1",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.5",
     "postcss": "^8.4.35",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3"
   }
