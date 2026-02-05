@@ -3,10 +3,13 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { Inter } from 'next/font/google'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Logo from '@/components/Logo'
 import LogoutButton from '@/components/LogoutButton'
 import CompanyStatusBadge from '@/components/CompanyStatusBadge'
+
+const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -145,7 +148,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   )
 
   return (
-    <div className="min-h-screen bg-[#0a0e27] flex">
+    <div className={`${inter.className} min-h-screen bg-[#0a0e27] flex`}>
       {/* Header mobile (visible uniquement sur mobile) */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-40 bg-[#111827] border-b border-[#2a2f4a] px-4 py-3 flex items-center justify-between">
         <button

@@ -181,10 +181,10 @@ export default function PatronDashboard() {
       {/* Header avec titre et numéro entreprise discret */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6">
         <div className="flex-1">
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-semibold text-white mb-2 tracking-tight leading-tight">
             Tableau de bord
           </h1>
-          <p className="text-gray-400 text-sm md:text-base">
+          <p className="text-sm md:text-base text-gray-400 opacity-80 leading-relaxed">
             Vue d'ensemble de votre activité
           </p>
         </div>
@@ -201,37 +201,37 @@ export default function PatronDashboard() {
       {/* KPIs Cards - Design sobre et professionnel */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 transition-colors">
-          <p className="text-gray-400 text-xs md:text-sm font-medium mb-2 tracking-wide uppercase">
+          <p className="text-[11px] uppercase tracking-wider opacity-70 text-gray-400 mb-2">
             CA du mois
           </p>
-          <p className="text-2xl md:text-3xl font-bold text-white tabular-nums">
+          <p className="text-2xl md:text-3xl font-semibold text-white tabular-nums">
             {loading ? '—' : formatAmount(caMois)}
           </p>
         </div>
         
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 transition-colors">
-          <p className="text-gray-400 text-xs md:text-sm font-medium mb-2 tracking-wide uppercase">
+          <p className="text-[11px] uppercase tracking-wider opacity-70 text-gray-400 mb-2">
             Devis en attente
           </p>
-          <p className="text-2xl md:text-3xl font-bold text-blue-400 tabular-nums">
+          <p className="text-2xl md:text-3xl font-semibold text-blue-400 tabular-nums">
             {loading ? '—' : formatKPIValue(devisEnAttente)}
           </p>
         </div>
         
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 transition-colors">
-          <p className="text-gray-400 text-xs md:text-sm font-medium mb-2 tracking-wide uppercase">
+          <p className="text-[11px] uppercase tracking-wider opacity-70 text-gray-400 mb-2">
             Chantiers en cours
           </p>
-          <p className="text-2xl md:text-3xl font-bold text-green-400 tabular-nums">
+          <p className="text-2xl md:text-3xl font-semibold text-green-400 tabular-nums">
             {loading ? '—' : formatKPIValue(chantiersEnCours)}
           </p>
         </div>
         
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 transition-colors">
-          <p className="text-gray-400 text-xs md:text-sm font-medium mb-2 tracking-wide uppercase">
+          <p className="text-[11px] uppercase tracking-wider opacity-70 text-gray-400 mb-2">
             Clients
           </p>
-          <p className="text-2xl md:text-3xl font-bold text-yellow-400 tabular-nums">
+          <p className="text-2xl md:text-3xl font-semibold text-yellow-400 tabular-nums">
             {loading ? '—' : formatKPIValue(nbClients)}
           </p>
         </div>
