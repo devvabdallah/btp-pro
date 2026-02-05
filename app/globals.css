@@ -50,7 +50,7 @@ body {
   /* Cards premium harmonisées */
   .dashboard-card {
     @apply bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] shadow-sm;
-    transition: all 0.3s ease-out;
+    transition: all 0.2s ease-out;
   }
 
   .dashboard-card:hover {
@@ -74,12 +74,30 @@ body {
   }
 
   .dashboard-list-item {
-    @apply p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-300 ease-out;
+    @apply p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-200 ease-out;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .dashboard-list-item:last-child {
     border-bottom: none;
+  }
+}
+
+/* Utilities globales pour polish final */
+@layer utilities {
+  /* Transitions douces globales */
+  .transition-smooth {
+    transition: all 0.2s ease-out;
+  }
+
+  /* Focus states subtils */
+  .focus-subtle {
+    @apply focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30;
+  }
+
+  /* Hover subtil pour liens */
+  .hover-subtle {
+    @apply transition-colors duration-200 ease-out;
   }
 }
 

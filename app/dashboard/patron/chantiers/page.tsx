@@ -143,12 +143,12 @@ export default function ChantiersPage() {
           <h1 className="text-[28px] md:text-4xl font-semibold text-white/95 mb-3.5 tracking-[-0.02em] leading-[1.15]">
             Mes chantiers
           </h1>
-          <p className="text-sm md:text-[15px] text-gray-400/85 leading-relaxed font-normal">
+          <p className="text-sm md:text-[15px] text-gray-400/80 leading-relaxed font-normal">
             Suivez l'avancement de vos projets
           </p>
         </div>
         <Link href="/dashboard/patron/chantiers/new">
-          <Button variant="primary" size="md" className="hover:shadow-lg hover:shadow-yellow-500/20 transition-shadow duration-300">
+          <Button variant="primary" size="md" className="hover:shadow-lg hover:shadow-yellow-500/20 transition-shadow duration-200">
             Ajouter un chantier
           </Button>
         </Link>
@@ -208,7 +208,7 @@ export default function ChantiersPage() {
                 <Link
                   key={chantier.id}
                   href={`/dashboard/patron/chantiers/${chantier.id}`}
-                  className="block p-5 md:p-6 hover:bg-white/[0.04] transition-all duration-300 ease-out group border-l-2 border-transparent hover:border-yellow-500/30"
+                  className="block p-5 md:p-6 hover:bg-white/[0.04] transition-all duration-200 ease-out group border-l-2 border-transparent hover:border-yellow-500/30"
                 >
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6">
                     <div className="flex-1 min-w-0 space-y-2.5">

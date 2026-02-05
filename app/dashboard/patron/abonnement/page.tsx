@@ -300,7 +300,7 @@ export default function AbonnementPage() {
           <h1 className="text-[28px] md:text-4xl font-semibold text-white/95 mb-3.5 tracking-[-0.02em] leading-[1.15]">
             Mon abonnement
           </h1>
-          <p className="text-sm md:text-[15px] text-gray-400/85 leading-relaxed font-normal">
+          <p className="text-sm md:text-[15px] text-gray-400/80 leading-relaxed font-normal">
             Gérez votre abonnement BTP PRO
           </p>
         </div>

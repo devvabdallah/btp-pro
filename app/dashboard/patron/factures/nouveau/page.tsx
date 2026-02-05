@@ -242,7 +242,7 @@ export default function NouvelleFacturePage() {
           <h1 className="text-[28px] md:text-4xl font-semibold text-white/95 mb-3.5 tracking-[-0.02em] leading-[1.15]">
             Créer une facture
           </h1>
-          <p className="text-sm md:text-[15px] text-gray-400/85 leading-relaxed font-normal">
+          <p className="text-sm md:text-[15px] text-gray-400/80 leading-relaxed font-normal">
             Remplissez les informations pour créer une nouvelle facture
           </p>
         </div>
@@ -309,7 +309,7 @@ export default function NouvelleFacturePage() {
               {lines.map((line, index) => (
                 <div
                   key={line.id}
-                  className="bg-white/[0.03] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-300"
+                  className="bg-white/[0.03] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-200"
                 >
                   {/* Mobile: Card layout */}
                   <div className="md:hidden space-y-4">

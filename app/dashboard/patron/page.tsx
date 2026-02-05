@@ -181,10 +181,10 @@ export default function PatronDashboard() {
       {/* Header avec titre et numéro entreprise discret */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
         <div className="flex-1">
-          <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3.5 tracking-[-0.02em] leading-[1.15]">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white/98 mb-3.5 tracking-[-0.02em] leading-[1.15]">
             Tableau de bord
           </h1>
-          <p className="text-sm md:text-[15px] text-gray-400/85 leading-relaxed font-normal">
+          <p className="text-sm md:text-[15px] text-gray-400/80 leading-relaxed font-normal">
             Vue d'ensemble de votre activité
           </p>
         </div>
@@ -199,9 +199,9 @@ export default function PatronDashboard() {
       </div>
 
       {/* KPIs Cards - Design premium sobre */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-300 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/65 mb-3.5 font-medium">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/60 mb-3.5 font-medium">
             CA du mois
           </p>
           <p className="text-[24px] md:text-[32px] font-semibold text-white/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
@@ -209,8 +209,8 @@ export default function PatronDashboard() {
           </p>
         </div>
         
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-300 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/65 mb-3.5 font-medium">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/60 mb-3.5 font-medium">
             Devis en attente
           </p>
           <p className="text-[24px] md:text-[32px] font-semibold text-blue-400/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
@@ -218,8 +218,8 @@ export default function PatronDashboard() {
           </p>
         </div>
         
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-300 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/65 mb-3.5 font-medium">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/60 mb-3.5 font-medium">
             Chantiers en cours
           </p>
           <p className="text-[24px] md:text-[32px] font-semibold text-green-400/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
@@ -227,8 +227,8 @@ export default function PatronDashboard() {
           </p>
         </div>
         
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-300 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/65 mb-3.5 font-medium">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/60 mb-3.5 font-medium">
             Clients
           </p>
           <p className="text-[24px] md:text-[32px] font-semibold text-yellow-400/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
@@ -244,38 +244,38 @@ export default function PatronDashboard() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-4">
           <Link href="/dashboard/patron/devis/nouveau" className="group">
-            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-300 ease-out cursor-pointer">
-              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-200 leading-snug">
+            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-200 ease-out cursor-pointer">
+              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
                 Créer un devis
               </h3>
-              <p className="text-gray-400/75 text-sm leading-relaxed">Nouveau devis</p>
+              <p className="text-gray-400/70 text-sm leading-relaxed">Nouveau devis</p>
             </div>
           </Link>
           
           <Link href="/dashboard/patron/devis" className="group">
-            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-300 ease-out cursor-pointer">
-              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-200 leading-snug">
+            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-200 ease-out cursor-pointer">
+              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
                 Voir les devis
               </h3>
-              <p className="text-gray-400/75 text-sm leading-relaxed">Tous les devis</p>
+              <p className="text-gray-400/70 text-sm leading-relaxed">Tous les devis</p>
             </div>
           </Link>
           
           <Link href="/dashboard/patron/factures" className="group">
-            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-300 ease-out cursor-pointer">
-              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-200 leading-snug">
+            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-200 ease-out cursor-pointer">
+              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
                 Voir les factures
               </h3>
-              <p className="text-gray-400/75 text-sm leading-relaxed">Gestion factures</p>
+              <p className="text-gray-400/70 text-sm leading-relaxed">Gestion factures</p>
             </div>
           </Link>
           
           <Link href="/dashboard/patron/chantiers" className="group">
-            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-300 ease-out cursor-pointer">
-              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-200 leading-snug">
+            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-200 ease-out cursor-pointer">
+              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
                 Voir les chantiers
               </h3>
-              <p className="text-gray-400/75 text-sm leading-relaxed">Suivi chantiers</p>
+              <p className="text-gray-400/70 text-sm leading-relaxed">Suivi chantiers</p>
             </div>
           </Link>
         </div>
@@ -301,17 +301,17 @@ export default function PatronDashboard() {
                 <Link
                   key={quote.id}
                   href={`/dashboard/patron/quotes/${quote.id}`}
-                  className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-300 ease-out group"
+                  className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-200 ease-out group"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2.5 md:gap-3 mb-2.5 flex-wrap">
-                        <h3 className="text-[15px] md:text-base font-semibold text-white/95 group-hover:text-yellow-400/95 transition-colors duration-200 truncate leading-snug">
+                        <h3 className="text-[15px] md:text-base font-semibold text-white/95 group-hover:text-yellow-400/95 transition-colors duration-150 truncate leading-snug">
                           {quote.title}
                         </h3>
                         {getStatusBadge(quote.status)}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-400/75">
+                      <div className="flex items-center gap-2 text-sm text-gray-400/70">
                         <span className="truncate">{quote.client}</span>
                         <span className="opacity-50">•</span>
                         <span className="whitespace-nowrap">{formatDate(quote.created_at)}</span>

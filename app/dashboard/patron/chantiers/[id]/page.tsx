@@ -820,7 +820,7 @@ export default function ChantierDetailPage() {
             Chantier
           </h1>
           {chantier && (
-            <p className="text-sm md:text-[15px] text-gray-400/85 leading-relaxed font-normal">
+            <p className="text-sm md:text-[15px] text-gray-400/80 leading-relaxed font-normal">
               {chantier.title || 'Détails du chantier'}
             </p>
           )}
