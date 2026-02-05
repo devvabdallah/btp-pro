@@ -176,14 +176,28 @@ export default function ChantiersPage() {
 
       {/* Liste des chantiers */}
       {loading ? (
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/75 text-center text-sm md:text-base">Chargement...</p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-12 md:p-16 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/70 text-center text-sm md:text-base font-medium">Chargement...</p>
         </div>
       ) : filteredChantiers.length === 0 ? (
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/75 text-center text-sm md:text-base">
-            {searchQuery ? 'Aucun chantier trouvé.' : 'Aucun chantier pour le moment.'}
-          </p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-12 md:p-16 border border-white/[0.06] shadow-sm">
+          <div className="text-center space-y-4">
+            <p className="text-gray-400/80 text-base md:text-lg font-medium">
+              {searchQuery ? 'Aucun chantier trouvé' : 'Aucun chantier pour le moment'}
+            </p>
+            {!searchQuery && (
+              <>
+                <p className="text-gray-500/70 text-sm md:text-base">Commencez par ajouter votre premier chantier</p>
+                <div className="pt-2">
+                  <Link href="/dashboard/patron/chantiers/new">
+                    <Button variant="primary" size="md" className="min-h-[44px] px-6">
+                      Ajouter un chantier
+                    </Button>
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       ) : (
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
@@ -194,13 +208,13 @@ export default function ChantiersPage() {
                 <Link
                   key={chantier.id}
                   href={`/dashboard/patron/chantiers/${chantier.id}`}
-                  className="block p-4 md:p-6 hover:bg-white/[0.03] transition-colors duration-300 ease-out group"
+                  className="block p-5 md:p-6 hover:bg-white/[0.04] transition-all duration-300 ease-out group border-l-2 border-transparent hover:border-yellow-500/30"
                 >
-                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3.5 md:gap-4">
-                    <div className="flex-1 min-w-0">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6">
+                    <div className="flex-1 min-w-0 space-y-2.5">
                       {/* Ligne 1 : NOM DU CLIENT + Badge statut */}
-                      <div className="flex flex-col md:flex-row md:items-start md:justify-between md:gap-4 mb-3">
-                        <h3 className="text-lg md:text-xl font-semibold text-white/95 group-hover:text-yellow-400/90 transition-colors duration-200 leading-tight">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                        <h3 className="text-base md:text-lg font-semibold text-white/95 group-hover:text-yellow-400/95 transition-colors duration-200 leading-snug">
                           {clientName || (
                             <span className="text-gray-300/85 font-normal">Client supprimé</span>
                           )}
@@ -208,11 +222,11 @@ export default function ChantiersPage() {
                         <StatusBadge status={chantier.status} />
                       </div>
                       {/* Ligne 2 : Titre du chantier */}
-                      <p className="text-gray-50/90 text-base md:text-lg mb-2.5 font-medium">
+                      <p className="text-gray-50/90 text-base md:text-lg font-medium">
                         {chantier.title || 'Chantier'}
                       </p>
                       {/* Ligne 3 : Métier */}
-                      <div className="mb-2.5">
+                      <div>
                         <span className="text-gray-200/75 text-sm md:text-base font-medium">
                           {getTradeLabel(chantier.trade)}
                         </span>

@@ -317,12 +317,12 @@ export default function ChantierDetailPage() {
     note: ChantierNote
   }) => {
     return (
-      <div className="bg-[#0f1329] border border-[#2a2f4a] rounded-xl p-4 space-y-2">
+      <div className="bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-xl p-4 md:p-5 space-y-2 hover:bg-white/[0.04] transition-colors duration-200">
         <div className="flex-1">
-          <p className="text-white text-base leading-relaxed whitespace-pre-wrap">
+          <p className="text-white/95 text-sm md:text-base leading-relaxed whitespace-pre-wrap">
             {note.content}
           </p>
-          <p className="text-gray-400 text-xs mt-2">
+          <p className="text-gray-400/70 text-xs mt-3">
             {formatRelativeDate(note.created_at)}
           </p>
         </div>
@@ -807,21 +807,28 @@ export default function ChantierDetailPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 md:px-6">
-      <div className="mb-6">
-        <Link href="/dashboard/patron/chantiers">
-          <Button variant="secondary" size="sm">
-            ← Retour
-          </Button>
-        </Link>
-      </div>
-
-      <div className="mb-4 md:mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-4xl md:text-5xl font-bold text-white">Chantier</h1>
+    <div className="space-y-10 md:space-y-12">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
+        <div className="flex-1">
+          <Link href="/dashboard/patron/chantiers" className="inline-block mb-4">
+            <Button variant="secondary" size="sm">
+              ← Retour
+            </Button>
+          </Link>
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white/95 mb-3.5 tracking-[-0.02em] leading-[1.15]">
+            Chantier
+          </h1>
+          {chantier && (
+            <p className="text-sm md:text-[15px] text-gray-400/85 leading-relaxed font-normal">
+              {chantier.title || 'Détails du chantier'}
+            </p>
+          )}
+        </div>
         {chantier && (
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href={`/dashboard/patron/chantiers/${chantierId}/edit`}>
-              <Button variant="primary" size="md">
+              <Button variant="primary" size="md" className="min-h-[44px] px-6">
                 Modifier
               </Button>
             </Link>
@@ -829,7 +836,7 @@ export default function ChantierDetailPage() {
               variant="secondary"
               size="md"
               onClick={() => setShowDeleteModal(true)}
-              className="border-red-500/50 text-red-400 hover:border-red-500 hover:bg-red-500/10"
+              className="border-red-500/50 text-red-400/90 hover:border-red-500/60 hover:bg-red-500/10 min-h-[44px] px-6"
             >
               Supprimer
             </Button>
@@ -868,74 +875,74 @@ export default function ChantierDetailPage() {
 
       {/* Erreur */}
       {error && (
-        <div className="mb-6 bg-red-500/20 border border-red-500/50 rounded-2xl p-4">
-          <p className="text-red-400">{error}</p>
+        <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
+          <p className="text-red-400/95 text-sm">{error}</p>
         </div>
       )}
 
       {/* Chargement */}
       {loading ? (
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-          <p className="text-gray-400 text-center py-8">Chargement...</p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-12 md:p-16 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/70 text-center text-sm md:text-base font-medium">Chargement...</p>
         </div>
       ) : chantier ? (
-        <div className="space-y-6">
+        <div className="space-y-6 md:space-y-8">
           {/* Détails du chantier */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-            <h2 className="text-xl font-bold text-white mb-4">Détails du chantier</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm">
+            <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-6 tracking-tight">Détails du chantier</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Adresse */}
               <div>
-                <label className="text-gray-400 text-sm font-medium mb-1 block">Adresse</label>
-                <p className="text-white text-lg">{chantier.address || '—'}</p>
+                <label className="text-gray-400/80 text-sm font-medium mb-2 block">Adresse</label>
+                <p className="text-white/95 text-base md:text-lg">{chantier.address || '—'}</p>
               </div>
 
               {/* Métier */}
               <div>
-                <label className="text-gray-400 text-sm font-medium mb-1 block">Métier</label>
-                <p className="text-white text-lg">{getTradeLabel(chantier.trade)}</p>
+                <label className="text-gray-400/80 text-sm font-medium mb-2 block">Métier</label>
+                <p className="text-white/95 text-base md:text-lg">{getTradeLabel(chantier.trade)}</p>
               </div>
 
               {/* Statut */}
               <div>
-                <label className="text-gray-400 text-sm font-medium mb-2 block">Statut</label>
+                <label className="text-gray-400/80 text-sm font-medium mb-2 block">Statut</label>
                 <StatusBadge status={chantier.status} />
               </div>
 
               {/* Client */}
               <div>
-                <label className="text-gray-400 text-sm font-medium mb-1 block">Client</label>
-                <p className="text-white text-lg font-semibold">{getClientName(chantier.client)}</p>
+                <label className="text-gray-400/80 text-sm font-medium mb-2 block">Client</label>
+                <p className="text-white/95 text-base md:text-lg font-semibold">{getClientName(chantier.client)}</p>
               </div>
 
               {/* Téléphone client */}
               <div>
-                <label className="text-gray-400 text-sm font-medium mb-1 block">Téléphone</label>
+                <label className="text-gray-400/80 text-sm font-medium mb-2 block">Téléphone</label>
                 {chantier.client?.phone ? (
-                  <p className="text-white text-lg font-semibold">{chantier.client.phone}</p>
+                  <p className="text-white/95 text-base md:text-lg font-semibold">{chantier.client.phone}</p>
                 ) : (
-                  <p className="text-gray-400 text-base">—</p>
+                  <p className="text-gray-400/70 text-base">—</p>
                 )}
               </div>
             </div>
           </div>
 
           {/* Suivi du chantier */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a] space-y-4">
+          <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-white mb-1">Suivi du chantier</h2>
-              <p className="text-gray-400 text-sm">Carnet de bord du chantier</p>
+              <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-2 tracking-tight">Suivi du chantier</h2>
+              <p className="text-gray-400/80 text-sm">Carnet de bord du chantier</p>
             </div>
 
             {/* Formulaire d'ajout de note */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <textarea
                 value={newNoteContent}
                 onChange={(e) => setNewNoteContent(e.target.value)}
                 placeholder="Ex : Avancement du jour, problème rencontré, client informé…"
                 rows={3}
                 disabled={isCompanyActive === false}
-                className="w-full px-4 py-3 bg-[#0f1329] border border-[#2a2f4a] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400/50 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-white/95 placeholder-gray-500/70 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 resize-none disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm md:text-base"
               />
               <div className="flex flex-col gap-2">
                 <div className="flex justify-end">
@@ -959,19 +966,19 @@ export default function ChantierDetailPage() {
 
             {/* Message d'erreur notes */}
             {notesError && (
-              <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3">
-                <p className="text-red-400 text-sm whitespace-pre-line">{notesError}</p>
+              <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3 backdrop-blur-sm">
+                <p className="text-red-400/95 text-sm whitespace-pre-line">{notesError}</p>
               </div>
             )}
 
             {/* Liste des notes */}
             {notesLoading ? (
-              <div className="py-4">
-                <p className="text-gray-400 text-center">Chargement des notes...</p>
+              <div className="py-6">
+                <p className="text-gray-400/70 text-center text-sm">Chargement des notes...</p>
               </div>
             ) : notes.length === 0 ? (
-              <div className="py-6">
-                <p className="text-gray-400 text-center">Aucune note pour le moment</p>
+              <div className="py-8">
+                <p className="text-gray-400/75 text-center text-sm md:text-base">Aucune note pour le moment</p>
               </div>
             ) : (
               <div className="space-y-3 pt-2">
@@ -986,15 +993,15 @@ export default function ChantierDetailPage() {
           </div>
 
           {/* Checklist du chantier */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a] space-y-4">
+          <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-white mb-1">Checklist du chantier</h2>
-              <p className="text-gray-400 text-sm">Tâches à accomplir</p>
+              <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-2 tracking-tight">Checklist du chantier</h2>
+              <p className="text-gray-400/80 text-sm">Tâches à accomplir</p>
             </div>
 
             {/* Formulaire d'ajout */}
             {isCompanyActive !== false && (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex flex-col sm:flex-row gap-3">
                   <input
                     type="text"
@@ -1008,7 +1015,7 @@ export default function ChantierDetailPage() {
                     }}
                     placeholder="Ex : Matériel livré, Client prévenu, Nettoyage fin de journée…"
                     disabled={addingChecklistItem || isCompanyActive === false}
-                    className="flex-1 px-4 py-3 bg-[#0f1329] border border-[#2a2f4a] rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-white/95 placeholder-gray-500/70 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
                   />
                   <Button
                     variant="primary"
@@ -1030,26 +1037,26 @@ export default function ChantierDetailPage() {
 
             {/* Message d'erreur checklist */}
             {checklistError && (
-              <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3">
-                <p className="text-red-400 text-sm">{checklistError}</p>
+              <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3 backdrop-blur-sm">
+                <p className="text-red-400/95 text-sm">{checklistError}</p>
               </div>
             )}
 
             {/* Liste des items */}
             {checklistLoading ? (
-              <div className="py-4">
-                <p className="text-gray-400 text-center">Chargement de la checklist...</p>
+              <div className="py-6">
+                <p className="text-gray-400/70 text-center text-sm">Chargement de la checklist...</p>
               </div>
             ) : checklistItems.length === 0 ? (
-              <div className="py-6">
-                <p className="text-gray-400 text-center">Aucun item dans la checklist</p>
+              <div className="py-8">
+                <p className="text-gray-400/75 text-center text-sm md:text-base">Aucun item dans la checklist</p>
               </div>
             ) : (
               <div className="space-y-2 pt-2">
                 {checklistItems.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 p-3 bg-[#0f1329] border border-[#2a2f4a] rounded-xl hover:border-[#3a3f5a] transition-colors"
+                    className="flex items-center gap-3 p-3 md:p-4 bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-xl hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-200"
                   >
                     <input
                       type="checkbox"
@@ -1063,10 +1070,10 @@ export default function ChantierDetailPage() {
                       className="w-5 h-5 rounded border-2 border-[#3a3f5a] bg-[#0f1329] text-yellow-400 focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-[#0f1329] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     <label
-                      className={`flex-1 text-base cursor-pointer ${
+                      className={`flex-1 text-sm md:text-base cursor-pointer ${
                         item.is_done
-                          ? 'text-gray-500 line-through'
-                          : 'text-white'
+                          ? 'text-gray-400/70 line-through'
+                          : 'text-white/95'
                       }`}
                       onClick={() => {
                         if (isCompanyActive !== false && togglingChecklistItem !== item.id) {
@@ -1133,9 +1140,12 @@ export default function ChantierDetailPage() {
           </div>
 
           {/* Photos */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a] space-y-4">
+          <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <h2 className="text-xl font-bold text-white">Photos</h2>
+              <div>
+                <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-2 tracking-tight">Photos</h2>
+                <p className="text-gray-400/80 text-sm">Documentez l'avancement du chantier</p>
+              </div>
               <label className="cursor-pointer w-full sm:w-auto">
                 <input
                   type="file"
@@ -1160,26 +1170,26 @@ export default function ChantierDetailPage() {
 
             {/* Message d'erreur photos */}
             {photosError && (
-              <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3">
-                <p className="text-red-400 text-sm">{photosError}</p>
+              <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-3 backdrop-blur-sm">
+                <p className="text-red-400/95 text-sm">{photosError}</p>
               </div>
             )}
 
             {/* Grille de photos */}
             {photosLoading ? (
               <div className="py-8">
-                <p className="text-gray-400 text-center">Chargement des photos...</p>
+                <p className="text-gray-400/70 text-center text-sm">Chargement des photos...</p>
               </div>
             ) : photos.length === 0 ? (
               <div className="py-8">
-                <p className="text-gray-400 text-center">Aucune photo pour le moment</p>
+                <p className="text-gray-400/75 text-center text-sm md:text-base">Aucune photo pour le moment</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                 {photos.map((photo) => (
                   <div
                     key={photo.id}
-                    className="relative aspect-square bg-[#0f1329] rounded-xl overflow-hidden group"
+                    className="relative aspect-square bg-white/[0.03] backdrop-blur-sm rounded-xl overflow-hidden group border border-white/[0.08] hover:border-white/[0.12] transition-all duration-200"
                   >
                     {photo.signedUrl ? (
                       <>
@@ -1290,8 +1300,8 @@ export default function ChantierDetailPage() {
           </Modal>
 
           {/* Actions rapides */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a] space-y-3">
-            <h2 className="text-xl font-bold text-white mb-2">Actions rapides</h2>
+          <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm space-y-4">
+            <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-2 tracking-tight">Actions rapides</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* Bouton Appeler */}
               {chantier.client?.phone ? (
