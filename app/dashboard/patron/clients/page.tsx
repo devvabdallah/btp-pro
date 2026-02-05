@@ -142,9 +142,17 @@ export default function ClientsPage() {
   }, [debouncedSearchQuery, clients])
 
   return (
-    <div className="max-w-4xl mx-auto px-4 md:px-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 mb-4 md:mb-6">
-        <h1 className="text-4xl md:text-5xl font-bold text-white">Mes clients</h1>
+    <div className="space-y-8 md:space-y-12">
+      {/* Header avec titre et bouton */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 md:gap-6">
+        <div className="flex-1">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3 tracking-[-0.02em] leading-[1.2]">
+            Mes clients
+          </h1>
+          <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
+            Gérez votre base de clients
+          </p>
+        </div>
         <Link href="/dashboard/patron/clients/nouveau">
           <Button variant="primary" size="md">
             Ajouter un client
@@ -153,7 +161,7 @@ export default function ClientsPage() {
       </div>
 
       {/* Recherche */}
-      <div className="mb-3 md:mb-5">
+      <div>
         <Input
           label="Rechercher un client"
           type="text"
@@ -167,51 +175,53 @@ export default function ClientsPage() {
 
       {/* Erreur */}
       {error && (
-        <div className="mb-6 bg-red-500/20 border border-red-500/50 rounded-2xl p-4">
-          <p className="text-red-400">{error}</p>
+        <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
+          <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
       {/* Liste des clients */}
       {loading ? (
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-          <p className="text-gray-400 text-center py-8">Chargement...</p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/80 text-center text-sm md:text-base">Chargement...</p>
         </div>
       ) : filteredClients.length === 0 ? (
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-          <p className="text-gray-400 text-center py-8">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/80 text-center text-sm md:text-base">
             {searchQuery ? 'Aucun client trouvé.' : 'Aucun client pour le moment.'}
           </p>
         </div>
       ) : (
-        <div className="space-y-4 md:space-y-3">
-          {filteredClients.map((client) => (
-            <Link
-              key={client.id}
-              href={`/dashboard/patron/clients/${client.id}`}
-              className="block w-full bg-[#1a1f3a] rounded-3xl p-6 md:p-6 border-2 md:border border-[#2a2f4a] hover:border-yellow-500/50 hover:bg-[#1f2440] active:bg-[#252a4a] transition-all duration-150 cursor-pointer min-h-[80px] md:min-h-[84px] flex items-center"
-            >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 md:gap-2 w-full">
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-2 md:mb-1.5 leading-tight">
-                    {client.last_name.toUpperCase()} {client.first_name}
-                  </h3>
-                  <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
-                    <span className="text-gray-100 text-base md:text-lg whitespace-nowrap font-medium">
-                      {client.phone}
-                    </span>
-                    <span className="hidden md:inline text-gray-400 mx-0.5">•</span>
-                    <p className="text-gray-100 text-base md:text-lg truncate md:whitespace-normal">
-                      {client.address}
-                    </p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
+          <div className="divide-y divide-white/[0.06]">
+            {filteredClients.map((client) => (
+              <Link
+                key={client.id}
+                href={`/dashboard/patron/clients/${client.id}`}
+                className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-200"
+              >
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 md:gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg md:text-xl font-semibold text-white mb-2 leading-tight">
+                      {client.last_name.toUpperCase()} {client.first_name}
+                    </h3>
+                    <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
+                      <span className="text-gray-300/90 text-sm md:text-base whitespace-nowrap font-medium">
+                        {client.phone}
+                      </span>
+                      <span className="hidden md:inline text-gray-500/60 mx-0.5">•</span>
+                      <p className="text-gray-300/90 text-sm md:text-base truncate md:whitespace-normal">
+                        {client.address}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-gray-400/70 text-lg md:text-xl flex-shrink-0 ml-2 md:ml-3 flex items-center">
+                    →
                   </div>
                 </div>
-                <div className="text-gray-400 text-xl md:text-2xl flex-shrink-0 ml-2 md:ml-3 flex items-center">
-                  →
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

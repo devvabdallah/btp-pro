@@ -261,9 +261,9 @@ export default function AbonnementPage() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-          <p className="text-gray-400 text-center py-8">Chargement...</p>
+      <div className="space-y-8 md:space-y-12">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/80 text-center text-sm md:text-base">Chargement...</p>
         </div>
       </div>
     )
@@ -271,10 +271,19 @@ export default function AbonnementPage() {
 
   if (error) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-8">Mon abonnement</h1>
-        <div className="bg-red-500/20 border border-red-500/50 rounded-3xl p-6 mb-6">
-          <p className="text-red-400">{error}</p>
+      <div className="space-y-8 md:space-y-12">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 md:gap-6">
+          <div className="flex-1">
+            <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3 tracking-[-0.02em] leading-[1.2]">
+              Mon abonnement
+            </h1>
+            <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
+              Gérez votre abonnement BTP PRO
+            </p>
+          </div>
+        </div>
+        <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
+          <p className="text-red-400 text-sm">{error}</p>
         </div>
         <Link href="/dashboard/patron">
           <Button variant="secondary">Retour au dashboard</Button>
@@ -284,30 +293,40 @@ export default function AbonnementPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-4xl md:text-5xl font-bold text-white mb-8">Mon abonnement</h1>
+    <div className="space-y-8 md:space-y-12">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 md:gap-6">
+        <div className="flex-1">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3 tracking-[-0.02em] leading-[1.2]">
+            Mon abonnement
+          </h1>
+          <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
+            Gérez votre abonnement BTP PRO
+          </p>
+        </div>
+      </div>
 
       {/* Card principale */}
-      <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a]">
+      <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm">
         {/* Badge statut */}
         <div className="mb-6">
           {status === 'active' && (
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold bg-green-500/20 text-green-300 border border-green-500/30">
+            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-500/30">
               Actif
             </span>
           )}
           {status === 'trial' && (
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
               Essai gratuit
             </span>
           )}
           {status === 'expired' && (
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold bg-red-500/20 text-red-300 border border-red-500/30">
+            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-300 border border-red-500/30">
               Expiré
             </span>
           )}
           {status === 'unknown' && (
-            <span className="inline-block px-4 py-2 rounded-full text-sm font-semibold bg-gray-500/20 text-gray-300 border border-gray-500/30">
+            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-300 border border-gray-500/30">
               Statut indisponible
             </span>
           )}
@@ -315,8 +334,8 @@ export default function AbonnementPage() {
 
         {/* Message si statut inconnu */}
         {status === 'unknown' && (
-          <div className="mb-6 bg-gray-500/20 border border-gray-500/50 rounded-xl p-4">
-            <p className="text-gray-300 text-sm">
+          <div className="mb-6 bg-gray-500/20 border border-gray-500/50 rounded-xl p-4 backdrop-blur-sm">
+            <p className="text-gray-300/90 text-sm">
               Statut indisponible (configuration en cours)
             </p>
           </div>
@@ -324,18 +343,18 @@ export default function AbonnementPage() {
 
         {/* Informations */}
         <div className="space-y-4 mb-8">
-          <div className="flex items-center justify-between py-3 border-b border-[#2a2f4a]">
-            <span className="text-gray-400">Prix :</span>
-            <span className="text-white font-semibold">50€/mois</span>
+          <div className="flex items-center justify-between py-3 border-b border-white/[0.06]">
+            <span className="text-gray-400/80 text-sm md:text-base">Prix :</span>
+            <span className="text-white font-semibold text-sm md:text-base tabular-nums">50€/mois</span>
           </div>
-          <div className="flex items-center justify-between py-3 border-b border-[#2a2f4a]">
-            <span className="text-gray-400">Essai :</span>
-            <span className="text-white font-semibold">5 jours</span>
+          <div className="flex items-center justify-between py-3 border-b border-white/[0.06]">
+            <span className="text-gray-400/80 text-sm md:text-base">Essai :</span>
+            <span className="text-white font-semibold text-sm md:text-base">5 jours</span>
           </div>
           {status === 'trial' && daysRemaining !== null && daysRemaining > 0 && (
-            <div className="flex items-center justify-between py-3 border-b border-[#2a2f4a]">
-              <span className="text-gray-400">Jours restants :</span>
-              <span className="text-yellow-300 font-bold text-lg">{daysRemaining} jour{daysRemaining > 1 ? 's' : ''}</span>
+            <div className="flex items-center justify-between py-3 border-b border-white/[0.06]">
+              <span className="text-gray-400/80 text-sm md:text-base">Jours restants :</span>
+              <span className="text-yellow-400/90 font-semibold text-base md:text-lg tabular-nums">{daysRemaining} jour{daysRemaining > 1 ? 's' : ''}</span>
             </div>
           )}
         </div>

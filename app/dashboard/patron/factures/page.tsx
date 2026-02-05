@@ -122,7 +122,7 @@ export default function FacturesPage() {
     }
     return (
       <span
-        className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${styles[status as keyof typeof styles] || styles.draft}`}
+        className={`px-2.5 py-1 rounded-full text-xs font-medium border ${styles[status as keyof typeof styles] || styles.draft}`}
       >
         {labels[status as keyof typeof labels] || status}
       </span>
@@ -130,9 +130,17 @@ export default function FacturesPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 md:px-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-white">Mes factures</h1>
+    <div className="space-y-8 md:space-y-12">
+      {/* Header avec titre et bouton */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 md:gap-6">
+        <div className="flex-1">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3 tracking-[-0.02em] leading-[1.2]">
+            Mes factures
+          </h1>
+          <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
+            Gérez vos factures et suivez les paiements
+          </p>
+        </div>
         <div className="flex flex-col w-full md:w-auto">
           <Link 
             href="/dashboard/patron/factures/nouveau" 
@@ -153,7 +161,7 @@ export default function FacturesPage() {
             </Button>
           </Link>
           {isCompanyActive === false && (
-            <p className="mt-2 text-sm text-red-300 text-center md:text-left">
+            <p className="mt-2 text-sm text-red-300/90 text-center md:text-left">
               Essai expiré : abonnez-vous pour créer de nouvelles factures.
             </p>
           )}
@@ -162,61 +170,57 @@ export default function FacturesPage() {
 
       {/* Erreur */}
       {error && (
-        <div className="mb-6 bg-red-500/20 border border-red-500/50 rounded-2xl p-4">
-          <p className="text-red-400">{error}</p>
+        <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
+          <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
       {/* Liste des factures */}
       {loading ? (
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-          <p className="text-gray-400 text-center py-8">Chargement...</p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/80 text-center text-sm md:text-base">Chargement...</p>
         </div>
       ) : invoices.length === 0 ? (
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-          <p className="text-gray-400 text-center py-8">Aucune facture pour le moment.</p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/80 text-center text-sm md:text-base">Aucune facture pour le moment.</p>
         </div>
       ) : (
-        <div className="space-y-4 md:space-y-3">
-          {invoices.map((invoice) => (
-            <Link
-              key={invoice.id}
-              href={`/dashboard/patron/factures/${invoice.id}`}
-              className="block cursor-pointer hover:opacity-90 transition-opacity"
-            >
-              <div className="bg-[#0f1429] rounded-2xl p-5 md:p-6 border-2 border-[#2a2f4a] hover:border-yellow-500/50 transition-all min-h-[90px] md:min-h-[100px] flex items-center">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 w-full">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
+          <div className="divide-y divide-white/[0.06]">
+            {invoices.map((invoice) => (
+              <Link
+                key={invoice.id}
+                href={`/dashboard/patron/factures/${invoice.id}`}
+                className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-200"
+              >
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-2">
-                      <h3 className="text-xl md:text-2xl font-bold text-white leading-tight">
+                      <h3 className="text-lg md:text-xl font-semibold text-white leading-tight">
                         {invoice.title || invoice.client}
                       </h3>
                       {getStatusBadge(invoice.status)}
                     </div>
                     <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
-                      <span className="text-gray-300 text-sm md:text-base font-medium">
+                      <span className="text-gray-300/90 text-sm md:text-base font-medium">
                         {invoice.client}
                       </span>
-                      <span className="hidden md:inline text-gray-500">•</span>
-                      <span className="text-gray-300 text-base md:text-lg font-semibold whitespace-nowrap">
-                        {formatAmount(invoice.amount_ht)} HT
-                      </span>
-                      <span className="hidden md:inline text-gray-500">•</span>
-                      <span className="text-gray-400 text-sm md:text-base">
+                      <span className="hidden md:inline text-gray-500/60">•</span>
+                      <span className="text-gray-400/80 text-sm md:text-base">
                         {formatDate(invoice.created_at)}
                       </span>
                     </div>
                   </div>
                   <div className="text-left md:text-right">
-                    <p className="text-xl md:text-2xl font-bold text-white">
+                    <p className="text-lg md:text-xl font-semibold text-white tabular-nums leading-none tracking-tight">
                       {formatAmount(invoice.amount_ht)}
                     </p>
-                    <p className="text-gray-400 text-xs md:text-sm mt-0.5">HT</p>
+                    <p className="text-gray-400/70 text-xs mt-0.5">HT</p>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       )}
     </div>

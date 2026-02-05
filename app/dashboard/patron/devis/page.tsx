@@ -104,7 +104,7 @@ export default function DevisPage() {
     }
     return (
       <span
-        className={`px-4 py-1.5 rounded-full text-sm font-semibold border ${styles[status as keyof typeof styles] || styles.brouillon}`}
+        className={`px-2.5 py-1 rounded-full text-xs font-medium border ${styles[status as keyof typeof styles] || styles.brouillon}`}
       >
         {labels[status as keyof typeof labels] || status}
       </span>
@@ -112,30 +112,49 @@ export default function DevisPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 md:px-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 md:mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-white">Mes devis</h1>
+    <div className="space-y-8 md:space-y-12">
+      {/* Header avec titre et bouton */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 md:gap-6">
+        <div className="flex-1">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3 tracking-[-0.02em] leading-[1.2]">
+            Mes devis
+          </h1>
+          <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
+            Gérez vos devis et suivez leur statut
+          </p>
+        </div>
         <Link href="/dashboard/patron/devis/nouveau" className="w-full md:w-auto">
           <Button variant="primary" size="lg" className="w-full md:w-auto min-h-[48px] px-8 text-base md:text-lg font-semibold">
             Créer un devis
           </Button>
         </Link>
       </div>
-      <div className="bg-[#1a1f3a] rounded-3xl p-6 md:p-8 border border-[#2a2f4a]">
-        {loading ? (
-          <p className="text-gray-400 text-center py-8">Chargement...</p>
-        ) : error ? (
-          <p className="text-red-400 text-center py-8">{error}</p>
-        ) : quotes.length === 0 ? (
-          <p className="text-gray-400 text-center py-8">Aucun devis pour le moment.</p>
-        ) : (
-          <div className="space-y-4 md:space-y-3">
+
+      {/* Erreur */}
+      {error && (
+        <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      )}
+
+      {/* Liste des devis */}
+      {loading ? (
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/80 text-center text-sm md:text-base">Chargement...</p>
+        </div>
+      ) : quotes.length === 0 ? (
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/80 text-center text-sm md:text-base">Aucun devis pour le moment.</p>
+        </div>
+      ) : (
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
+          <div className="divide-y divide-white/[0.06]">
             {quotes.map((quote) => {
               if (!quote.id) {
                 return (
                   <div
                     key={quote.title || 'no-id'}
-                    className="flex items-center justify-between p-4 bg-red-500/20 rounded-xl border border-red-500/50"
+                    className="flex items-center justify-between p-4 md:p-5 bg-red-500/20 border-b border-red-500/30"
                   >
                     <p className="text-red-400 text-sm">Devis sans id</p>
                   </div>
@@ -146,39 +165,39 @@ export default function DevisPage() {
                 <Link
                   key={quote.id}
                   href={`/dashboard/patron/quotes/${quote.id}`}
-                  className="block cursor-pointer hover:opacity-90 transition-opacity"
+                  className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-200"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4 p-5 md:p-6 bg-[#0f1429] rounded-2xl border-2 border-[#2a2f4a] hover:border-yellow-500/50 transition-all">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-2">
-                        <h3 className="text-xl md:text-2xl font-bold text-white leading-tight">
+                        <h3 className="text-lg md:text-xl font-semibold text-white leading-tight">
                           {quote.title}
                         </h3>
                         {getStatusBadge(quote.status)}
                       </div>
                       <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
-                        <span className="text-gray-300 text-sm md:text-base font-medium">
+                        <span className="text-gray-300/90 text-sm md:text-base font-medium">
                           {quote.client}
                         </span>
-                        <span className="hidden md:inline text-gray-500">•</span>
-                        <span className="text-gray-400 text-sm md:text-base">
+                        <span className="hidden md:inline text-gray-500/60">•</span>
+                        <span className="text-gray-400/80 text-sm md:text-base">
                           {formatDate(quote.created_at)}
                         </span>
                       </div>
                     </div>
                     <div className="text-left md:text-right">
-                      <p className="text-xl md:text-2xl font-bold text-white">
+                      <p className="text-lg md:text-xl font-semibold text-white tabular-nums leading-none tracking-tight">
                         {formatAmount(quote.amount_ht)}
                       </p>
-                      <p className="text-gray-400 text-xs md:text-sm mt-0.5">HT</p>
+                      <p className="text-gray-400/70 text-xs mt-0.5">HT</p>
                     </div>
                   </div>
                 </Link>
               )
             })}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -136,9 +136,17 @@ export default function ChantiersPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 md:px-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-5 mb-5 md:mb-6">
-        <h1 className="text-4xl md:text-5xl font-bold text-white">Mes chantiers</h1>
+    <div className="space-y-8 md:space-y-12">
+      {/* Header avec titre et bouton */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 md:gap-6">
+        <div className="flex-1">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3 tracking-[-0.02em] leading-[1.2]">
+            Mes chantiers
+          </h1>
+          <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
+            Suivez l'avancement de vos projets
+          </p>
+        </div>
         <Link href="/dashboard/patron/chantiers/new">
           <Button variant="primary" size="md" className="hover:shadow-lg hover:shadow-yellow-500/20 transition-shadow">
             Ajouter un chantier
@@ -147,7 +155,7 @@ export default function ChantiersPage() {
       </div>
 
       {/* Recherche */}
-      <div className="mb-4 md:mb-5">
+      <div>
         <Input
           label="Rechercher un chantier"
           type="text"
@@ -161,73 +169,74 @@ export default function ChantiersPage() {
 
       {/* Erreur */}
       {error && (
-        <div className="mb-6 bg-red-500/20 border border-red-500/50 rounded-2xl p-4">
-          <p className="text-red-400">{error}</p>
+        <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
+          <p className="text-red-400 text-sm">{error}</p>
         </div>
       )}
 
       {/* Liste des chantiers */}
       {loading ? (
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-          <p className="text-gray-400 text-center py-8">Chargement...</p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/80 text-center text-sm md:text-base">Chargement...</p>
         </div>
       ) : filteredChantiers.length === 0 ? (
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
-          <p className="text-gray-400 text-center py-8">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/80 text-center text-sm md:text-base">
             {searchQuery ? 'Aucun chantier trouvé.' : 'Aucun chantier pour le moment.'}
           </p>
         </div>
       ) : (
-        <div className="space-y-4 md:space-y-4">
-          {filteredChantiers.map((chantier) => {
-            const clientName = getClientName(chantier.client)
-            return (
-              <Link
-                key={chantier.id}
-                href={`/dashboard/patron/chantiers/${chantier.id}`}
-                className="block w-full bg-[#1a1f3a] rounded-3xl p-7 md:p-8 border-2 md:border border-[#2a2f4a] hover:border-yellow-500/50 hover:bg-[#1f2440] active:bg-[#252a4a] transition-all duration-150 cursor-pointer min-h-[100px] md:min-h-[110px] flex items-center"
-              >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-3 w-full">
-                  <div className="flex-1 min-w-0">
-                    {/* Ligne 1 : NOM DU CLIENT + Badge statut */}
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between md:gap-4 mb-2.5 md:mb-2">
-                      <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-2 md:mb-0">
-                        {clientName || (
-                          <span className="text-gray-300 text-2xl md:text-3xl font-normal">Client supprimé</span>
-                        )}
-                      </h3>
-                      {/* Badge statut très visible */}
-                      <StatusBadge status={chantier.status} />
-                    </div>
-                    {/* Ligne 2 : Titre du chantier */}
-                    <p className="text-gray-50 text-lg md:text-xl mb-2 md:mb-1.5 font-semibold">
-                      {chantier.title || 'Chantier'}
-                    </p>
-                    {/* Ligne 3 : Métier */}
-                    <div className="mb-2 md:mb-1.5">
-                      <span className="text-gray-200 text-sm md:text-base font-medium">
-                        {getTradeLabel(chantier.trade)}
-                      </span>
-                    </div>
-                    {/* Ligne 4 : Adresse */}
-                    {chantier.address && (
-                      <p className="text-gray-200 text-sm md:text-base leading-relaxed overflow-hidden" style={{
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        textOverflow: 'ellipsis'
-                      }}>
-                        {chantier.address}
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
+          <div className="divide-y divide-white/[0.06]">
+            {filteredChantiers.map((chantier) => {
+              const clientName = getClientName(chantier.client)
+              return (
+                <Link
+                  key={chantier.id}
+                  href={`/dashboard/patron/chantiers/${chantier.id}`}
+                  className="block p-4 md:p-6 hover:bg-white/[0.03] transition-colors duration-200"
+                >
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
+                    <div className="flex-1 min-w-0">
+                      {/* Ligne 1 : NOM DU CLIENT + Badge statut */}
+                      <div className="flex flex-col md:flex-row md:items-start md:justify-between md:gap-4 mb-2.5">
+                        <h3 className="text-lg md:text-xl font-semibold text-white leading-tight">
+                          {clientName || (
+                            <span className="text-gray-300/90 font-normal">Client supprimé</span>
+                          )}
+                        </h3>
+                        <StatusBadge status={chantier.status} />
+                      </div>
+                      {/* Ligne 2 : Titre du chantier */}
+                      <p className="text-gray-50/90 text-base md:text-lg mb-2 font-medium">
+                        {chantier.title || 'Chantier'}
                       </p>
-                    )}
+                      {/* Ligne 3 : Métier */}
+                      <div className="mb-2">
+                        <span className="text-gray-200/80 text-sm md:text-base font-medium">
+                          {getTradeLabel(chantier.trade)}
+                        </span>
+                      </div>
+                      {/* Ligne 4 : Adresse */}
+                      {chantier.address && (
+                        <p className="text-gray-200/80 text-sm md:text-base leading-relaxed overflow-hidden" style={{
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {chantier.address}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-gray-400/70 text-lg md:text-xl flex-shrink-0 ml-2 md:ml-4 flex items-center">
+                      →
+                    </div>
                   </div>
-                  <div className="text-gray-400 text-2xl md:text-3xl flex-shrink-0 ml-2 md:ml-4 flex items-center">
-                    →
-                  </div>
-                </div>
-              </Link>
-            )
-          })}
+                </Link>
+              )
+            })}
+          </div>
         </div>
       )}
     </div>
