@@ -204,7 +204,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       )}
 
       {/* Main content */}
-      <main className="flex-1 w-full md:ml-64 pt-14 md:pt-0 relative z-10">
+      <main className="flex-1 w-full md:ml-64 pt-14 md:pt-0 relative z-10" data-dashboard="true">
         {/* Header avec badge statut (desktop) */}
         <header className="hidden md:block w-full px-4 md:px-6 lg:px-8 py-4 border-b border-white/[0.08] bg-[#0a0e27]/50 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto flex items-center justify-end">

@@ -112,15 +112,38 @@ h3 + p, h3 + div, h3 + section {
 
 /* Styles globaux premium pour le dashboard */
 @layer components {
-  /* Cards premium harmonisées - légèrement plus claires */
+  /* Cards premium harmonisées - avec depth et highlight */
   .dashboard-card {
-    @apply backdrop-blur-sm rounded-xl shadow-sm;
-    background-color: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    @apply backdrop-blur-sm rounded-xl;
+    background: linear-gradient(180deg, 
+      rgba(255, 255, 255, 0.05) 0%, 
+      rgba(255, 255, 255, 0.04) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.15),
+      0 1px 3px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    position: relative;
     transition: background-color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
                 border-color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
                 box-shadow 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
                 transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Highlight subtil en haut de la carte */
+  .dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.15) 50%, 
+      transparent 100%);
+    border-radius: 1rem 1rem 0 0;
+    pointer-events: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -130,9 +153,14 @@ h3 + p, h3 + div, h3 + section {
   }
 
   .dashboard-card:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.14);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(180deg, 
+      rgba(255, 255, 255, 0.07) 0%, 
+      rgba(255, 255, 255, 0.06) 100%);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 
+      0 4px 16px rgba(0, 0, 0, 0.2),
+      0 2px 6px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
     transform: translateY(-1px);
   }
 
@@ -144,7 +172,10 @@ h3 + p, h3 + div, h3 + section {
 
   .dashboard-card:active {
     transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 
+      0 1px 4px rgba(0, 0, 0, 0.15),
+      0 1px 2px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -162,17 +193,42 @@ h3 + p, h3 + div, h3 + section {
   /* Sections avec marges verticales harmonisées - plus respirantes */
   .dashboard-section {
     margin-bottom: 2rem;
+    position: relative;
+  }
+
+  /* Séparateur discret entre sections */
+  .dashboard-section:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: -1rem;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.06) 20%, 
+      rgba(255, 255, 255, 0.06) 80%, 
+      transparent 100%);
+    pointer-events: none;
   }
 
   @media (min-width: 768px) {
     .dashboard-section {
       margin-bottom: 2.5rem;
     }
+
+    .dashboard-section:not(:last-child)::after {
+      bottom: -1.25rem;
+    }
   }
 
   @media (min-width: 1024px) {
     .dashboard-section {
       margin-bottom: 3rem;
+    }
+
+    .dashboard-section:not(:last-child)::after {
+      bottom: -1.5rem;
     }
   }
 
@@ -206,14 +262,39 @@ h3 + p, h3 + div, h3 + section {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Conteneurs de liste premium - légèrement plus clairs */
+
+  /* Conteneurs de liste premium - avec depth */
   .dashboard-list-container {
-    @apply backdrop-blur-sm rounded-xl overflow-hidden shadow-sm;
-    background-color: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.09);
+    @apply backdrop-blur-sm rounded-xl overflow-hidden;
+    background: linear-gradient(180deg, 
+      rgba(255, 255, 255, 0.05) 0%, 
+      rgba(255, 255, 255, 0.04) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.15),
+      0 1px 3px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    position: relative;
     transition: background-color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
                 border-color 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
                 box-shadow 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Highlight subtil en haut du conteneur */
+  .dashboard-list-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.15) 50%, 
+      transparent 100%);
+    border-radius: 1rem 1rem 0 0;
+    pointer-events: none;
+    z-index: 1;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -223,7 +304,11 @@ h3 + p, h3 + div, h3 + section {
   }
 
   .dashboard-list-container:hover {
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 
+      0 4px 16px rgba(0, 0, 0, 0.2),
+      0 2px 6px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 
   .dashboard-list-item {
@@ -288,8 +373,75 @@ h3 + p, h3 + div, h3 + section {
   }
 }
 
-/* Amélioration globale des contrastes et lisibilité */
+/* Fond premium pour le dashboard avec vignette et depth */
 @layer base {
+  /* Vignette subtile (center glow) pour le dashboard */
+  main[data-dashboard="true"]::before {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120vw;
+    height: 120vh;
+    background: radial-gradient(
+      circle at center,
+      rgba(250, 204, 21, 0.03) 0%,
+      rgba(250, 204, 21, 0.01) 30%,
+      transparent 60%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Amélioration premium pour toutes les cartes avec backdrop-blur-sm dans le dashboard */
+  main[data-dashboard="true"] div.backdrop-blur-sm.rounded-xl,
+  main[data-dashboard="true"] div.backdrop-blur-sm.rounded-lg {
+    position: relative;
+  }
+
+  /* Appliquer depth premium avec gradient overlay */
+  main[data-dashboard="true"] div.backdrop-blur-sm.rounded-xl,
+  main[data-dashboard="true"] div.backdrop-blur-sm.rounded-lg {
+    background-image: 
+      linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, transparent 100%),
+      var(--tw-gradient-stops);
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.15),
+      0 1px 3px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  /* Highlight en haut pour ces cartes */
+  main[data-dashboard="true"] div.backdrop-blur-sm.rounded-xl::before,
+  main[data-dashboard="true"] div.backdrop-blur-sm.rounded-lg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.15) 50%, 
+      transparent 100%);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Hover amélioré pour ces cartes */
+  main[data-dashboard="true"] div.backdrop-blur-sm.rounded-xl:hover,
+  main[data-dashboard="true"] div.backdrop-blur-sm.rounded-lg:hover {
+    background-image: 
+      linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 100%),
+      var(--tw-gradient-stops);
+    box-shadow: 
+      0 4px 16px rgba(0, 0, 0, 0.2),
+      0 2px 6px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
   /* Typographie globale améliorée */
   * {
     font-feature-settings: "liga", "kern";
