@@ -104,6 +104,13 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Récupérer l'entreprise pour vérifier/créer le customer Stripe
+    console.log('[Stripe Checkout] Recherche entreprise:', {
+      userId: user.id,
+      companyId: companyId,
+      table: 'entreprises',
+      colonne: 'id'
+    })
+    
     const { data: entreprise, error: entrepriseError } = await supabase
       .from('entreprises')
       .select('id, name, stripe_customer_id')
@@ -111,6 +118,15 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (entrepriseError || !entreprise) {
+      console.error('[Stripe Checkout] Entreprise introuvable:', {
+        userId: user.id,
+        companyId: companyId,
+        error: entrepriseError,
+        errorMessage: entrepriseError?.message,
+        errorCode: entrepriseError?.code,
+        errorDetails: entrepriseError?.details,
+        errorHint: entrepriseError?.hint
+      })
       return NextResponse.json(
         { error: 'Entreprise introuvable' },
         { status: 404 }

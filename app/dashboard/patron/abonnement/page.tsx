@@ -263,6 +263,11 @@ export default function AbonnementPage() {
 
       const accessToken = session.access_token
 
+      console.log('[Abonnement] Envoi checkout:', {
+        entrepriseId: entrepriseId,
+        companyId: entrepriseId
+      })
+
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: {
