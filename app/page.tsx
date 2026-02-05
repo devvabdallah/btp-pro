@@ -54,70 +54,28 @@ export default function Home() {
       {/* Hero Section */}
       <section className="w-full px-4 py-20 md:py-32 md:px-8 bg-gradient-to-b from-[#0a0e27] via-[#0f1429] to-[#020617] relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/5 via-transparent to-orange-500/5"></div>
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Texte */}
-            <div className="text-center lg:text-left">
-              <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                L'application BTP pour faire vos devis et factures simplement.
-              </h2>
-              <p className="text-xl md:text-2xl text-gray-200 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                Pensée pour les artisans et petites équipes, pour gagner du temps sur la paperasse.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
-                <Link href="/register" className="w-full sm:w-auto">
-                  <Button variant="primary" size="lg" className="w-full sm:w-auto shadow-xl shadow-yellow-500/30 hover:shadow-2xl hover:shadow-yellow-500/40 transition-shadow">
-                    Créer un compte
-                  </Button>
-                </Link>
-                <Link href="/login" className="w-full sm:w-auto">
-                  <Button variant="secondary" size="lg" className="w-full sm:w-auto border-white/20 hover:border-white/40">
-                    Me connecter
-                  </Button>
-                </Link>
-              </div>
-              <p className="text-base md:text-lg text-gray-300 max-w-xl mx-auto lg:mx-0">
-                Vos devis et factures sont centralisés, organisés et faciles à retrouver.
-              </p>
-            </div>
-
-            {/* Mockup dans la carte */}
-            <div className="relative">
-              <div className="bg-gradient-to-br from-[#111827] to-[#020617] rounded-3xl p-8 border border-white/10 shadow-2xl shadow-black/50 overflow-hidden">
-                <div className="aspect-[9/16] md:aspect-[4/3] rounded-2xl overflow-hidden relative bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20">
-                  {/* Placeholder premium */}
-                  <div className="w-full h-full flex items-center justify-center flex-col p-6 md:p-8">
-                    {/* Logo */}
-                    <div className="w-24 h-24 md:w-28 md:h-28 mx-auto mb-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl flex items-center justify-center shadow-lg shadow-yellow-500/30">
-                      <span className="text-5xl md:text-6xl font-bold text-[#0a0e27]">B</span>
-                    </div>
-                    
-                    {/* Titre */}
-                    <h3 className="text-xl md:text-2xl font-bold text-white mb-3 text-center">
-                      Application BTP PRO
-                    </h3>
-                    
-                    {/* Sous-texte */}
-                    <p className="text-gray-300 text-sm md:text-base mb-6 text-center max-w-xs">
-                      Application en ligne sécurisée pour les professionnels du BTP
-                    </p>
-                    
-                    {/* Badge */}
-                    <div className="flex flex-wrap items-center justify-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-sm rounded-full border border-white/10">
-                      <span className="text-xs md:text-sm text-gray-300 font-medium">Produit réel</span>
-                      <span className="text-gray-500">•</span>
-                      <span className="text-xs md:text-sm text-gray-300 font-medium">Devis</span>
-                      <span className="text-gray-500">•</span>
-                      <span className="text-xs md:text-sm text-gray-300 font-medium">Factures</span>
-                      <span className="text-gray-500">•</span>
-                      <span className="text-xs md:text-sm text-gray-300 font-medium">Chantiers</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Décoration */}
-              <div className="absolute -top-4 -right-4 w-32 h-32 bg-yellow-500/10 rounded-full blur-3xl"></div>
-              <div className="absolute -bottom-4 -left-4 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl"></div>
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              L'application BTP pour gérer vos devis et factures simplement
+            </h1>
+            <h2 className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Une solution conçue pour les professionnels du bâtiment souhaitant gagner du temps et structurer leur gestion quotidienne.
+            </h2>
+            <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+              BTP PRO centralise vos devis, factures, clients et chantiers dans une interface claire, rapide et accessible sur ordinateur et mobile.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <Link href="/register" className="w-full sm:w-auto">
+                <Button variant="primary" size="lg" className="w-full sm:w-auto shadow-xl shadow-yellow-500/30 hover:shadow-2xl hover:shadow-yellow-500/40 transition-shadow">
+                  Créer un compte
+                </Button>
+              </Link>
+              <Link href="/login" className="w-full sm:w-auto">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto border-white/20 hover:border-white/40">
+                  Me connecter
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
