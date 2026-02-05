@@ -20,7 +20,6 @@ DECLARE
   v_trial_ends_at TIMESTAMPTZ;
   v_subscription_status TEXT;
   v_subscription_current_period_end TIMESTAMPTZ;
-  v_is_active BOOLEAN;
 BEGIN
   -- Si entreprise_id fourni, l'utiliser
   IF p_entreprise_id IS NOT NULL THEN
@@ -42,39 +41,26 @@ BEGIN
   SELECT 
     trial_ends_at,
     subscription_status,
-    subscription_current_period_end,
-    is_active
+    subscription_current_period_end
   INTO 
     v_trial_ends_at,
     v_subscription_status,
-    v_subscription_current_period_end,
-    v_is_active
+    v_subscription_current_period_end
   FROM entreprises
   WHERE id = v_entreprise_id;
 
-  -- Si l'entreprise n'existe pas, retourner false
-  IF v_entreprise_id IS NULL THEN
-    RETURN false;
-  END IF;
-
-  -- Vérifier la période d'essai
-  -- Si trial_ends_at existe et est dans le futur, l'entreprise est active
-  IF v_trial_ends_at IS NOT NULL AND v_trial_ends_at > NOW() THEN
+  -- Condition A: Période d'essai active
+  -- trial_ends_at IS NOT NULL ET now() < trial_ends_at
+  IF v_trial_ends_at IS NOT NULL AND NOW() < v_trial_ends_at THEN
     RETURN true;
   END IF;
 
-  -- Vérifier le statut d'abonnement Stripe
-  -- Si subscription_status est 'trialing' ou 'active', l'entreprise est active
-  IF v_subscription_status IN ('trialing', 'active') THEN
-    -- Vérifier aussi que la période n'est pas expirée
-    IF v_subscription_current_period_end IS NULL OR v_subscription_current_period_end > NOW() THEN
+  -- Condition B: Abonnement actif
+  -- subscription_status IN ('active','trialing') ET (subscription_current_period_end IS NULL OU now() < subscription_current_period_end)
+  IF v_subscription_status IN ('active', 'trialing') THEN
+    IF v_subscription_current_period_end IS NULL OR NOW() < v_subscription_current_period_end THEN
       RETURN true;
     END IF;
-  END IF;
-
-  -- Si is_active est explicitement true, retourner true
-  IF v_is_active = true THEN
-    RETURN true;
   END IF;
 
   -- Sinon, l'entreprise n'est pas active
@@ -93,7 +79,6 @@ DECLARE
   v_trial_ends_at TIMESTAMPTZ;
   v_subscription_status TEXT;
   v_subscription_current_period_end TIMESTAMPTZ;
-  v_is_active BOOLEAN;
 BEGIN
   -- Récupérer entreprise_id depuis le profil de l'utilisateur connecté
   SELECT entreprise_id INTO v_entreprise_id
@@ -110,34 +95,26 @@ BEGIN
   SELECT 
     trial_ends_at,
     subscription_status,
-    subscription_current_period_end,
-    is_active
+    subscription_current_period_end
   INTO 
     v_trial_ends_at,
     v_subscription_status,
-    v_subscription_current_period_end,
-    v_is_active
+    v_subscription_current_period_end
   FROM entreprises
   WHERE id = v_entreprise_id;
 
-  -- Vérifier la période d'essai
-  -- Si trial_ends_at existe et est dans le futur, l'entreprise est active
-  IF v_trial_ends_at IS NOT NULL AND v_trial_ends_at > NOW() THEN
+  -- Condition A: Période d'essai active
+  -- trial_ends_at IS NOT NULL ET now() < trial_ends_at
+  IF v_trial_ends_at IS NOT NULL AND NOW() < v_trial_ends_at THEN
     RETURN true;
   END IF;
 
-  -- Vérifier le statut d'abonnement Stripe
-  -- Si subscription_status est 'trialing' ou 'active', l'entreprise est active
-  IF v_subscription_status IN ('trialing', 'active') THEN
-    -- Vérifier aussi que la période n'est pas expirée
-    IF v_subscription_current_period_end IS NULL OR v_subscription_current_period_end > NOW() THEN
+  -- Condition B: Abonnement actif
+  -- subscription_status IN ('active','trialing') ET (subscription_current_period_end IS NULL OU now() < subscription_current_period_end)
+  IF v_subscription_status IN ('active', 'trialing') THEN
+    IF v_subscription_current_period_end IS NULL OR NOW() < v_subscription_current_period_end THEN
       RETURN true;
     END IF;
-  END IF;
-
-  -- Si is_active est explicitement true, retourner true
-  IF v_is_active = true THEN
-    RETURN true;
   END IF;
 
   -- Sinon, l'entreprise n'est pas active
