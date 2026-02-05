@@ -27,6 +27,22 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  line-height: 1.6;
+}
+
+/* Amélioration de la lisibilité des paragraphes */
+p {
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
+
+/* Titres plus marqués avec meilleure hiérarchie */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  text-rendering: optimizeLegibility;
 }
 
 /* Animation pour le bandeau PWA */
@@ -47,35 +63,69 @@ body {
 
 /* Styles globaux premium pour le dashboard */
 @layer components {
-  /* Cards premium harmonisées */
+  /* Cards premium harmonisées - légèrement plus claires */
   .dashboard-card {
-    @apply bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] shadow-sm;
-    transition: all 0.2s ease-out;
+    @apply backdrop-blur-sm rounded-xl shadow-sm;
+    background-color: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dashboard-card:hover {
-    @apply border-white/[0.12] bg-white/[0.04];
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
   }
 
-  /* Sections avec marges verticales harmonisées */
+  /* Sections avec marges verticales harmonisées - plus respirantes */
   .dashboard-section {
-    @apply mb-6 md:mb-8 lg:mb-10;
+    margin-bottom: 2rem;
   }
 
-  /* Titres de section uniformes */
+  @media (min-width: 768px) {
+    .dashboard-section {
+      margin-bottom: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .dashboard-section {
+      margin-bottom: 3rem;
+    }
+  }
+
+  /* Titres de section uniformes - plus marqués */
   .dashboard-section-title {
-    @apply text-lg md:text-xl font-semibold text-white/95 mb-5 md:mb-6 tracking-tight;
+    @apply text-lg md:text-xl font-semibold tracking-tight;
+    color: rgba(255, 255, 255, 0.98);
+    margin-bottom: 1.75rem;
   }
 
-  /* Conteneurs de liste premium */
+  @media (min-width: 768px) {
+    .dashboard-section-title {
+      margin-bottom: 2rem;
+    }
+  }
+
+  /* Conteneurs de liste premium - légèrement plus clairs */
   .dashboard-list-container {
-    @apply bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm;
+    @apply backdrop-blur-sm rounded-xl overflow-hidden shadow-sm;
+    background-color: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.09);
   }
 
   .dashboard-list-item {
-    @apply p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-200 ease-out;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    @apply hover:bg-white/[0.04] transition-colors;
+    padding: 1.5rem 1.5rem;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  @media (min-width: 768px) {
+    .dashboard-list-item {
+      padding: 1.75rem 2rem;
+    }
   }
 
   .dashboard-list-item:last-child {
@@ -85,19 +135,28 @@ body {
 
 /* Utilities globales pour polish final */
 @layer utilities {
-  /* Transitions douces globales */
+  /* Transitions douces globales - optimisées */
   .transition-smooth {
-    transition: all 0.2s ease-out;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Focus states subtils */
+  /* Focus states subtils - améliorés */
   .focus-subtle {
     @apply focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30;
+    transition: all 0.15s ease-out;
   }
 
-  /* Hover subtil pour liens */
+  /* Hover subtil pour liens - optimisé */
   .hover-subtle {
-    @apply transition-colors duration-200 ease-out;
+    transition: color 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+                background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }
+}
+
+/* Amélioration globale des contrastes et lisibilité */
+@layer base {
+  /* Amélioration subtile : les cartes avec bg-white/[0.02] ou bg-white/[0.03] 
+     bénéficient automatiquement d'un meilleur contraste via les classes Tailwind existantes */
 }
 
