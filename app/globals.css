@@ -45,3 +45,41 @@ body {
   animation: slide-up 0.3s ease-out;
 }
 
+/* Styles globaux premium pour le dashboard */
+@layer components {
+  /* Cards premium harmonisées */
+  .dashboard-card {
+    @apply bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] shadow-sm;
+    transition: all 0.3s ease-out;
+  }
+
+  .dashboard-card:hover {
+    @apply border-white/[0.12] bg-white/[0.04];
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  /* Sections avec marges verticales harmonisées */
+  .dashboard-section {
+    @apply mb-6 md:mb-8 lg:mb-10;
+  }
+
+  /* Titres de section uniformes */
+  .dashboard-section-title {
+    @apply text-lg md:text-xl font-semibold text-white/95 mb-5 md:mb-6 tracking-tight;
+  }
+
+  /* Conteneurs de liste premium */
+  .dashboard-list-container {
+    @apply bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm;
+  }
+
+  .dashboard-list-item {
+    @apply p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-300 ease-out;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .dashboard-list-item:last-child {
+    border-bottom: none;
+  }
+}
+
