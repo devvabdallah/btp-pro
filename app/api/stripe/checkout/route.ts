@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,14 +26,40 @@ export async function POST(request: NextRequest) {
     })
 
     // 3. Récupérer l'utilisateur connecté
-    const supabase = await createSupabaseServerClient()
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    // Priorité: header Authorization Bearer token, sinon fallback sur cookies
+    let user = null
+    let supabase = null
 
-    if (userError || !user) {
-      return NextResponse.json(
-        { error: 'Non authentifié' },
-        { status: 401 }
-      )
+    const authHeader = request.headers.get('authorization')
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      // Utiliser le token depuis le header Authorization
+      const token = authHeader.substring(7)
+      const adminSupabase = createSupabaseAdminClient()
+      const { data: { user: authUser }, error: userError } = await adminSupabase.auth.getUser(token)
+
+      if (userError || !authUser) {
+        return NextResponse.json(
+          { error: 'Non authentifié' },
+          { status: 401 }
+        )
+      }
+
+      user = authUser
+      // Utiliser le client admin pour les requêtes suivantes
+      supabase = adminSupabase
+    } else {
+      // Fallback: utiliser les cookies
+      supabase = await createSupabaseServerClient()
+      const { data: { user: authUser }, error: userError } = await supabase.auth.getUser()
+
+      if (userError || !authUser) {
+        return NextResponse.json(
+          { error: 'Non authentifié' },
+          { status: 401 }
+        )
+      }
+
+      user = authUser
     }
 
     // 4. Récupérer le profil pour obtenir entreprise_id

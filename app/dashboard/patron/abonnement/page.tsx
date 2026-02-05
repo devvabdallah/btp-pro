@@ -248,10 +248,21 @@ export default function AbonnementPage() {
     setCheckoutError(null)
 
     try {
+      // Récupérer la session Supabase pour obtenir le token
+      const supabase = createSupabaseBrowserClient()
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError || !session) {
+        throw new Error('Session non disponible')
+      }
+
+      const accessToken = session.access_token
+
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
         },
         credentials: 'include',
       })
