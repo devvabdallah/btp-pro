@@ -293,14 +293,14 @@ export default function AbonnementPage() {
   }
 
   return (
-    <div className="space-y-8 md:space-y-12">
+    <div className="space-y-10 md:space-y-14">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 md:gap-6">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
         <div className="flex-1">
-          <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3 tracking-[-0.02em] leading-[1.2]">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white/95 mb-3.5 tracking-[-0.02em] leading-[1.15]">
             Mon abonnement
           </h1>
-          <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
+          <p className="text-sm md:text-[15px] text-gray-400/85 leading-relaxed font-normal">
             Gérez votre abonnement BTP PRO
           </p>
         </div>
@@ -311,22 +311,22 @@ export default function AbonnementPage() {
         {/* Badge statut */}
         <div className="mb-6">
           {status === 'active' && (
-            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300 border border-green-500/30">
+            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300/95 border border-green-500/30">
               Actif
             </span>
           )}
           {status === 'trial' && (
-            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
+            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300/95 border border-blue-500/30">
               Essai gratuit
             </span>
           )}
           {status === 'expired' && (
-            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-300 border border-red-500/30">
+            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-300/95 border border-red-500/30">
               Expiré
             </span>
           )}
           {status === 'unknown' && (
-            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-300 border border-gray-500/30">
+            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-300/95 border border-gray-500/30">
               Statut indisponible
             </span>
           )}
@@ -335,7 +335,7 @@ export default function AbonnementPage() {
         {/* Message si statut inconnu */}
         {status === 'unknown' && (
           <div className="mb-6 bg-gray-500/20 border border-gray-500/50 rounded-xl p-4 backdrop-blur-sm">
-            <p className="text-gray-300/90 text-sm">
+            <p className="text-gray-300/85 text-sm">
               Statut indisponible (configuration en cours)
             </p>
           </div>
@@ -343,18 +343,18 @@ export default function AbonnementPage() {
 
         {/* Informations */}
         <div className="space-y-4 mb-8">
-          <div className="flex items-center justify-between py-3 border-b border-white/[0.06]">
-            <span className="text-gray-400/80 text-sm md:text-base">Prix :</span>
-            <span className="text-white font-semibold text-sm md:text-base tabular-nums">50€/mois</span>
+          <div className="flex items-center justify-between py-3.5 border-b border-white/[0.06]">
+            <span className="text-gray-400/75 text-sm md:text-base">Prix :</span>
+            <span className="text-white/95 font-semibold text-sm md:text-base tabular-nums tracking-tight">50€/mois</span>
           </div>
-          <div className="flex items-center justify-between py-3 border-b border-white/[0.06]">
-            <span className="text-gray-400/80 text-sm md:text-base">Essai :</span>
-            <span className="text-white font-semibold text-sm md:text-base">5 jours</span>
+          <div className="flex items-center justify-between py-3.5 border-b border-white/[0.06]">
+            <span className="text-gray-400/75 text-sm md:text-base">Essai :</span>
+            <span className="text-white/95 font-semibold text-sm md:text-base">5 jours</span>
           </div>
           {status === 'trial' && daysRemaining !== null && daysRemaining > 0 && (
-            <div className="flex items-center justify-between py-3 border-b border-white/[0.06]">
-              <span className="text-gray-400/80 text-sm md:text-base">Jours restants :</span>
-              <span className="text-yellow-400/90 font-semibold text-base md:text-lg tabular-nums">{daysRemaining} jour{daysRemaining > 1 ? 's' : ''}</span>
+            <div className="flex items-center justify-between py-3.5 border-b border-white/[0.06]">
+              <span className="text-gray-400/75 text-sm md:text-base">Jours restants :</span>
+              <span className="text-yellow-400/95 font-semibold text-base md:text-lg tabular-nums tracking-tight">{daysRemaining} jour{daysRemaining > 1 ? 's' : ''}</span>
             </div>
           )}
         </div>

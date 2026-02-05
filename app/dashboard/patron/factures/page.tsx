@@ -130,14 +130,14 @@ export default function FacturesPage() {
   }
 
   return (
-    <div className="space-y-8 md:space-y-12">
+    <div className="space-y-10 md:space-y-14">
       {/* Header avec titre et bouton */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 md:gap-6">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
         <div className="flex-1">
-          <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3 tracking-[-0.02em] leading-[1.2]">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white/95 mb-3.5 tracking-[-0.02em] leading-[1.15]">
             Mes factures
           </h1>
-          <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
+          <p className="text-sm md:text-[15px] text-gray-400/85 leading-relaxed font-normal">
             Gérez vos factures et suivez les paiements
           </p>
         </div>
@@ -171,18 +171,18 @@ export default function FacturesPage() {
       {/* Erreur */}
       {error && (
         <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
-          <p className="text-red-400 text-sm">{error}</p>
+          <p className="text-red-400/95 text-sm">{error}</p>
         </div>
       )}
 
       {/* Liste des factures */}
       {loading ? (
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/80 text-center text-sm md:text-base">Chargement...</p>
+          <p className="text-gray-400/75 text-center text-sm md:text-base">Chargement...</p>
         </div>
       ) : invoices.length === 0 ? (
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/80 text-center text-sm md:text-base">Aucune facture pour le moment.</p>
+          <p className="text-gray-400/75 text-center text-sm md:text-base">Aucune facture pour le moment.</p>
         </div>
       ) : (
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
@@ -191,31 +191,31 @@ export default function FacturesPage() {
               <Link
                 key={invoice.id}
                 href={`/dashboard/patron/factures/${invoice.id}`}
-                className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-200"
+                className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-300 ease-out group"
               >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3.5 md:gap-4">
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-2">
-                      <h3 className="text-lg md:text-xl font-semibold text-white leading-tight">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-2.5">
+                      <h3 className="text-lg md:text-xl font-semibold text-white/95 group-hover:text-yellow-400/90 transition-colors duration-200 leading-tight">
                         {invoice.title || invoice.client}
                       </h3>
                       {getStatusBadge(invoice.status)}
                     </div>
                     <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
-                      <span className="text-gray-300/90 text-sm md:text-base font-medium">
+                      <span className="text-gray-300/85 text-sm md:text-base font-medium">
                         {invoice.client}
                       </span>
-                      <span className="hidden md:inline text-gray-500/60">•</span>
-                      <span className="text-gray-400/80 text-sm md:text-base">
+                      <span className="hidden md:inline text-gray-500/55">•</span>
+                      <span className="text-gray-400/75 text-sm md:text-base">
                         {formatDate(invoice.created_at)}
                       </span>
                     </div>
                   </div>
                   <div className="text-left md:text-right">
-                    <p className="text-lg md:text-xl font-semibold text-white tabular-nums leading-none tracking-tight">
+                    <p className="text-lg md:text-xl font-semibold text-white/95 tabular-nums leading-[1.1] tracking-tight">
                       {formatAmount(invoice.amount_ht)}
                     </p>
-                    <p className="text-gray-400/70 text-xs mt-0.5">HT</p>
+                    <p className="text-gray-400/65 text-xs mt-0.5">HT</p>
                   </div>
                 </div>
               </Link>

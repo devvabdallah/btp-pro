@@ -142,14 +142,14 @@ export default function ClientsPage() {
   }, [debouncedSearchQuery, clients])
 
   return (
-    <div className="space-y-8 md:space-y-12">
+    <div className="space-y-10 md:space-y-14">
       {/* Header avec titre et bouton */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 md:gap-6">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
         <div className="flex-1">
-          <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3 tracking-[-0.02em] leading-[1.2]">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white/95 mb-3.5 tracking-[-0.02em] leading-[1.15]">
             Mes clients
           </h1>
-          <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
+          <p className="text-sm md:text-[15px] text-gray-400/85 leading-relaxed font-normal">
             Gérez votre base de clients
           </p>
         </div>
@@ -176,18 +176,18 @@ export default function ClientsPage() {
       {/* Erreur */}
       {error && (
         <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
-          <p className="text-red-400 text-sm">{error}</p>
+          <p className="text-red-400/95 text-sm">{error}</p>
         </div>
       )}
 
       {/* Liste des clients */}
       {loading ? (
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/80 text-center text-sm md:text-base">Chargement...</p>
+          <p className="text-gray-400/75 text-center text-sm md:text-base">Chargement...</p>
         </div>
       ) : filteredClients.length === 0 ? (
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/80 text-center text-sm md:text-base">
+          <p className="text-gray-400/75 text-center text-sm md:text-base">
             {searchQuery ? 'Aucun client trouvé.' : 'Aucun client pour le moment.'}
           </p>
         </div>
@@ -198,24 +198,24 @@ export default function ClientsPage() {
               <Link
                 key={client.id}
                 href={`/dashboard/patron/clients/${client.id}`}
-                className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-200"
+                className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-300 ease-out group"
               >
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 md:gap-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg md:text-xl font-semibold text-white mb-2 leading-tight">
+                    <h3 className="text-lg md:text-xl font-semibold text-white/95 mb-2.5 group-hover:text-yellow-400/90 transition-colors duration-200 leading-tight">
                       {client.last_name.toUpperCase()} {client.first_name}
                     </h3>
                     <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
-                      <span className="text-gray-300/90 text-sm md:text-base whitespace-nowrap font-medium">
+                      <span className="text-gray-300/85 text-sm md:text-base whitespace-nowrap font-medium">
                         {client.phone}
                       </span>
-                      <span className="hidden md:inline text-gray-500/60 mx-0.5">•</span>
-                      <p className="text-gray-300/90 text-sm md:text-base truncate md:whitespace-normal">
+                      <span className="hidden md:inline text-gray-500/55 mx-0.5">•</span>
+                      <p className="text-gray-300/85 text-sm md:text-base truncate md:whitespace-normal">
                         {client.address}
                       </p>
                     </div>
                   </div>
-                  <div className="text-gray-400/70 text-lg md:text-xl flex-shrink-0 ml-2 md:ml-3 flex items-center">
+                  <div className="text-gray-400/60 text-lg md:text-xl flex-shrink-0 ml-2 md:ml-3 flex items-center group-hover:text-gray-400/80 transition-colors duration-200">
                     →
                   </div>
                 </div>
