@@ -111,9 +111,9 @@ export default function FacturesPage() {
   // Badge de statut
   const getStatusBadge = (status: string) => {
     const styles = {
-      draft: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
-      sent: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-      paid: 'bg-green-500/20 text-green-300 border-green-500/30',
+      draft: 'bg-gray-500/15 text-gray-300/90 border-gray-500/25',
+      sent: 'bg-blue-500/15 text-blue-300/90 border-blue-500/25',
+      paid: 'bg-green-500/15 text-green-300/90 border-green-500/25',
     }
     const labels = {
       draft: 'Brouillon',
@@ -122,7 +122,7 @@ export default function FacturesPage() {
     }
     return (
       <span
-        className={`px-2.5 py-1 rounded-full text-xs font-medium border ${styles[status as keyof typeof styles] || styles.draft}`}
+        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${styles[status as keyof typeof styles] || styles.draft}`}
       >
         {labels[status as keyof typeof labels] || status}
       </span>
@@ -177,12 +177,22 @@ export default function FacturesPage() {
 
       {/* Liste des factures */}
       {loading ? (
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/75 text-center text-sm md:text-base">Chargement...</p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-12 md:p-16 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/70 text-center text-sm md:text-base font-medium">Chargement...</p>
         </div>
       ) : invoices.length === 0 ? (
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/75 text-center text-sm md:text-base">Aucune facture pour le moment.</p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-12 md:p-16 border border-white/[0.06] shadow-sm">
+          <div className="text-center space-y-4">
+            <p className="text-gray-400/80 text-base md:text-lg font-medium">Aucune facture pour le moment</p>
+            <p className="text-gray-500/70 text-sm md:text-base">Commencez par créer votre première facture</p>
+            <div className="pt-2">
+              <Link href="/dashboard/patron/factures/nouveau">
+                <Button variant="primary" size="md" className="min-h-[44px] px-6" disabled={isCompanyActive === false}>
+                  Créer une facture
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
@@ -191,31 +201,31 @@ export default function FacturesPage() {
               <Link
                 key={invoice.id}
                 href={`/dashboard/patron/factures/${invoice.id}`}
-                className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-300 ease-out group"
+                className="block p-5 md:p-6 hover:bg-white/[0.04] transition-all duration-300 ease-out group border-l-2 border-transparent hover:border-yellow-500/30"
               >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3.5 md:gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 mb-2.5">
-                      <h3 className="text-lg md:text-xl font-semibold text-white/95 group-hover:text-yellow-400/90 transition-colors duration-200 leading-tight">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
+                      <h3 className="text-base md:text-lg font-semibold text-white/95 group-hover:text-yellow-400/95 transition-colors duration-200 leading-snug">
                         {invoice.title || invoice.client}
                       </h3>
                       {getStatusBadge(invoice.status)}
                     </div>
-                    <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
-                      <span className="text-gray-300/85 text-sm md:text-base font-medium">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-sm">
+                      <span className="text-gray-300/80 font-medium">
                         {invoice.client}
                       </span>
-                      <span className="hidden md:inline text-gray-500/55">•</span>
-                      <span className="text-gray-400/75 text-sm md:text-base">
+                      <span className="hidden sm:inline text-gray-500/50">•</span>
+                      <span className="text-gray-400/70">
                         {formatDate(invoice.created_at)}
                       </span>
                     </div>
                   </div>
-                  <div className="text-left md:text-right">
-                    <p className="text-lg md:text-xl font-semibold text-white/95 tabular-nums leading-[1.1] tracking-tight">
+                  <div className="text-left md:text-right flex-shrink-0">
+                    <p className="text-xl md:text-2xl font-semibold text-white/95 tabular-nums leading-none tracking-tight">
                       {formatAmount(invoice.amount_ht)}
                     </p>
-                    <p className="text-gray-400/65 text-xs mt-0.5">HT</p>
+                    <p className="text-gray-400/60 text-xs mt-1 font-medium">HT</p>
                   </div>
                 </div>
               </Link>
