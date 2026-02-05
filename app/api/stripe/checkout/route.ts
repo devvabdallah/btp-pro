@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+
+if (!stripeSecretKey) {
+  throw new Error('STRIPE_SECRET_KEY is not set')
+}
+
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
 })
 
@@ -86,9 +92,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 6. Créer la session Stripe Checkout
-    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    
+    // 6. Récupérer APP_URL depuis les variables d'environnement
+    const appUrl = process.env.APP_URL
+
+    if (!appUrl) {
+      console.error('[Stripe Checkout] APP_URL manquant')
+      return NextResponse.json(
+        { error: 'Configuration incomplète' },
+        { status: 500 }
+      )
+    }
+
+    // 7. Créer la session Stripe Checkout
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
@@ -98,21 +113,15 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      subscription_data: {
-        trial_period_days: 5,
-        metadata: {
-          entreprise_id: entreprise.id,
-        },
-      },
-      success_url: `${origin}/dashboard/patron?checkout=success`,
-      cancel_url: `${origin}/dashboard/patron/abonnement?checkout=cancel`,
+      success_url: `${appUrl}/dashboard/patron/abonnement?success=1`,
+      cancel_url: `${appUrl}/dashboard/patron/abonnement?canceled=1`,
       metadata: {
         entreprise_id: entreprise.id,
         user_id: user.id,
       },
     })
 
-    return NextResponse.json({ sessionId: session.id, url: session.url })
+    return NextResponse.json({ url: session.url })
   } catch (error) {
     console.error('[Stripe Checkout] Error:', error)
     return NextResponse.json(
