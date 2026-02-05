@@ -2,15 +2,31 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
-})
-
 // Configuration pour recevoir le raw body (nécessaire pour Stripe webhooks)
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
+  // 1. Vérifier les variables d'environnement Stripe (uniquement à l'exécution)
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
+
+  if (!stripeSecretKey || !webhookSecret) {
+    console.error('[Stripe Webhook] Variables d\'environnement Stripe manquantes:', {
+      hasSecretKey: !!stripeSecretKey,
+      hasWebhookSecret: !!webhookSecret,
+    })
+    return NextResponse.json(
+      { error: 'Stripe non configuré' },
+      { status: 500 }
+    )
+  }
+
+  // 2. Initialiser Stripe uniquement si les variables sont présentes
+  const stripe = new Stripe(stripeSecretKey, {
+    apiVersion: '2023-10-16',
+  })
+
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')
 
@@ -22,21 +38,13 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (!process.env.STRIPE_WEBHOOK_SECRET) {
-    console.error('[Stripe Webhook] STRIPE_WEBHOOK_SECRET manquant')
-    return NextResponse.json(
-      { error: 'Configuration webhook manquante' },
-      { status: 500 }
-    )
-  }
-
   let event: Stripe.Event
 
   try {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      webhookSecret
     )
   } catch (err) {
     console.error('[Stripe Webhook] Signature verification failed:', err)

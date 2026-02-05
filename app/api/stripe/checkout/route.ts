@@ -2,19 +2,29 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY
-
-if (!stripeSecretKey) {
-  throw new Error('STRIPE_SECRET_KEY is not set')
-}
-
-const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: '2023-10-16',
-})
-
 export async function POST(request: NextRequest) {
   try {
-    // 1. Récupérer l'utilisateur connecté
+    // 1. Vérifier les variables d'environnement Stripe (uniquement à l'exécution)
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+    const priceId = process.env.STRIPE_PRICE_ID
+
+    if (!stripeSecretKey || !priceId) {
+      console.error('[Stripe Checkout] Variables d\'environnement Stripe manquantes:', {
+        hasSecretKey: !!stripeSecretKey,
+        hasPriceId: !!priceId,
+      })
+      return NextResponse.json(
+        { error: 'Stripe non configuré' },
+        { status: 500 }
+      )
+    }
+
+    // 2. Initialiser Stripe uniquement si les variables sont présentes
+    const stripe = new Stripe(stripeSecretKey, {
+      apiVersion: '2023-10-16',
+    })
+
+    // 3. Récupérer l'utilisateur connecté
     const supabase = await createSupabaseServerClient()
     const { data: { user }, error: userError } = await supabase.auth.getUser()
 
@@ -25,7 +35,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 2. Récupérer le profil pour obtenir entreprise_id
+    // 4. Récupérer le profil pour obtenir entreprise_id
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('entreprise_id, role')
@@ -47,7 +57,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 3. Récupérer l'entreprise pour vérifier/créer le customer Stripe
+    // 5. Récupérer l'entreprise pour vérifier/créer le customer Stripe
     const { data: entreprise, error: entrepriseError } = await supabase
       .from('entreprises')
       .select('id, name, stripe_customer_id')
@@ -61,7 +71,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 4. Créer ou récupérer le customer Stripe
+    // 6. Créer ou récupérer le customer Stripe
     let customerId = entreprise.stripe_customer_id
 
     if (!customerId) {
@@ -82,18 +92,7 @@ export async function POST(request: NextRequest) {
         .eq('id', entreprise.id)
     }
 
-    // 5. Récupérer le price ID depuis les variables d'environnement
-    const priceId = process.env.STRIPE_PRICE_ID
-
-    if (!priceId) {
-      console.error('[Stripe Checkout] STRIPE_PRICE_ID manquant')
-      return NextResponse.json(
-        { error: 'Configuration Stripe incomplète' },
-        { status: 500 }
-      )
-    }
-
-    // 6. Récupérer APP_URL depuis les variables d'environnement
+    // 7. Récupérer APP_URL depuis les variables d'environnement
     const appUrl = process.env.APP_URL
 
     if (!appUrl) {
@@ -104,7 +103,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 7. Créer la session Stripe Checkout
+    // 8. Créer la session Stripe Checkout
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
