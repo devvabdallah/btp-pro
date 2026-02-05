@@ -120,13 +120,20 @@ export async function registerUser(formData: FormData): Promise<AuthResult | nev
       // Générer le code entreprise
       const code = generateEntrepriseCode()
 
-      // Créer l'entreprise
+      // Créer l'entreprise avec période d'essai de 5 jours
+      const trialStartDate = new Date()
+      const trialEndDate = new Date()
+      trialEndDate.setDate(trialEndDate.getDate() + 5)
+
       const { data: entrepriseData, error: entrepriseError } = await supabase
         .from('entreprises')
         .insert({
           name: companyName,
           code,
           owner_user_id: userId,
+          trial_started_at: trialStartDate.toISOString(),
+          trial_ends_at: trialEndDate.toISOString(),
+          subscription_status: 'trialing',
         })
         .select()
         .single()

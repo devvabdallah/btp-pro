@@ -110,14 +110,21 @@ export default function RegisterPage() {
 
       // Étape 2.3 : Création de l'entreprise + profil
       if (role === 'patron') {
-        // 1) Créer l'entreprise
+        // 1) Créer l'entreprise avec période d'essai de 5 jours
         const code = generateEntrepriseCode()
+        const trialStartDate = new Date()
+        const trialEndDate = new Date()
+        trialEndDate.setDate(trialEndDate.getDate() + 5)
+
         const { data: entrepriseData, error: entrepriseError } = await supabase
           .from('entreprises')
           .insert({
             name: enterpriseName.trim(),
             code,
             owner_user_id: user.id,
+            trial_started_at: trialStartDate.toISOString(),
+            trial_ends_at: trialEndDate.toISOString(),
+            subscription_status: 'trialing',
           })
           .select('id')
           .single()
