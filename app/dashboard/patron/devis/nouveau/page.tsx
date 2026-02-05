@@ -302,16 +302,23 @@ export default function NouveauDevisPage() {
   }
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">Créer un devis</h1>
-        <p className="text-gray-400">Remplissez les informations pour créer un nouveau devis.</p>
+    <div className="space-y-10 md:space-y-12">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
+        <div className="flex-1">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white/95 mb-3.5 tracking-[-0.02em] leading-[1.15]">
+            Créer un devis
+          </h1>
+          <p className="text-sm md:text-[15px] text-gray-400/85 leading-relaxed font-normal">
+            Remplissez les informations pour créer un nouveau devis
+          </p>
+        </div>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         {/* Informations de base */}
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 md:p-8 border border-[#2a2f4a]">
-          <h2 className="text-2xl font-bold text-white mb-6">Informations de base</h2>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm">
+          <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-6 tracking-tight">Informations de base</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input
               label="Nom du client"
@@ -342,10 +349,10 @@ export default function NouveauDevisPage() {
         </div>
 
         {/* Description du chantier */}
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 md:p-8 border border-[#2a2f4a]">
-          <h2 className="text-2xl font-bold text-white mb-4">Description du chantier</h2>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm">
+          <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-4 tracking-tight">Description du chantier</h2>
           <textarea
-            className="w-full px-4 py-3 bg-[#0f1429] border border-gray-600 rounded-2xl text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all resize-none mb-4"
+            className="w-full px-4 py-3 bg-white/[0.03] border border-white/[0.08] rounded-xl text-white/95 placeholder-gray-500/70 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all resize-none mb-4 text-sm md:text-base"
             rows={5}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -354,9 +361,10 @@ export default function NouveauDevisPage() {
           <Button
             type="button"
             variant="primary"
-            size="lg"
+            size="md"
             onClick={handleGenerateLines}
             disabled={!description.trim()}
+            className="min-h-[44px] px-6"
           >
             Préparer mon devis automatiquement
           </Button>
@@ -364,13 +372,13 @@ export default function NouveauDevisPage() {
 
         {/* Lignes de devis */}
         {lines.length > 0 && (
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 md:p-8 border border-[#2a2f4a]">
-            <div className="mb-4">
-              <p className="text-gray-300 text-sm mb-6">
+          <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm">
+            <div className="mb-6">
+              <p className="text-gray-400/80 text-sm mb-6 leading-relaxed">
                 Ce devis est automatiquement pré-rempli pour vous faire gagner du temps. Vous pouvez ajuster librement les quantités et les prix avant validation.
               </p>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <h2 className="text-2xl font-bold text-white">Lignes de devis</h2>
+                <h2 className="text-lg md:text-xl font-semibold text-white/95 tracking-tight">Lignes de devis</h2>
                 <Button type="button" variant="secondary" size="md" onClick={addLine} className="min-h-[44px] px-6">
                   + Ajouter une ligne
                 </Button>
@@ -381,7 +389,7 @@ export default function NouveauDevisPage() {
               {lines.map((line, index) => (
                 <div
                   key={line.id}
-                  className="bg-[#0f1429] rounded-2xl p-5 md:p-4 border-2 border-[#2a2f4a] hover:border-yellow-500/30 transition-all"
+                  className="bg-white/[0.03] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-300"
                 >
                   {/* Mobile: Card layout */}
                   <div className="md:hidden space-y-4">
@@ -395,7 +403,7 @@ export default function NouveauDevisPage() {
                         onChange={(e) => {
                           updateLine(line.id, 'description', e.target.value)
                         }}
-                        className="w-full px-4 py-3 bg-[#020617] border border-gray-600 rounded-xl text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl text-base text-white/95 placeholder-gray-500/70 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all"
                         placeholder="Description de la tâche"
                       />
                     </div>
@@ -408,7 +416,7 @@ export default function NouveauDevisPage() {
                           type="number"
                           value={line.quantite}
                           onChange={(e) => updateLine(line.id, 'quantite', parseFloat(e.target.value) || 0)}
-                          className="w-full px-4 py-3 bg-[#020617] border border-gray-600 rounded-xl text-base text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl text-base text-white/95 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all"
                           min="0"
                           step="0.01"
                         />
@@ -421,7 +429,7 @@ export default function NouveauDevisPage() {
                           type="text"
                           value={line.unite}
                           onChange={(e) => updateLine(line.id, 'unite', e.target.value)}
-                          className="w-full px-4 py-3 bg-[#020617] border border-gray-600 rounded-xl text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl text-base text-white/95 placeholder-gray-500/70 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all"
                           placeholder="pièce"
                         />
                       </div>
@@ -435,7 +443,7 @@ export default function NouveauDevisPage() {
                           type="number"
                           value={line.prix_unitaire}
                           onChange={(e) => updateLine(line.id, 'prix_unitaire', parseFloat(e.target.value) || 0)}
-                          className="w-full px-4 py-3 bg-[#020617] border border-gray-600 rounded-xl text-base text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          className="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl text-base text-white/95 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all"
                           min="0"
                           step="0.01"
                         />
@@ -444,7 +452,7 @@ export default function NouveauDevisPage() {
                         <label className="block text-sm font-semibold text-gray-300 mb-2">
                           Total ligne
                         </label>
-                        <div className="px-4 py-3 bg-[#1a1f3a] border border-gray-600 rounded-xl text-base text-white font-semibold">
+                        <div className="px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl text-base text-white/95 font-semibold tabular-nums">
                           {new Intl.NumberFormat('fr-FR', {
                             style: 'currency',
                             currency: 'EUR',
@@ -455,7 +463,7 @@ export default function NouveauDevisPage() {
                     <button
                       type="button"
                       onClick={() => removeLine(line.id)}
-                      className="w-full px-4 py-3 bg-red-500/20 border border-red-500/50 rounded-xl text-red-300 font-semibold hover:bg-red-500/30 transition-colors flex items-center justify-center gap-2"
+                      className="w-full px-4 py-3 bg-red-500/15 border border-red-500/30 rounded-xl text-red-300/90 font-medium hover:bg-red-500/20 hover:border-red-500/40 transition-all duration-200 flex items-center justify-center gap-2"
                     >
                       <span>✕</span>
                       <span>Supprimer la ligne</span>
@@ -474,7 +482,7 @@ export default function NouveauDevisPage() {
                         onChange={(e) => {
                           updateLine(line.id, 'description', e.target.value)
                         }}
-                        className="w-full px-4 py-2 bg-[#020617] border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        className="w-full px-4 py-2.5 bg-white/[0.05] border border-white/[0.1] rounded-xl text-white/95 placeholder-gray-500/70 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all"
                         placeholder="Description de la tâche"
                       />
                     </div>
@@ -486,7 +494,7 @@ export default function NouveauDevisPage() {
                         type="number"
                         value={line.quantite}
                         onChange={(e) => updateLine(line.id, 'quantite', parseFloat(e.target.value) || 0)}
-                        className="w-full px-4 py-2 bg-[#020617] border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        className="w-full px-4 py-2.5 bg-white/[0.05] border border-white/[0.1] rounded-xl text-white/95 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all"
                         min="0"
                         step="0.01"
                       />
@@ -499,7 +507,7 @@ export default function NouveauDevisPage() {
                         type="text"
                         value={line.unite}
                         onChange={(e) => updateLine(line.id, 'unite', e.target.value)}
-                        className="w-full px-4 py-2 bg-[#020617] border border-gray-600 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        className="w-full px-4 py-2.5 bg-white/[0.05] border border-white/[0.1] rounded-xl text-white/95 placeholder-gray-500/70 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all"
                         placeholder="m, pièce..."
                       />
                     </div>
@@ -511,7 +519,7 @@ export default function NouveauDevisPage() {
                         type="number"
                         value={line.prix_unitaire}
                         onChange={(e) => updateLine(line.id, 'prix_unitaire', parseFloat(e.target.value) || 0)}
-                        className="w-full px-4 py-2 bg-[#020617] border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        className="w-full px-4 py-2.5 bg-white/[0.05] border border-white/[0.1] rounded-xl text-white/95 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all"
                         min="0"
                         step="0.01"
                       />
@@ -527,10 +535,10 @@ export default function NouveauDevisPage() {
                       </button>
                     </div>
                   </div>
-                  <div className="hidden md:block mt-3 pt-3 border-t border-[#2a2f4a]">
+                  <div className="hidden md:block mt-4 pt-4 border-t border-white/[0.08]">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400 text-sm">Total ligne:</span>
-                      <span className="text-white font-semibold text-base">
+                      <span className="text-gray-400/80 text-sm font-medium">Total ligne:</span>
+                      <span className="text-white/95 font-semibold text-base tabular-nums">
                         {new Intl.NumberFormat('fr-FR', {
                           style: 'currency',
                           currency: 'EUR',
@@ -544,10 +552,10 @@ export default function NouveauDevisPage() {
             
             {/* Total HT visible */}
             {lines.length > 0 && (
-              <div className="mt-6 pt-6 border-t-2 border-[#2a2f4a]">
+              <div className="mt-6 pt-6 border-t border-white/[0.08]">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-white">Total HT:</span>
-                  <span className="text-xl md:text-2xl font-bold text-white">
+                  <span className="text-base md:text-lg font-semibold text-white/95">Total HT:</span>
+                  <span className="text-xl md:text-2xl font-semibold text-white/95 tabular-nums tracking-tight">
                     {new Intl.NumberFormat('fr-FR', {
                       style: 'currency',
                       currency: 'EUR',
@@ -561,40 +569,40 @@ export default function NouveauDevisPage() {
 
         {/* Résumé */}
         {lines.length > 0 && (
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 md:p-8 border border-[#2a2f4a]">
-            <h2 className="text-2xl font-bold text-white mb-6">Résumé</h2>
+          <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm">
+            <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-6 tracking-tight">Résumé</h2>
             <div className="space-y-4">
-              <div className="flex justify-between text-gray-300">
-                <span>Total HT:</span>
-                <span className="text-white font-semibold text-lg">
+              <div className="flex justify-between items-center py-2">
+                <span className="text-gray-400/80 text-sm md:text-base">Total HT:</span>
+                <span className="text-white/95 font-semibold text-base md:text-lg tabular-nums">
                   {new Intl.NumberFormat('fr-FR', {
                     style: 'currency',
                     currency: 'EUR',
                   }).format(getTotalHT())}
                 </span>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-2">
-                  <label className="text-gray-300">TVA (%):</label>
+                  <label className="text-gray-400/80 text-sm md:text-base">TVA (%):</label>
                   <input
                     type="number"
                     value={tva}
                     onChange={(e) => setTva(parseFloat(e.target.value) || 0)}
-                    className="w-20 px-3 py-1 bg-[#0f1429] border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                    className="w-20 px-3 py-1.5 bg-white/[0.05] border border-white/[0.1] rounded-lg text-white/95 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/30 transition-all"
                     min="0"
                     max="100"
                   />
                 </div>
-                <span className="text-gray-400 text-sm">
+                <span className="text-gray-400/70 text-sm tabular-nums">
                   TVA: {new Intl.NumberFormat('fr-FR', {
                     style: 'currency',
                     currency: 'EUR',
                   }).format(getTotalHT() * (tva / 100))}
                 </span>
               </div>
-              <div className="flex justify-between text-xl font-bold text-white pt-4 border-t border-[#2a2f4a]">
+              <div className="flex justify-between items-center text-lg md:text-xl font-semibold text-white/95 pt-4 border-t border-white/[0.08]">
                 <span>Total TTC:</span>
-                <span>
+                <span className="tabular-nums tracking-tight">
                   {new Intl.NumberFormat('fr-FR', {
                     style: 'currency',
                     currency: 'EUR',
