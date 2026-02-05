@@ -182,14 +182,28 @@ export default function ClientsPage() {
 
       {/* Liste des clients */}
       {loading ? (
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/75 text-center text-sm md:text-base">Chargement...</p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-12 md:p-16 border border-white/[0.06] shadow-sm">
+          <p className="text-gray-400/70 text-center text-sm md:text-base font-medium">Chargement...</p>
         </div>
       ) : filteredClients.length === 0 ? (
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-8 md:p-10 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/75 text-center text-sm md:text-base">
-            {searchQuery ? 'Aucun client trouvé.' : 'Aucun client pour le moment.'}
-          </p>
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-12 md:p-16 border border-white/[0.06] shadow-sm">
+          <div className="text-center space-y-4">
+            <p className="text-gray-400/80 text-base md:text-lg font-medium">
+              {searchQuery ? 'Aucun client trouvé' : 'Aucun client pour le moment'}
+            </p>
+            {!searchQuery && (
+              <>
+                <p className="text-gray-500/70 text-sm md:text-base">Commencez par ajouter votre premier client</p>
+                <div className="pt-2">
+                  <Link href="/dashboard/patron/clients/nouveau">
+                    <Button variant="primary" size="md" className="min-h-[44px] px-6">
+                      Ajouter un client
+                    </Button>
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       ) : (
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
@@ -198,19 +212,19 @@ export default function ClientsPage() {
               <Link
                 key={client.id}
                 href={`/dashboard/patron/clients/${client.id}`}
-                className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-300 ease-out group"
+                className="block p-5 md:p-6 hover:bg-white/[0.04] transition-all duration-300 ease-out group border-l-2 border-transparent hover:border-yellow-500/30"
               >
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 md:gap-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg md:text-xl font-semibold text-white/95 mb-2.5 group-hover:text-yellow-400/90 transition-colors duration-200 leading-tight">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <h3 className="text-base md:text-lg font-semibold text-white/95 group-hover:text-yellow-400/95 transition-colors duration-200 leading-snug">
                       {client.last_name.toUpperCase()} {client.first_name}
                     </h3>
-                    <div className="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
-                      <span className="text-gray-300/85 text-sm md:text-base whitespace-nowrap font-medium">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-sm">
+                      <span className="text-gray-300/80 whitespace-nowrap font-medium">
                         {client.phone}
                       </span>
-                      <span className="hidden md:inline text-gray-500/55 mx-0.5">•</span>
-                      <p className="text-gray-300/85 text-sm md:text-base truncate md:whitespace-normal">
+                      <span className="hidden sm:inline text-gray-500/50">•</span>
+                      <p className="text-gray-300/80 truncate sm:whitespace-normal">
                         {client.address}
                       </p>
                     </div>
