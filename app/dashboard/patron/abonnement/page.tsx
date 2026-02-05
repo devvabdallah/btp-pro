@@ -248,6 +248,11 @@ export default function AbonnementPage() {
     setCheckoutError(null)
 
     try {
+      // Vérifier que l'ID d'entreprise est disponible
+      if (!entrepriseId) {
+        throw new Error('Entreprise introuvable')
+      }
+
       // Récupérer la session Supabase pour obtenir le token
       const supabase = createSupabaseBrowserClient()
       const { data: { session }, error: sessionError } = await supabase.auth.getSession()
@@ -264,6 +269,7 @@ export default function AbonnementPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${accessToken}`,
         },
+        body: JSON.stringify({ companyId: entrepriseId }),
         credentials: 'include',
       })
 

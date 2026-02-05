@@ -25,7 +25,26 @@ export async function POST(request: NextRequest) {
       apiVersion: '2023-10-16',
     })
 
-    // 3. Récupérer l'utilisateur connecté
+    // 3. Lire le body pour obtenir companyId
+    let body
+    try {
+      body = await request.json()
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Body JSON invalide' },
+        { status: 400 }
+      )
+    }
+
+    const companyId = body?.companyId
+    if (!companyId) {
+      return NextResponse.json(
+        { error: 'companyId manquant' },
+        { status: 400 }
+      )
+    }
+
+    // 4. Récupérer l'utilisateur connecté
     // Priorité: header Authorization Bearer token, sinon fallback sur cookies
     let user = null
     let supabase = null
@@ -62,16 +81,16 @@ export async function POST(request: NextRequest) {
       user = authUser
     }
 
-    // 4. Récupérer le profil pour obtenir entreprise_id
+    // 5. Récupérer le profil pour vérifier le rôle (patron uniquement)
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('entreprise_id, role')
+      .select('role')
       .eq('id', user.id)
       .single()
 
-    if (profileError || !profile || !profile.entreprise_id) {
+    if (profileError || !profile) {
       return NextResponse.json(
-        { error: 'Entreprise introuvable' },
+        { error: 'Profil introuvable' },
         { status: 404 }
       )
     }
@@ -84,11 +103,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 5. Récupérer l'entreprise pour vérifier/créer le customer Stripe
+    // 6. Récupérer l'entreprise pour vérifier/créer le customer Stripe
     const { data: entreprise, error: entrepriseError } = await supabase
       .from('entreprises')
       .select('id, name, stripe_customer_id')
-      .eq('id', profile.entreprise_id)
+      .eq('id', companyId)
       .single()
 
     if (entrepriseError || !entreprise) {
@@ -98,7 +117,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 6. Créer ou récupérer le customer Stripe
+    // 7. Créer ou récupérer le customer Stripe
     let customerId = entreprise.stripe_customer_id
 
     if (!customerId) {
@@ -119,7 +138,7 @@ export async function POST(request: NextRequest) {
         .eq('id', entreprise.id)
     }
 
-    // 7. Récupérer APP_URL depuis les variables d'environnement
+    // 8. Récupérer APP_URL depuis les variables d'environnement
     const appUrl = process.env.APP_URL
 
     if (!appUrl) {
@@ -130,7 +149,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 8. Créer la session Stripe Checkout
+    // 9. Créer la session Stripe Checkout
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
