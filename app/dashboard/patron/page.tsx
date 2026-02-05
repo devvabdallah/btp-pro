@@ -207,6 +207,11 @@ export default function PatronDashboard() {
           <p className="text-[24px] md:text-[32px] font-semibold text-white/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatAmount(caMois)}
           </p>
+          {!loading && caMois === 0 && (
+            <p className="text-xs text-gray-400/70 mt-2.5 leading-relaxed">
+              Le chiffre d'affaires apparaîtra dès la première facture.
+            </p>
+          )}
         </div>
         
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
@@ -216,6 +221,11 @@ export default function PatronDashboard() {
           <p className="text-[24px] md:text-[32px] font-semibold text-blue-400/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatKPIValue(devisEnAttente)}
           </p>
+          {!loading && devisEnAttente === 0 && (
+            <p className="text-xs text-gray-400/70 mt-2.5 leading-relaxed">
+              Créez un devis pour démarrer.
+            </p>
+          )}
         </div>
         
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
@@ -225,6 +235,11 @@ export default function PatronDashboard() {
           <p className="text-[24px] md:text-[32px] font-semibold text-green-400/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatKPIValue(chantiersEnCours)}
           </p>
+          {!loading && chantiersEnCours === 0 && (
+            <p className="text-xs text-gray-400/70 mt-2.5 leading-relaxed">
+              Les chantiers actifs s'afficheront ici.
+            </p>
+          )}
         </div>
         
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
@@ -234,6 +249,11 @@ export default function PatronDashboard() {
           <p className="text-[24px] md:text-[32px] font-semibold text-yellow-400/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatKPIValue(nbClients)}
           </p>
+          {!loading && nbClients === 0 && (
+            <p className="text-xs text-gray-400/70 mt-2.5 leading-relaxed">
+              Ajoutez votre premier client.
+            </p>
+          )}
         </div>
       </div>
 
@@ -293,7 +313,12 @@ export default function PatronDashboard() {
             </div>
           ) : quotes.length === 0 ? (
             <div className="p-10 text-center">
-              <p className="text-gray-400/70 text-sm font-normal">Aucun devis récent pour le moment.</p>
+              <p className="text-gray-400/70 text-sm font-normal mb-2">
+                Aucun devis pour le moment. Commencez par créer votre premier devis.
+              </p>
+              <Link href="/dashboard/patron/devis/nouveau" className="inline-block text-xs text-yellow-400/80 hover:text-yellow-400/95 transition-colors duration-150 underline underline-offset-2">
+                Créer un devis
+              </Link>
             </div>
           ) : (
             <div className="divide-y divide-white/[0.06]">
