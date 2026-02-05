@@ -177,148 +177,148 @@ export default function PatronDashboard() {
   }
 
   return (
-    <div className="space-y-8 md:space-y-10">
+    <div className="space-y-8 md:space-y-12">
       {/* Header avec titre et numéro entreprise discret */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 md:gap-6">
         <div className="flex-1">
-          <h1 className="text-3xl md:text-4xl font-semibold text-white mb-2 tracking-tight leading-tight">
+          <h1 className="text-[28px] md:text-4xl font-semibold text-white mb-3 tracking-[-0.02em] leading-[1.2]">
             Tableau de bord
           </h1>
-          <p className="text-sm md:text-base text-gray-400 opacity-80 leading-relaxed">
+          <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
             Vue d'ensemble de votre activité
           </p>
         </div>
         
         {/* Numéro entreprise discret */}
         {entrepriseCode && (
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
-            <span className="text-gray-400 text-xs font-medium">N° entreprise</span>
-            <span className="text-white text-sm font-mono font-semibold">{entrepriseCode}</span>
+          <div className="flex items-center gap-2.5 px-4 py-2.5 bg-white/[0.03] rounded-lg border border-white/[0.08] backdrop-blur-sm">
+            <span className="text-gray-400/80 text-[11px] font-medium tracking-wide uppercase">N° entreprise</span>
+            <span className="text-white text-sm font-mono font-semibold tracking-tight">{entrepriseCode}</span>
           </div>
         )}
       </div>
 
-      {/* KPIs Cards - Design sobre et professionnel */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 transition-colors">
-          <p className="text-[11px] uppercase tracking-wider opacity-70 text-gray-400 mb-2">
+      {/* KPIs Cards - Design premium sobre */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-200 shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/70 mb-3 font-medium">
             CA du mois
           </p>
-          <p className="text-2xl md:text-3xl font-semibold text-white tabular-nums">
+          <p className="text-[24px] md:text-[32px] font-semibold text-white tabular-nums leading-none tracking-tight">
             {loading ? '—' : formatAmount(caMois)}
           </p>
         </div>
         
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 transition-colors">
-          <p className="text-[11px] uppercase tracking-wider opacity-70 text-gray-400 mb-2">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-200 shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/70 mb-3 font-medium">
             Devis en attente
           </p>
-          <p className="text-2xl md:text-3xl font-semibold text-blue-400 tabular-nums">
+          <p className="text-[24px] md:text-[32px] font-semibold text-blue-400/90 tabular-nums leading-none tracking-tight">
             {loading ? '—' : formatKPIValue(devisEnAttente)}
           </p>
         </div>
         
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 transition-colors">
-          <p className="text-[11px] uppercase tracking-wider opacity-70 text-gray-400 mb-2">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-200 shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/70 mb-3 font-medium">
             Chantiers en cours
           </p>
-          <p className="text-2xl md:text-3xl font-semibold text-green-400 tabular-nums">
+          <p className="text-[24px] md:text-[32px] font-semibold text-green-400/90 tabular-nums leading-none tracking-tight">
             {loading ? '—' : formatKPIValue(chantiersEnCours)}
           </p>
         </div>
         
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/10 hover:border-white/20 transition-colors">
-          <p className="text-[11px] uppercase tracking-wider opacity-70 text-gray-400 mb-2">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-200 shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/70 mb-3 font-medium">
             Clients
           </p>
-          <p className="text-2xl md:text-3xl font-semibold text-yellow-400 tabular-nums">
+          <p className="text-[24px] md:text-[32px] font-semibold text-yellow-400/90 tabular-nums leading-none tracking-tight">
             {loading ? '—' : formatKPIValue(nbClients)}
           </p>
         </div>
       </div>
 
-      {/* Actions rapides - Design SaaS propre */}
+      {/* Actions rapides - Design premium sobre */}
       <div>
-        <h2 className="text-xl md:text-2xl font-semibold text-white mb-4 md:mb-6 tracking-tight">
+        <h2 className="text-lg md:text-xl font-semibold text-white mb-5 md:mb-6 tracking-tight">
           Actions rapides
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           <Link href="/dashboard/patron/devis/nouveau" className="group">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/10 hover:border-yellow-500/30 hover:bg-white/10 transition-all cursor-pointer">
-              <h3 className="text-base md:text-lg font-semibold text-white mb-1.5 group-hover:text-yellow-400 transition-colors">
+            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/20 hover:bg-white/[0.04] transition-all duration-200 cursor-pointer">
+              <h3 className="text-[15px] md:text-base font-semibold text-white mb-1.5 group-hover:text-yellow-400/90 transition-colors leading-snug">
                 Créer un devis
               </h3>
-              <p className="text-gray-400 text-sm">Nouveau devis</p>
+              <p className="text-gray-400/80 text-sm leading-relaxed">Nouveau devis</p>
             </div>
           </Link>
           
           <Link href="/dashboard/patron/devis" className="group">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/10 hover:border-yellow-500/30 hover:bg-white/10 transition-all cursor-pointer">
-              <h3 className="text-base md:text-lg font-semibold text-white mb-1.5 group-hover:text-yellow-400 transition-colors">
+            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/20 hover:bg-white/[0.04] transition-all duration-200 cursor-pointer">
+              <h3 className="text-[15px] md:text-base font-semibold text-white mb-1.5 group-hover:text-yellow-400/90 transition-colors leading-snug">
                 Voir les devis
               </h3>
-              <p className="text-gray-400 text-sm">Tous les devis</p>
+              <p className="text-gray-400/80 text-sm leading-relaxed">Tous les devis</p>
             </div>
           </Link>
           
           <Link href="/dashboard/patron/factures" className="group">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/10 hover:border-yellow-500/30 hover:bg-white/10 transition-all cursor-pointer">
-              <h3 className="text-base md:text-lg font-semibold text-white mb-1.5 group-hover:text-yellow-400 transition-colors">
+            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/20 hover:bg-white/[0.04] transition-all duration-200 cursor-pointer">
+              <h3 className="text-[15px] md:text-base font-semibold text-white mb-1.5 group-hover:text-yellow-400/90 transition-colors leading-snug">
                 Voir les factures
               </h3>
-              <p className="text-gray-400 text-sm">Gestion factures</p>
+              <p className="text-gray-400/80 text-sm leading-relaxed">Gestion factures</p>
             </div>
           </Link>
           
           <Link href="/dashboard/patron/chantiers" className="group">
-            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/10 hover:border-yellow-500/30 hover:bg-white/10 transition-all cursor-pointer">
-              <h3 className="text-base md:text-lg font-semibold text-white mb-1.5 group-hover:text-yellow-400 transition-colors">
+            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/20 hover:bg-white/[0.04] transition-all duration-200 cursor-pointer">
+              <h3 className="text-[15px] md:text-base font-semibold text-white mb-1.5 group-hover:text-yellow-400/90 transition-colors leading-snug">
                 Voir les chantiers
               </h3>
-              <p className="text-gray-400 text-sm">Suivi chantiers</p>
+              <p className="text-gray-400/80 text-sm leading-relaxed">Suivi chantiers</p>
             </div>
           </Link>
         </div>
       </div>
 
-      {/* Derniers devis - Design épuré */}
+      {/* Derniers devis - Design premium épuré */}
       <div>
-        <h2 className="text-xl md:text-2xl font-semibold text-white mb-4 md:mb-6 tracking-tight">
+        <h2 className="text-lg md:text-xl font-semibold text-white mb-5 md:mb-6 tracking-tight">
           Derniers devis
         </h2>
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden">
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
           {loading ? (
-            <div className="p-8 text-center">
-              <p className="text-gray-400 text-sm">Chargement...</p>
+            <div className="p-10 text-center">
+              <p className="text-gray-400/70 text-sm font-normal">Chargement...</p>
             </div>
           ) : quotes.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="text-gray-400 text-sm">Aucun devis récent pour le moment.</p>
+            <div className="p-10 text-center">
+              <p className="text-gray-400/70 text-sm font-normal">Aucun devis récent pour le moment.</p>
             </div>
           ) : (
-            <div className="divide-y divide-white/10">
+            <div className="divide-y divide-white/[0.06]">
               {quotes.slice(0, 5).map((quote) => (
                 <Link
                   key={quote.id}
                   href={`/dashboard/patron/quotes/${quote.id}`}
-                  className="block p-4 md:p-5 hover:bg-white/5 transition-colors group"
+                  className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-200 group"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 md:gap-3 mb-1.5 flex-wrap">
-                        <h3 className="text-base md:text-lg font-semibold text-white group-hover:text-yellow-400 transition-colors truncate">
+                      <div className="flex items-center gap-2.5 md:gap-3 mb-2 flex-wrap">
+                        <h3 className="text-[15px] md:text-base font-semibold text-white group-hover:text-yellow-400/90 transition-colors truncate leading-snug">
                           {quote.title}
                         </h3>
                         {getStatusBadge(quote.status)}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <div className="flex items-center gap-2 text-sm text-gray-400/80">
                         <span className="truncate">{quote.client}</span>
-                        <span>•</span>
+                        <span className="opacity-50">•</span>
                         <span className="whitespace-nowrap">{formatDate(quote.created_at)}</span>
                       </div>
                     </div>
                     <div className="flex-shrink-0">
-                      <p className="text-lg md:text-xl font-bold text-white tabular-nums">
+                      <p className="text-lg md:text-xl font-semibold text-white tabular-nums tracking-tight">
                         {formatAmount(quote.amount_ht || 0)}
                       </p>
                     </div>
