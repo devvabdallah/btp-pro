@@ -200,11 +200,11 @@ export default function PatronDashboard() {
 
       {/* KPIs Cards - Design premium sobre */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/60 mb-3.5 font-medium">
+        <div className="bg-white/[0.04] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] md:hover:border-white/[0.12] md:hover:bg-white/[0.06] md:hover:shadow-md transition-all duration-200 ease-out shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/50 mb-3.5 font-medium">
             CA du mois
           </p>
-          <p className="text-[24px] md:text-[32px] font-semibold text-white/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
+          <p className="text-[26px] md:text-[34px] font-bold text-white/98 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatAmount(caMois)}
           </p>
           {!loading && caMois === 0 && (
@@ -214,11 +214,11 @@ export default function PatronDashboard() {
           )}
         </div>
         
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/60 mb-3.5 font-medium">
+        <div className="bg-white/[0.04] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] md:hover:border-white/[0.12] md:hover:bg-white/[0.06] md:hover:shadow-md transition-all duration-200 ease-out shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/50 mb-3.5 font-medium">
             Devis en attente
           </p>
-          <p className="text-[24px] md:text-[32px] font-semibold text-blue-400/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
+          <p className="text-[26px] md:text-[34px] font-bold text-blue-400/98 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatKPIValue(devisEnAttente)}
           </p>
           {!loading && devisEnAttente === 0 && (
@@ -228,11 +228,11 @@ export default function PatronDashboard() {
           )}
         </div>
         
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/60 mb-3.5 font-medium">
+        <div className="bg-white/[0.04] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] md:hover:border-white/[0.12] md:hover:bg-white/[0.06] md:hover:shadow-md transition-all duration-200 ease-out shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/50 mb-3.5 font-medium">
             Chantiers en cours
           </p>
-          <p className="text-[24px] md:text-[32px] font-semibold text-green-400/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
+          <p className="text-[26px] md:text-[34px] font-bold text-green-400/98 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatKPIValue(chantiersEnCours)}
           </p>
           {!loading && chantiersEnCours === 0 && (
@@ -242,11 +242,11 @@ export default function PatronDashboard() {
           )}
         </div>
         
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.04] transition-all duration-200 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/60 mb-3.5 font-medium">
+        <div className="bg-white/[0.04] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] md:hover:border-white/[0.12] md:hover:bg-white/[0.06] md:hover:shadow-md transition-all duration-200 ease-out shadow-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/50 mb-3.5 font-medium">
             Clients
           </p>
-          <p className="text-[24px] md:text-[32px] font-semibold text-yellow-400/95 tabular-nums leading-[1.1] tracking-[-0.01em]">
+          <p className="text-[26px] md:text-[34px] font-bold text-yellow-400/98 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatKPIValue(nbClients)}
           </p>
           {!loading && nbClients === 0 && (
@@ -259,43 +259,63 @@ export default function PatronDashboard() {
 
       {/* Actions rapides - Design premium sobre */}
       <div>
-        <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-6 md:mb-7 tracking-tight">
+        <h2 className="text-xl md:text-2xl font-bold text-white/98 mb-6 md:mb-7 tracking-tight">
           Actions rapides
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-4">
-          <Link href="/dashboard/patron/devis/nouveau" className="group">
-            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-200 ease-out cursor-pointer">
-              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
-                Créer un devis
-              </h3>
-              <p className="text-gray-400/70 text-sm leading-relaxed">Nouveau devis</p>
+          <Link href="/dashboard/patron/devis/nouveau" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
+            <div className="bg-white/[0.04] backdrop-blur-sm rounded-lg p-6 md:p-7 border border-white/[0.08] group-hover:border-yellow-500/30 group-hover:bg-white/[0.06] group-hover:-translate-y-0.5 group-hover:shadow-lg group-active:translate-y-0 group-active:shadow-md transition-all duration-200 ease-out cursor-pointer">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className="text-base md:text-lg font-semibold text-white/95 mb-2.5 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
+                    Créer un devis
+                  </h3>
+                  <p className="text-gray-400/70 text-sm leading-relaxed">Nouveau devis</p>
+                </div>
+                <span className="text-gray-400/40 group-hover:text-yellow-400/60 transition-colors duration-150 text-lg ml-2">➜</span>
+              </div>
             </div>
           </Link>
           
-          <Link href="/dashboard/patron/devis" className="group">
-            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-200 ease-out cursor-pointer">
-              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
-                Voir les devis
-              </h3>
-              <p className="text-gray-400/70 text-sm leading-relaxed">Tous les devis</p>
+          <Link href="/dashboard/patron/devis" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
+            <div className="bg-white/[0.04] backdrop-blur-sm rounded-lg p-6 md:p-7 border border-white/[0.08] group-hover:border-yellow-500/30 group-hover:bg-white/[0.06] group-hover:-translate-y-0.5 group-hover:shadow-lg group-active:translate-y-0 group-active:shadow-md transition-all duration-200 ease-out cursor-pointer">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className="text-base md:text-lg font-semibold text-white/95 mb-2.5 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
+                    Voir les devis
+                  </h3>
+                  <p className="text-gray-400/70 text-sm leading-relaxed">Tous les devis</p>
+                </div>
+                <span className="text-gray-400/40 group-hover:text-yellow-400/60 transition-colors duration-150 text-lg ml-2">➜</span>
+              </div>
             </div>
           </Link>
           
-          <Link href="/dashboard/patron/factures" className="group">
-            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-200 ease-out cursor-pointer">
-              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
-                Voir les factures
-              </h3>
-              <p className="text-gray-400/70 text-sm leading-relaxed">Gestion factures</p>
+          <Link href="/dashboard/patron/factures" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
+            <div className="bg-white/[0.04] backdrop-blur-sm rounded-lg p-6 md:p-7 border border-white/[0.08] group-hover:border-yellow-500/30 group-hover:bg-white/[0.06] group-hover:-translate-y-0.5 group-hover:shadow-lg group-active:translate-y-0 group-active:shadow-md transition-all duration-200 ease-out cursor-pointer">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className="text-base md:text-lg font-semibold text-white/95 mb-2.5 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
+                    Voir les factures
+                  </h3>
+                  <p className="text-gray-400/70 text-sm leading-relaxed">Gestion factures</p>
+                </div>
+                <span className="text-gray-400/40 group-hover:text-yellow-400/60 transition-colors duration-150 text-lg ml-2">➜</span>
+              </div>
             </div>
           </Link>
           
-          <Link href="/dashboard/patron/chantiers" className="group">
-            <div className="bg-white/[0.02] backdrop-blur-sm rounded-lg p-5 md:p-6 border border-white/[0.06] hover:border-yellow-500/25 hover:bg-white/[0.04] transition-all duration-200 ease-out cursor-pointer">
-              <h3 className="text-[15px] md:text-base font-semibold text-white/95 mb-2 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
-                Voir les chantiers
-              </h3>
-              <p className="text-gray-400/70 text-sm leading-relaxed">Suivi chantiers</p>
+          <Link href="/dashboard/patron/chantiers" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
+            <div className="bg-white/[0.04] backdrop-blur-sm rounded-lg p-6 md:p-7 border border-white/[0.08] group-hover:border-yellow-500/30 group-hover:bg-white/[0.06] group-hover:-translate-y-0.5 group-hover:shadow-lg group-active:translate-y-0 group-active:shadow-md transition-all duration-200 ease-out cursor-pointer">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className="text-base md:text-lg font-semibold text-white/95 mb-2.5 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
+                    Voir les chantiers
+                  </h3>
+                  <p className="text-gray-400/70 text-sm leading-relaxed">Suivi chantiers</p>
+                </div>
+                <span className="text-gray-400/40 group-hover:text-yellow-400/60 transition-colors duration-150 text-lg ml-2">➜</span>
+              </div>
             </div>
           </Link>
         </div>
@@ -303,7 +323,7 @@ export default function PatronDashboard() {
 
       {/* Derniers devis - Design premium épuré */}
       <div>
-        <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-6 md:mb-7 tracking-tight">
+        <h2 className="text-xl md:text-2xl font-bold text-white/98 mb-6 md:mb-7 tracking-tight">
           Derniers devis
         </h2>
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
