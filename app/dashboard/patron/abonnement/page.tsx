@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 
 export default function AbonnementPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isActive, setIsActive] = useState<boolean | null>(null)
@@ -16,6 +17,8 @@ export default function AbonnementPage() {
   const [daysRemaining, setDaysRemaining] = useState<number | null>(null)
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null)
   const [loadingCheckout, setLoadingCheckout] = useState(false)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const [checkoutSuccess, setCheckoutSuccess] = useState(false)
 
   // Helper pour vérifier si l'entreprise est active avec plusieurs tentatives de noms de paramètres
   async function checkCompanyActive(supabase: any, entrepriseIdValue: string): Promise<boolean | null> {
@@ -74,6 +77,26 @@ export default function AbonnementPage() {
 
     return null
   }
+
+  // Vérifier les paramètres de query string pour success/canceled
+  useEffect(() => {
+    const success = searchParams.get('success')
+    const canceled = searchParams.get('canceled')
+
+    if (success === '1') {
+      setCheckoutSuccess(true)
+      // Nettoyer l'URL
+      router.replace('/dashboard/patron/abonnement')
+      // Recharger les données après un court délai
+      setTimeout(() => {
+        window.location.reload()
+      }, 2000)
+    } else if (canceled === '1') {
+      setCheckoutError('Paiement annulé')
+      // Nettoyer l'URL
+      router.replace('/dashboard/patron/abonnement')
+    }
+  }, [searchParams, router])
 
   useEffect(() => {
     async function load() {
@@ -222,7 +245,7 @@ export default function AbonnementPage() {
   // Handler pour créer une session Stripe Checkout
   const handleSubscribe = async () => {
     setLoadingCheckout(true)
-    setError(null)
+    setCheckoutError(null)
 
     try {
       const response = await fetch('/api/stripe/checkout', {
@@ -239,15 +262,15 @@ export default function AbonnementPage() {
 
       const { url } = await response.json()
 
-      if (url) {
-        // Rediriger vers Stripe Checkout
-        window.location.href = url
-      } else {
+      if (!url) {
         throw new Error('URL de paiement non reçue')
       }
+
+      // Rediriger vers Stripe Checkout
+      window.location.href = url
     } catch (err) {
       console.error('[Abonnement] Erreur checkout:', err)
-      setError(err instanceof Error ? err.message : 'Erreur lors du démarrage du paiement')
+      setCheckoutError(err instanceof Error ? err.message : 'Erreur lors du démarrage du paiement')
       setLoadingCheckout(false)
     }
   }
@@ -358,6 +381,20 @@ export default function AbonnementPage() {
             </div>
           )}
         </div>
+
+        {/* Message de succès checkout */}
+        {checkoutSuccess && (
+          <div className="mb-6 bg-green-500/20 border border-green-500/50 rounded-xl p-4 backdrop-blur-sm">
+            <p className="text-green-400 text-sm">Paiement réussi ! Votre abonnement est en cours d'activation...</p>
+          </div>
+        )}
+
+        {/* Message d'erreur checkout */}
+        {checkoutError && (
+          <div className="mb-6 bg-red-500/20 border border-red-500/50 rounded-xl p-4 backdrop-blur-sm">
+            <p className="text-red-400 text-sm">{checkoutError}</p>
+          </div>
+        )}
 
         {/* Boutons */}
         <div className="flex flex-col sm:flex-row gap-4">
