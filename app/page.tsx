@@ -6,16 +6,16 @@ import Logo from '@/components/Logo'
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#0d1228] to-[#0a0e27]">
       {/* Header */}
-      <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+      <header className="w-full bg-[#0a0e27]/95 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 shadow-lg shadow-black/20">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8 py-5 md:py-6">
           <Link href="/">
             <Logo size="md" showText={true} />
           </Link>
           <div className="flex items-center gap-2 md:gap-3">
             <Link href="/login">
-              <Button variant="secondary" size="sm" className="border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50">
+              <Button variant="secondary" size="sm" className="border-white/20 text-gray-300 hover:border-white/30 hover:bg-white/5">
                 Me connecter
               </Button>
             </Link>
@@ -30,62 +30,103 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-white">
+      <section className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-gradient-to-br from-[#0a0e27] via-[#0d1228] to-[#0a0e27]">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
-            {/* Texte à gauche */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Texte centré */}
             <div className="text-center lg:text-left">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 mb-6 md:mb-8 leading-tight tracking-tight">
-                Le logiciel simple pour gérer vos devis, factures et chantiers.
+              <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 md:mb-8 leading-tight tracking-tight">
+                Le logiciel simple pour gérer devis, factures et chantiers.
               </h1>
-              <p className="text-xl md:text-2xl text-gray-600 mb-8 md:mb-10 leading-relaxed">
-                Tout votre quotidien artisan, au même endroit.
+              <p className="text-xl md:text-2xl text-gray-300 mb-8 md:mb-10 leading-relaxed">
+                Pensé pour les artisans et petites équipes.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 md:gap-5 mb-6 md:mb-8 justify-center lg:justify-start">
                 <Link href="/register" className="w-full sm:w-auto">
-                  <Button variant="primary" size="lg" className="w-full sm:w-auto shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-shadow">
+                  <Button variant="primary" size="lg" className="w-full sm:w-auto shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-shadow">
                     Essai gratuit 5 jours
                   </Button>
                 </Link>
                 <Link href="#how" className="w-full sm:w-auto">
-                  <Button variant="secondary" size="lg" className="w-full sm:w-auto border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50">
+                  <Button variant="secondary" size="lg" className="w-full sm:w-auto border-white/20 text-gray-300 hover:border-white/30 hover:bg-white/5">
                     Voir comment ça marche
                   </Button>
                 </Link>
               </div>
-              <p className="text-sm md:text-base text-gray-500">
+              <p className="text-sm md:text-base text-gray-400">
                 Sans carte bancaire • Annulable à tout moment • 50€/mois après essai
               </p>
             </div>
 
-            {/* Screenshot principal à droite */}
+            {/* Screenshot principal */}
             <div className="flex items-center justify-center lg:justify-end">
               <div className="relative w-full max-w-2xl">
-                {/* Frame sombre */}
-                <div className="bg-gradient-to-br from-[#0a0e27] to-[#0d1228] rounded-2xl p-3 md:p-4 shadow-2xl shadow-black/50 border border-white/10 overflow-hidden">
-                  {/* Barre de navigation du navigateur */}
+                <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl p-3 md:p-4 shadow-2xl shadow-black/50 border border-white/10 overflow-hidden">
                   <div className="mb-3 flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-red-500/50"></div>
                     <div className="h-2 w-2 rounded-full bg-yellow-500/50"></div>
                     <div className="h-2 w-2 rounded-full bg-green-500/50"></div>
                   </div>
-                  {/* Screenshot Dashboard/Devis */}
                   <div className="relative rounded-lg overflow-hidden bg-[#0a0e27]">
                     <img 
                       src="/screenshots/dashboard-hero.png" 
                       alt="Aperçu du dashboard BTP PRO"
                       className="w-full h-auto"
                       onError={(e) => {
-                        // Fallback si l'image n'existe pas
                         e.currentTarget.style.display = 'none'
                         e.currentTarget.parentElement!.innerHTML = '<div class="h-96 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center"><p class="text-gray-400 text-sm">Screenshot Dashboard</p></div>'
                       }}
                     />
-                    {/* Overlay pour masquer "Essai expiré" si présent */}
                     <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#0a0e27] to-transparent pointer-events-none"></div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section Pourquoi BTP PRO */}
+      <section id="features" className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-gradient-to-br from-[#0a0e27] to-[#0d1228]">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
+            {/* Card 1 */}
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl p-8 md:p-10 border border-white/10 shadow-xl shadow-black/30 backdrop-blur-sm hover:border-orange-500/30 transition-all">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30">
+                <span className="text-3xl">⚡</span>
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                Devis & factures rapides
+              </h3>
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Crée, envoie, relance. PDF propre, paiement ensuite.
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl p-8 md:p-10 border border-white/10 shadow-xl shadow-black/30 backdrop-blur-sm hover:border-blue-500/30 transition-all">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30">
+                <span className="text-3xl">📋</span>
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                Suivi chantier clair
+              </h3>
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Infos client, statut, notes et actions rapides.
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl p-8 md:p-10 border border-white/10 shadow-xl shadow-black/30 backdrop-blur-sm hover:border-orange-500/30 transition-all">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30">
+                <span className="text-3xl">👥</span>
+              </div>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                Fait pour petites équipes
+              </h3>
+              <p className="text-lg text-gray-300 leading-relaxed">
+                Patron + employés, permissions simples.
+              </p>
             </div>
           </div>
         </div>
@@ -123,7 +164,6 @@ export default function Home() {
                       e.currentTarget.parentElement!.innerHTML = '<div class="h-64 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center"><p class="text-gray-400 text-sm">Screenshot Clients</p></div>'
                     }}
                   />
-                  {/* Overlay pour masquer éléments indésirables */}
                   <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
                 </div>
               </div>
@@ -201,86 +241,40 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Bénéfices Section */}
-      <section id="features" className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 lg:gap-14">
-            {/* Card 1 */}
-            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/20">
-                <span className="text-3xl">⚡</span>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                Devis & factures en quelques minutes
-              </h3>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                Crée, envoie, relance. PDF propre, paiement ensuite.
-              </p>
-            </div>
-
-            {/* Card 2 */}
-            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20">
-                <span className="text-3xl">📋</span>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                Suivi de chantier clair
-              </h3>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                Infos client, statut, notes et actions rapides (appeler / itinéraire).
-              </p>
-            </div>
-
-            {/* Card 3 */}
-            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/20">
-                <span className="text-3xl">👥</span>
-              </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                Fait pour petites équipes
-              </h3>
-              <p className="text-lg text-gray-600 leading-relaxed">
-                Patron + employés, permissions simples, sans usine à gaz.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Comment ça marche Section */}
-      <section id="how" className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-white">
+      <section id="how" className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-gradient-to-br from-[#0d1228] to-[#0f1429]">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center mb-20 md:mb-24">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center mb-16 md:mb-20">
             Comment ça marche
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 lg:gap-14">
             {/* Étape 1 */}
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 text-white flex items-center justify-center font-bold text-3xl mb-6 mx-auto shadow-lg shadow-orange-500/20">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white flex items-center justify-center font-bold text-3xl mb-6 mx-auto shadow-lg shadow-orange-500/30">
                 1
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 Crée ton entreprise
               </h3>
             </div>
 
             {/* Étape 2 */}
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 text-white flex items-center justify-center font-bold text-3xl mb-6 mx-auto shadow-lg shadow-orange-500/20">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white flex items-center justify-center font-bold text-3xl mb-6 mx-auto shadow-lg shadow-orange-500/30">
                 2
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 Ajoute clients & chantiers
               </h3>
             </div>
 
             {/* Étape 3 */}
             <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 text-white flex items-center justify-center font-bold text-3xl mb-6 mx-auto shadow-lg shadow-orange-500/20">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white flex items-center justify-center font-bold text-3xl mb-6 mx-auto shadow-lg shadow-orange-500/30">
                 3
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                Fais ton devis → facture
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                Devis → facture → paiement
               </h3>
             </div>
           </div>
@@ -288,34 +282,34 @@ export default function Home() {
       </section>
 
       {/* Pour qui Section */}
-      <section className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-gray-50">
+      <section className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-gradient-to-br from-[#0a0e27] to-[#0d1228]">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center mb-20 md:mb-24">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center mb-16 md:mb-20">
             Pour qui ?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
             {/* Patron */}
-            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-sm border border-gray-200">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/20">
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl p-10 md:p-12 border border-white/10 shadow-xl shadow-black/30 backdrop-blur-sm">
+              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30">
                 <span className="text-4xl">👔</span>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 Patron
               </h3>
-              <p className="text-lg text-gray-600 leading-relaxed">
+              <p className="text-lg text-gray-300 leading-relaxed">
                 Pilotage, devis/factures, dashboard
               </p>
             </div>
 
             {/* Employé */}
-            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-sm border border-gray-200">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20">
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl p-10 md:p-12 border border-white/10 shadow-xl shadow-black/30 backdrop-blur-sm">
+              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30">
                 <span className="text-4xl">👷</span>
               </div>
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
                 Employé
               </h3>
-              <p className="text-lg text-gray-600 leading-relaxed">
+              <p className="text-lg text-gray-300 leading-relaxed">
                 Chantiers, clients, tâches (accès limité)
               </p>
             </div>
@@ -324,21 +318,18 @@ export default function Home() {
       </section>
 
       {/* CTA Final Section */}
-      <section className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-white">
+      <section className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-gradient-to-br from-[#0a0e27] to-[#0d1228]">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 md:mb-8">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 md:mb-8">
             Prêt à simplifier votre gestion ?
           </h2>
-          <p className="text-xl md:text-2xl text-gray-600 mb-10 md:mb-12 max-w-2xl mx-auto leading-relaxed">
-            Commencez votre essai gratuit de 5 jours, sans carte bancaire.
-          </p>
           <div className="flex flex-col sm:flex-row gap-4 md:gap-5 justify-center">
             <Link href="/register" className="w-full sm:w-auto">
-              <Button variant="primary" size="lg" className="w-full sm:w-auto shadow-lg shadow-orange-500/20 hover:shadow-xl hover:shadow-orange-500/30 transition-shadow">
+              <Button variant="primary" size="lg" className="w-full sm:w-auto shadow-lg shadow-orange-500/30 hover:shadow-xl hover:shadow-orange-500/40 transition-shadow">
                 Essai gratuit 5 jours
               </Button>
             </Link>
-            <Link href="/login" className="text-orange-600 hover:text-orange-700 font-semibold text-lg transition-colors">
+            <Link href="/login" className="text-orange-400 hover:text-orange-300 font-semibold text-lg transition-colors">
               Déjà client ? Me connecter
             </Link>
           </div>
@@ -346,13 +337,13 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="w-full px-4 py-12 md:py-16 md:px-8 bg-gray-50 border-t border-gray-200">
+      <footer className="w-full px-4 py-12 md:py-16 md:px-8 bg-[#0a0e27] border-t border-white/10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center space-y-4">
-            <p className="text-gray-900 font-semibold text-lg md:text-xl">BTP PRO</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-gray-600 text-sm md:text-base">
+            <p className="text-white font-semibold text-lg md:text-xl">BTP PRO</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 text-gray-400 text-sm md:text-base">
               <span>lavno.app@gmail.com</span>
-              <span className="hidden sm:inline text-gray-400">•</span>
+              <span className="hidden sm:inline text-gray-600">•</span>
               <span>+33 06 31 49 22 08</span>
             </div>
             <p className="text-gray-500 text-xs md:text-sm mt-6">
