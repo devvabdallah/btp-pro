@@ -55,6 +55,8 @@ export default function QuoteDetailPage() {
   const [editedLines, setEditedLines] = useState<any[]>([])
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!quoteId) return
@@ -666,6 +668,84 @@ export default function QuoteDetailPage() {
     setEditedQuote({ ...editedQuote, amount_ht: totalHT })
   }
 
+  // Supprimer le devis
+  const handleDelete = async () => {
+    if (!quote?.id) {
+      setDeleteError('Devis introuvable')
+      return
+    }
+
+    setDeleting(true)
+    setDeleteError(null)
+
+    try {
+      // Vérifier si des factures sont liées à ce devis pour la confirmation
+      if (!quote.entreprise_id) {
+        setDeleteError('Devis sans entreprise associée')
+        setDeleting(false)
+        return
+      }
+
+      const { data: linkedInvoices, error: invoicesCheckError } = await supabase
+        .from('invoices')
+        .select('id')
+        .eq('quote_id', quote.id)
+        .eq('entreprise_id', quote.entreprise_id)
+
+      let confirmed = false
+
+      if (!invoicesCheckError && linkedInvoices && linkedInvoices.length > 0) {
+        // Confirmation explicite si des factures sont liées
+        confirmed = window.confirm(
+          `Ce devis a déjà ${linkedInvoices.length} facture${linkedInvoices.length > 1 ? 's' : ''} liée${linkedInvoices.length > 1 ? 's' : ''}. Supprimer le devis supprimera aussi ${linkedInvoices.length > 1 ? 'les factures' : 'la facture'}. Continuer ?`
+        )
+      } else {
+        // Confirmation standard si pas de factures liées
+        confirmed = window.confirm('Supprimer ce devis ? Cette action est irréversible.')
+      }
+
+      if (!confirmed) {
+        setDeleting(false)
+        return
+      }
+
+      // Récupérer la session Supabase pour obtenir le token
+      const supabaseClient = createSupabaseBrowserClient()
+      const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession()
+
+      if (sessionError || !session || !session.access_token) {
+        setDeleteError('Veuillez vous reconnecter')
+        setDeleting(false)
+        return
+      }
+
+      // Appeler la route API centralisée avec le token dans le header
+      const response = await fetch('/api/admin/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ type: 'quote', id: quote.id }),
+      })
+
+      const data = await response.json()
+
+      if (!data.ok) {
+        setDeleteError(data.message || 'Erreur lors de la suppression du devis')
+        setDeleting(false)
+        return
+      }
+
+      // Rediriger vers la liste des devis
+      router.push('/dashboard/patron/devis')
+    } catch (err) {
+      console.error('Unexpected error deleting quote:', err)
+      setDeleteError('Erreur lors de la suppression du devis')
+      setDeleting(false)
+    }
+  }
+
   // Générer et télécharger le PDF
   const handlePrintPdf = () => {
     if (!quote) return
@@ -955,6 +1035,9 @@ export default function QuoteDetailPage() {
       updateEditedLine={updateEditedLine}
       addEditedLine={addEditedLine}
       removeEditedLine={removeEditedLine}
+      onDelete={handleDelete}
+      deleting={deleting}
+      deleteError={deleteError}
     />
   )
 }

@@ -1,6 +1,7 @@
 'use server'
 
 import { createSupabaseServerClient } from './supabase/server'
+import { createSupabaseAdminClient } from './supabase/admin'
 import { redirect } from 'next/navigation'
 
 export type QuoteStatus = 'brouillon' | 'envoye' | 'accepte' | 'refuse'
@@ -309,6 +310,130 @@ export async function getQuoteStats(): Promise<{ success: boolean; stats?: Quote
     }
   } catch (error) {
     console.error('Get quote stats error:', error)
+    return {
+      success: false,
+      error: 'Une erreur inattendue est survenue.',
+    }
+  }
+}
+
+/**
+ * Supprime un devis
+ */
+export async function deleteQuote(quoteId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    // 1. Récupérer l'entreprise_id de l'utilisateur connecté (client serveur normal pour l'auth)
+    const entrepriseId = await getUserEntrepriseId()
+
+    if (!entrepriseId) {
+      return {
+        success: false,
+        error: 'Accès non autorisé.',
+      }
+    }
+
+    // 2. Utiliser le client admin pour bypass RLS
+    const adminSupabase = createSupabaseAdminClient()
+
+    // 3. Récupérer le devis par son id (avec client admin)
+    const { data: quote, error: quoteError } = await adminSupabase
+      .from('quotes')
+      .select('id, entreprise_id')
+      .eq('id', quoteId)
+      .single()
+
+    if (quoteError || !quote) {
+      return {
+        success: false,
+        error: 'Devis introuvable.',
+      }
+    }
+
+    // 4. Vérifier que le devis appartient à l'entreprise de l'utilisateur
+    const quoteEntrepriseId = String(quote.entreprise_id || '').trim()
+    const userEntrepriseId = String(entrepriseId).trim()
+
+    if (quoteEntrepriseId !== userEntrepriseId) {
+      return {
+        success: false,
+        error: 'Accès non autorisé.',
+      }
+    }
+
+    // 5. Chercher les factures liées à ce devis (avec client admin)
+    const { data: linkedInvoices, error: invoicesCheckError } = await adminSupabase
+      .from('invoices')
+      .select('id')
+      .eq('quote_id', quoteId)
+      .eq('entreprise_id', entrepriseId)
+
+    // Ne pas bloquer si la table n'existe pas
+    if (invoicesCheckError && invoicesCheckError.code !== 'PGRST116') {
+      console.error('Error checking linked invoices:', invoicesCheckError)
+      // On continue quand même la suppression du devis
+    }
+
+    // 6. Supprimer les factures liées si elles existent (avec client admin)
+    if (linkedInvoices && linkedInvoices.length > 0) {
+      const invoiceIds = linkedInvoices.map(inv => inv.id)
+      
+      // Supprimer d'abord les lignes des factures
+      for (const invoiceId of invoiceIds) {
+        const { error: invoiceLinesError } = await adminSupabase
+          .from('invoice_lines')
+          .delete()
+          .eq('invoice_id', invoiceId)
+
+        // Ne pas bloquer si la table n'existe pas
+        if (invoiceLinesError && invoiceLinesError.code !== 'PGRST116') {
+          console.error('Error deleting invoice lines:', invoiceLinesError)
+        }
+      }
+
+      // Supprimer les factures
+      const { error: invoicesDeleteError } = await adminSupabase
+        .from('invoices')
+        .delete()
+        .in('id', invoiceIds)
+
+      if (invoicesDeleteError) {
+        return {
+          success: false,
+          error: 'Erreur lors de la suppression des factures liées.',
+        }
+      }
+    }
+
+    // 7. Supprimer d'abord les lignes du devis (si elles existent) (avec client admin)
+    const { error: linesError } = await adminSupabase
+      .from('quote_lines')
+      .delete()
+      .eq('quote_id', quoteId)
+
+    // Ne pas bloquer si la table n'existe pas ou s'il n'y a pas de lignes
+    if (linesError && linesError.code !== 'PGRST116') {
+      console.error('Error deleting quote lines:', linesError)
+      // On continue quand même la suppression du devis
+    }
+
+    // 8. Supprimer le devis (avec client admin)
+    const { error } = await adminSupabase
+      .from('quotes')
+      .delete()
+      .eq('id', quoteId)
+
+    if (error) {
+      return {
+        success: false,
+        error: 'Erreur lors de la suppression du devis.',
+      }
+    }
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error('Delete quote error:', error)
     return {
       success: false,
       error: 'Une erreur inattendue est survenue.',

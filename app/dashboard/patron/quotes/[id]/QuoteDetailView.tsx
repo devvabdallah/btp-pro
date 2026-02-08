@@ -37,6 +37,9 @@ interface QuoteDetailViewProps {
   updateEditedLine?: (index: number, field: string, value: any) => void
   addEditedLine?: () => void
   removeEditedLine?: (index: number) => void
+  onDelete?: () => void
+  deleting?: boolean
+  deleteError?: string | null
 }
 
 export default function QuoteDetailView({
@@ -70,6 +73,9 @@ export default function QuoteDetailView({
   updateEditedLine,
   addEditedLine,
   removeEditedLine,
+  onDelete,
+  deleting = false,
+  deleteError = null,
 }: QuoteDetailViewProps) {
   // Garde si quoteId n'est pas disponible
   if (!quoteId) {
@@ -682,6 +688,33 @@ export default function QuoteDetailView({
               📄 Télécharger en PDF
             </Button>
           </div>
+
+          {/* Supprimer le devis */}
+          {!isEditing && onDelete && (
+            <div className="mt-6 pt-6 border-t border-[#2a2f4a]">
+              {deleteError && (
+                <div className="mb-4 bg-red-500/20 border border-red-500/50 rounded-xl p-3">
+                  <p className="text-red-400 text-sm">{deleteError}</p>
+                </div>
+              )}
+              {existingInvoiceId && (
+                <div className="mb-4 bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-3">
+                  <p className="text-yellow-300 text-sm">
+                    ⚠️ Ce devis a une facture liée. La suppression du devis supprimera aussi la facture.
+                  </p>
+                </div>
+              )}
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={onDelete}
+                disabled={deleting}
+                className="w-full sm:w-auto min-h-[48px] px-6 text-base font-semibold border-red-500/50 text-red-300 hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleting ? 'Suppression...' : '🗑️ Supprimer ce devis'}
+              </Button>
+            </div>
+          )}
 
         </div>
       </div>
