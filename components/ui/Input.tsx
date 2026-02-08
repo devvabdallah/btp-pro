@@ -4,6 +4,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string
   labelProps?: LabelHTMLAttributes<HTMLLabelElement>
   error?: string
+  variant?: 'light' | 'dark'
 }
 
 export default function Input({
@@ -11,22 +12,36 @@ export default function Input({
   labelProps,
   error,
   className = '',
+  variant = 'light',
   ...props
 }: InputProps) {
+  const isDark = variant === 'dark'
+  
   return (
     <div className="w-full">
-      <label
-        {...labelProps}
-        className={`block text-sm font-medium text-gray-300 mb-2 ${labelProps?.className || ''}`}
-      >
-        {label}
-      </label>
+      {label && (
+        <label
+          {...labelProps}
+          className={`block mb-3 ${isDark 
+            ? 'text-sm font-medium text-gray-300' 
+            : 'text-base font-semibold text-gray-900'
+          } ${labelProps?.className || ''}`}
+        >
+          {label}
+        </label>
+      )}
       <input
-        className={`w-full px-4 py-3 bg-[#1a1f3a] border border-gray-600 rounded-2xl text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all ${error ? 'border-red-500' : ''} ${className}`}
+        className={`w-full px-5 py-4 rounded-2xl focus:outline-none focus:ring-2 transition-all text-base ${
+          isDark
+            ? `bg-[#1a1f3a] border border-gray-600 text-gray-200 placeholder-gray-500 focus:ring-yellow-400 focus:border-transparent ${error ? 'border-red-500' : ''}`
+            : `bg-white border-2 text-gray-900 placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'}`
+        } ${className}`}
         {...props}
       />
       {error && (
-        <p className="mt-1 text-sm text-red-400">{error}</p>
+        <p className={`mt-2 text-sm font-medium ${isDark ? 'text-red-400' : 'text-red-600'}`}>
+          {error}
+        </p>
       )}
     </div>
   )

@@ -118,11 +118,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Composant Sidebar réutilisable
   const SidebarContent = () => (
     <>
-      <div className="p-6 border-b border-white/[0.08]">
+      <div className="p-7 md:p-8 border-b border-white/[0.08]">
         <Logo size="md" showText={true} />
       </div>
 
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-5 md:p-6 space-y-3">
         {navItems.map((item) => {
           const isActive = pathname === item.href
           return (
@@ -141,7 +141,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         })}
       </nav>
 
-      <div className="p-4 border-t border-white/[0.08]">
+      <div className="p-5 md:p-6 border-t border-white/[0.08]">
         <LogoutButton />
       </div>
     </>
@@ -206,19 +206,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main content */}
       <main className="flex-1 w-full md:ml-64 pt-14 md:pt-0 relative z-10" data-dashboard="true">
         {/* Header avec badge statut (desktop) */}
-        <header className="hidden md:block w-full px-4 md:px-6 lg:px-8 py-4 border-b border-white/[0.08] bg-[#0a0e27]/50 backdrop-blur-sm">
+        <header className="hidden md:block w-full px-4 md:px-6 lg:px-8 py-5 md:py-6 border-b border-white/[0.08] bg-[#0a0e27]/50 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto flex items-center justify-end">
             <CompanyStatusBadge />
           </div>
         </header>
 
         {/* Header mobile avec badge statut */}
-        <div className="md:hidden w-full px-4 py-3 border-b border-white/[0.08] bg-[#0a0e27]/50 backdrop-blur-sm flex items-center justify-end">
+        <div className="md:hidden w-full px-4 py-4 border-b border-white/[0.08] bg-[#0a0e27]/50 backdrop-blur-sm flex items-center justify-end">
           <CompanyStatusBadge />
         </div>
         
         {/* App Shell Premium - Conteneur principal avec largeur max et padding harmonisé */}
-        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-8 md:py-10 lg:py-12">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-10 md:py-12 lg:py-16">
           {children}
         </div>
       </main>

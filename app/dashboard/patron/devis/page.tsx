@@ -112,7 +112,7 @@ export default function DevisPage() {
   }
 
   return (
-    <div className="space-y-10 md:space-y-14">
+    <div className="space-y-12 md:space-y-16 lg:space-y-20">
       {/* Header avec titre et bouton */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
         <div className="flex-1">
@@ -139,14 +139,14 @@ export default function DevisPage() {
 
       {/* Liste des devis */}
       {loading ? (
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-12 md:p-16 border border-white/[0.06] shadow-sm">
-          <p className="text-gray-400/70 text-center text-sm md:text-base font-medium">Chargement...</p>
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl p-16 md:p-20 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
+          <p className="text-gray-300 text-center text-sm md:text-base font-medium">Chargement...</p>
         </div>
       ) : quotes.length === 0 ? (
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-12 md:p-16 border border-white/[0.06] shadow-sm">
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl p-16 md:p-20 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
           <div className="text-center space-y-4">
-            <p className="text-gray-400/80 text-base md:text-lg font-medium">Aucun devis pour le moment</p>
-            <p className="text-gray-500/70 text-sm md:text-base">Commencez par créer votre premier devis</p>
+            <p className="text-gray-200 text-base md:text-lg font-medium">Aucun devis pour le moment</p>
+            <p className="text-gray-400 text-sm md:text-base">Commencez par créer votre premier devis</p>
             <div className="pt-2">
               <Link href="/dashboard/patron/devis/nouveau">
                 <Button variant="primary" size="md" className="min-h-[44px] px-6">
@@ -157,16 +157,16 @@ export default function DevisPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
-          <div className="divide-y divide-white/[0.06]">
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 overflow-hidden shadow-lg shadow-black/30 backdrop-blur-sm">
+          <div className="divide-y divide-white/10">
             {quotes.map((quote) => {
               if (!quote.id) {
                 return (
                   <div
                     key={quote.title || 'no-id'}
-                    className="flex items-center justify-between p-4 md:p-5 bg-red-500/15 border-b border-red-500/25"
+                    className="flex items-center justify-between p-4 md:p-5 bg-red-500/20 border-b border-red-500/30"
                   >
-                    <p className="text-red-400/90 text-sm font-medium">Devis sans id</p>
+                    <p className="text-red-400 text-sm font-medium">Devis sans id</p>
                   </div>
                 )
               }
@@ -175,31 +175,31 @@ export default function DevisPage() {
                 <Link
                   key={quote.id}
                   href={`/dashboard/patron/quotes/${quote.id}`}
-                  className="block p-5 md:p-6 hover:bg-white/[0.04] transition-all duration-200 ease-out group border-l-2 border-transparent hover:border-yellow-500/30"
+                  className="block p-6 md:p-8 hover:bg-white/5 transition-all duration-200 ease-out group border-l-2 border-transparent hover:border-orange-500/40"
                 >
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
                     <div className="flex-1 min-w-0 space-y-2">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 sm:gap-3">
-                        <h3 className="text-base md:text-lg font-semibold text-white/95 group-hover:text-yellow-400/95 transition-colors duration-200 leading-snug">
+                        <h3 className="text-base md:text-lg font-semibold text-white group-hover:text-orange-400 transition-colors duration-200 leading-snug">
                           {quote.title}
                         </h3>
                         {getStatusBadge(quote.status)}
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-sm">
-                        <span className="text-gray-300/80 font-medium">
+                        <span className="text-gray-300 font-medium">
                           {quote.client}
                         </span>
-                        <span className="hidden sm:inline text-gray-500/50">•</span>
-                        <span className="text-gray-400/70">
+                        <span className="hidden sm:inline text-gray-500">•</span>
+                        <span className="text-gray-400">
                           {formatDate(quote.created_at)}
                         </span>
                       </div>
                     </div>
                     <div className="text-left md:text-right flex-shrink-0">
-                      <p className="text-xl md:text-2xl font-semibold text-white/95 tabular-nums leading-none tracking-tight">
+                      <p className="text-xl md:text-2xl font-semibold text-white tabular-nums leading-none tracking-tight">
                         {formatAmount(quote.amount_ht)}
                       </p>
-                      <p className="text-gray-400/60 text-xs mt-1 font-medium">HT</p>
+                      <p className="text-gray-400 text-xs mt-1 font-medium">HT</p>
                     </div>
                   </div>
                 </Link>

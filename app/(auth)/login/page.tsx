@@ -196,10 +196,10 @@ export default function LoginPage() {
 
   if (checkingSession) {
     return (
-      <main className="min-h-screen bg-[#0a0e27] flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a]">
-            <p className="text-gray-400 text-center">Vérification de la session...</p>
+      <main className="min-h-screen bg-gradient-to-br from-[#0a0e27] via-[#0d1228] to-[#0a0e27] flex items-center justify-center px-4 py-16 md:py-20">
+        <div className="w-full max-w-lg">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-10 md:p-12 border border-gray-200 shadow-xl">
+            <p className="text-gray-600 text-center text-base">Vérification de la session...</p>
           </div>
         </div>
       </main>
@@ -207,16 +207,19 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0e27] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center px-4 py-16 md:py-20">
+      <div className="w-full max-w-lg">
+        <div className="text-center mb-10 md:mb-12">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 tracking-tight">
             Connexion
           </h1>
+          <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+            Accédez à votre espace BTP PRO
+          </p>
         </div>
 
-        <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a]">
-          <form onSubmit={handleLogin} className="space-y-6">
+        <div className="bg-white rounded-3xl p-10 md:p-12 border border-gray-200 shadow-xl shadow-gray-200/50">
+          <form onSubmit={handleLogin} className="space-y-8">
             <Input
               label="Email"
               type="email"
@@ -238,34 +241,36 @@ export default function LoginPage() {
             <ErrorMessage message={error} />
 
             {/* Checkbox "Se souvenir de moi" */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 pt-2">
               <input
                 type="checkbox"
                 id="rememberMe"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-600 bg-[#1a1f3a] text-yellow-400 focus:ring-2 focus:ring-yellow-400 focus:ring-offset-0 focus:ring-offset-[#1a1f3a] cursor-pointer"
+                className="w-5 h-5 rounded border-gray-300 bg-white text-orange-500 focus:ring-2 focus:ring-orange-500 focus:ring-offset-0 cursor-pointer"
               />
-              <label htmlFor="rememberMe" className="text-sm text-gray-300 cursor-pointer select-none">
+              <label htmlFor="rememberMe" className="text-base text-gray-700 cursor-pointer select-none font-medium">
                 Se souvenir de moi
               </label>
             </div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              className="w-full"
-              disabled={loading || checkingSession}
-            >
-              {loading ? 'Connexion...' : 'Se connecter'}
-            </Button>
+            <div className="pt-2">
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="w-full min-h-[56px] text-lg font-semibold"
+                disabled={loading || checkingSession}
+              >
+                {loading ? 'Connexion...' : 'Se connecter'}
+              </Button>
+            </div>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-400">
+          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+            <p className="text-base text-gray-600">
               Pas encore de compte ?{' '}
-              <Link href="/register" className="text-yellow-400 hover:text-yellow-500 font-semibold">
+              <Link href="/register" className="text-orange-600 hover:text-orange-700 font-semibold transition-colors">
                 Créer un compte
               </Link>
             </p>

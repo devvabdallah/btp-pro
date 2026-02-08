@@ -62,37 +62,40 @@ export default function EmployeDashboard() {
   const tachesAFaire = 0
 
   return (
-    <div>
-      <h1 className="text-4xl md:text-5xl font-bold text-white mb-8">Tableau de bord - Employé</h1>
+    <div className="space-y-12 md:space-y-16 lg:space-y-20">
+      <div>
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Tableau de bord - Employé</h1>
+        <p className="text-gray-400 text-sm md:text-base">Vue d'ensemble de votre activité</p>
+      </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a]">
           <p className="text-gray-400 text-sm mb-2">Chantiers assignés</p>
           <p className="text-3xl font-bold text-green-300">{chantiersAssignes}</p>
         </div>
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
+        <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a]">
           <p className="text-gray-400 text-sm mb-2">Clients de l'entreprise</p>
           <p className="text-3xl font-bold text-blue-300">{nbClients}</p>
         </div>
-        <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
+        <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a]">
           <p className="text-gray-400 text-sm mb-2">Tâches à faire</p>
           <p className="text-3xl font-bold text-yellow-300">{tachesAFaire}</p>
         </div>
       </div>
 
       {/* Actions rapides */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-white mb-6">Actions rapides</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <h2 className="text-2xl font-bold text-white mb-8 md:mb-10">Actions rapides</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           <Link href="/dashboard/employe/chantiers">
-            <div className="bg-gradient-to-br from-[#1a1f3a] to-[#0f1429] rounded-3xl p-6 border border-[#2a2f4a] hover:border-yellow-500/50 transition-all cursor-pointer">
+            <div className="bg-gradient-to-br from-[#1a1f3a] to-[#0f1429] rounded-3xl p-8 border border-[#2a2f4a] hover:border-yellow-500/50 transition-all cursor-pointer">
               <h3 className="text-xl font-bold text-white mb-2">Voir les chantiers</h3>
               <p className="text-gray-400 text-sm">Mes chantiers assignés</p>
             </div>
           </Link>
           <Link href="/dashboard/employe/clients">
-            <div className="bg-gradient-to-br from-[#1a1f3a] to-[#0f1429] rounded-3xl p-6 border border-[#2a2f4a] hover:border-yellow-500/50 transition-all cursor-pointer">
+            <div className="bg-gradient-to-br from-[#1a1f3a] to-[#0f1429] rounded-3xl p-8 border border-[#2a2f4a] hover:border-yellow-500/50 transition-all cursor-pointer">
               <h3 className="text-xl font-bold text-white mb-2">Voir les clients</h3>
               <p className="text-gray-400 text-sm">Clients de l'entreprise</p>
             </div>

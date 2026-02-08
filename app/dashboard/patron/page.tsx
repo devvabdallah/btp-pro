@@ -177,7 +177,7 @@ export default function PatronDashboard() {
   }
 
   return (
-    <div className="space-y-10 md:space-y-14">
+    <div className="space-y-12 md:space-y-16 lg:space-y-20">
       {/* Header avec titre et numéro entreprise discret */}
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 md:gap-8">
         <div className="flex-1">
@@ -199,58 +199,58 @@ export default function PatronDashboard() {
       </div>
 
       {/* KPIs Cards - Design premium sobre */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        <div className="bg-white/[0.04] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] md:hover:border-white/[0.12] md:hover:bg-white/[0.06] md:hover:shadow-md transition-all duration-200 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/50 mb-3.5 font-medium">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 lg:gap-8">
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl p-6 md:p-8 border border-white/10 md:hover:border-orange-500/30 md:hover:shadow-xl md:hover:shadow-black/40 transition-all duration-200 ease-out shadow-lg shadow-black/30 backdrop-blur-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400 mb-3.5 font-medium">
             CA du mois
           </p>
-          <p className="text-[26px] md:text-[34px] font-bold text-white/98 tabular-nums leading-[1.1] tracking-[-0.01em]">
+          <p className="text-[26px] md:text-[34px] font-bold text-white tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatAmount(caMois)}
           </p>
           {!loading && caMois === 0 && (
-            <p className="text-xs text-gray-400/70 mt-2.5 leading-relaxed">
+            <p className="text-xs text-gray-400 mt-2.5 leading-relaxed">
               Le chiffre d'affaires apparaîtra dès la première facture.
             </p>
           )}
         </div>
         
-        <div className="bg-white/[0.04] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] md:hover:border-white/[0.12] md:hover:bg-white/[0.06] md:hover:shadow-md transition-all duration-200 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/50 mb-3.5 font-medium">
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl p-6 md:p-8 border border-white/10 md:hover:border-blue-500/30 md:hover:shadow-xl md:hover:shadow-black/40 transition-all duration-200 ease-out shadow-lg shadow-black/30 backdrop-blur-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400 mb-3.5 font-medium">
             Devis en attente
           </p>
-          <p className="text-[26px] md:text-[34px] font-bold text-blue-400/98 tabular-nums leading-[1.1] tracking-[-0.01em]">
+          <p className="text-[26px] md:text-[34px] font-bold text-blue-400 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatKPIValue(devisEnAttente)}
           </p>
           {!loading && devisEnAttente === 0 && (
-            <p className="text-xs text-gray-400/70 mt-2.5 leading-relaxed">
+            <p className="text-xs text-gray-400 mt-2.5 leading-relaxed">
               Créez un devis pour démarrer.
             </p>
           )}
         </div>
         
-        <div className="bg-white/[0.04] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] md:hover:border-white/[0.12] md:hover:bg-white/[0.06] md:hover:shadow-md transition-all duration-200 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/50 mb-3.5 font-medium">
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl p-6 md:p-8 border border-white/10 md:hover:border-green-500/30 md:hover:shadow-xl md:hover:shadow-black/40 transition-all duration-200 ease-out shadow-lg shadow-black/30 backdrop-blur-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400 mb-3.5 font-medium">
             Chantiers en cours
           </p>
-          <p className="text-[26px] md:text-[34px] font-bold text-green-400/98 tabular-nums leading-[1.1] tracking-[-0.01em]">
+          <p className="text-[26px] md:text-[34px] font-bold text-green-400 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatKPIValue(chantiersEnCours)}
           </p>
           {!loading && chantiersEnCours === 0 && (
-            <p className="text-xs text-gray-400/70 mt-2.5 leading-relaxed">
+            <p className="text-xs text-gray-400 mt-2.5 leading-relaxed">
               Les chantiers actifs s'afficheront ici.
             </p>
           )}
         </div>
         
-        <div className="bg-white/[0.04] backdrop-blur-sm rounded-xl p-5 md:p-6 border border-white/[0.08] md:hover:border-white/[0.12] md:hover:bg-white/[0.06] md:hover:shadow-md transition-all duration-200 ease-out shadow-sm">
-          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400/50 mb-3.5 font-medium">
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl p-6 md:p-8 border border-white/10 md:hover:border-orange-500/30 md:hover:shadow-xl md:hover:shadow-black/40 transition-all duration-200 ease-out shadow-lg shadow-black/30 backdrop-blur-sm">
+          <p className="text-[10px] uppercase tracking-[0.08em] text-gray-400 mb-3.5 font-medium">
             Clients
           </p>
-          <p className="text-[26px] md:text-[34px] font-bold text-yellow-400/98 tabular-nums leading-[1.1] tracking-[-0.01em]">
+          <p className="text-[26px] md:text-[34px] font-bold text-orange-400 tabular-nums leading-[1.1] tracking-[-0.01em]">
             {loading ? '—' : formatKPIValue(nbClients)}
           </p>
           {!loading && nbClients === 0 && (
-            <p className="text-xs text-gray-400/70 mt-2.5 leading-relaxed">
+            <p className="text-xs text-gray-500 mt-2.5 leading-relaxed">
               Ajoutez votre premier client.
             </p>
           )}
@@ -259,62 +259,62 @@ export default function PatronDashboard() {
 
       {/* Actions rapides - Design premium sobre */}
       <div>
-        <h2 className="text-xl md:text-2xl font-bold text-white/98 mb-6 md:mb-7 tracking-tight">
+        <h2 className="text-xl md:text-2xl font-bold text-white/98 mb-8 md:mb-10 tracking-tight">
           Actions rapides
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-4">
-          <Link href="/dashboard/patron/devis/nouveau" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
-            <div className="bg-white/[0.04] backdrop-blur-sm rounded-lg p-6 md:p-7 border border-white/[0.08] group-hover:border-yellow-500/30 group-hover:bg-white/[0.06] group-hover:-translate-y-0.5 group-hover:shadow-lg group-active:translate-y-0 group-active:shadow-md transition-all duration-200 ease-out cursor-pointer">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+          <Link href="/dashboard/patron/devis/nouveau" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-lg p-7 md:p-8 border border-white/10 group-hover:border-orange-500/40 group-hover:-translate-y-0.5 group-hover:shadow-xl group-hover:shadow-black/40 group-active:translate-y-0 group-active:shadow-lg transition-all duration-200 ease-out cursor-pointer shadow-lg shadow-black/30 backdrop-blur-sm">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-base md:text-lg font-semibold text-white/95 mb-2.5 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
+                  <h3 className="text-base md:text-lg font-semibold text-white mb-2.5 group-hover:text-orange-400 transition-colors duration-150 leading-snug">
                     Créer un devis
                   </h3>
-                  <p className="text-gray-400/70 text-sm leading-relaxed">Nouveau devis</p>
+                  <p className="text-gray-400 text-sm leading-relaxed">Nouveau devis</p>
                 </div>
-                <span className="text-gray-400/40 group-hover:text-yellow-400/60 transition-colors duration-150 text-lg ml-2">➜</span>
+                <span className="text-gray-500 group-hover:text-orange-400 transition-colors duration-150 text-lg ml-2">➜</span>
               </div>
             </div>
           </Link>
           
-          <Link href="/dashboard/patron/devis" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
-            <div className="bg-white/[0.04] backdrop-blur-sm rounded-lg p-6 md:p-7 border border-white/[0.08] group-hover:border-yellow-500/30 group-hover:bg-white/[0.06] group-hover:-translate-y-0.5 group-hover:shadow-lg group-active:translate-y-0 group-active:shadow-md transition-all duration-200 ease-out cursor-pointer">
+          <Link href="/dashboard/patron/devis" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-lg p-7 md:p-8 border border-white/10 group-hover:border-orange-500/40 group-hover:-translate-y-0.5 group-hover:shadow-xl group-hover:shadow-black/40 group-active:translate-y-0 group-active:shadow-lg transition-all duration-200 ease-out cursor-pointer shadow-lg shadow-black/30 backdrop-blur-sm">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-base md:text-lg font-semibold text-white/95 mb-2.5 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
+                  <h3 className="text-base md:text-lg font-semibold text-white mb-2.5 group-hover:text-orange-400 transition-colors duration-150 leading-snug">
                     Voir les devis
                   </h3>
-                  <p className="text-gray-400/70 text-sm leading-relaxed">Tous les devis</p>
+                  <p className="text-gray-400 text-sm leading-relaxed">Tous les devis</p>
                 </div>
-                <span className="text-gray-400/40 group-hover:text-yellow-400/60 transition-colors duration-150 text-lg ml-2">➜</span>
+                <span className="text-gray-500 group-hover:text-orange-400 transition-colors duration-150 text-lg ml-2">➜</span>
               </div>
             </div>
           </Link>
           
-          <Link href="/dashboard/patron/factures" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
-            <div className="bg-white/[0.04] backdrop-blur-sm rounded-lg p-6 md:p-7 border border-white/[0.08] group-hover:border-yellow-500/30 group-hover:bg-white/[0.06] group-hover:-translate-y-0.5 group-hover:shadow-lg group-active:translate-y-0 group-active:shadow-md transition-all duration-200 ease-out cursor-pointer">
+          <Link href="/dashboard/patron/factures" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-lg p-7 md:p-8 border border-white/10 group-hover:border-orange-500/40 group-hover:-translate-y-0.5 group-hover:shadow-xl group-hover:shadow-black/40 group-active:translate-y-0 group-active:shadow-lg transition-all duration-200 ease-out cursor-pointer shadow-lg shadow-black/30 backdrop-blur-sm">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-base md:text-lg font-semibold text-white/95 mb-2.5 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
+                  <h3 className="text-base md:text-lg font-semibold text-white mb-2.5 group-hover:text-orange-400 transition-colors duration-150 leading-snug">
                     Voir les factures
                   </h3>
-                  <p className="text-gray-400/70 text-sm leading-relaxed">Gestion factures</p>
+                  <p className="text-gray-400 text-sm leading-relaxed">Gestion factures</p>
                 </div>
-                <span className="text-gray-400/40 group-hover:text-yellow-400/60 transition-colors duration-150 text-lg ml-2">➜</span>
+                <span className="text-gray-500 group-hover:text-orange-400 transition-colors duration-150 text-lg ml-2">➜</span>
               </div>
             </div>
           </Link>
           
-          <Link href="/dashboard/patron/chantiers" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
-            <div className="bg-white/[0.04] backdrop-blur-sm rounded-lg p-6 md:p-7 border border-white/[0.08] group-hover:border-yellow-500/30 group-hover:bg-white/[0.06] group-hover:-translate-y-0.5 group-hover:shadow-lg group-active:translate-y-0 group-active:shadow-md transition-all duration-200 ease-out cursor-pointer">
+          <Link href="/dashboard/patron/chantiers" className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0e27] rounded-lg">
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-lg p-7 md:p-8 border border-white/10 group-hover:border-orange-500/40 group-hover:-translate-y-0.5 group-hover:shadow-xl group-hover:shadow-black/40 group-active:translate-y-0 group-active:shadow-lg transition-all duration-200 ease-out cursor-pointer shadow-lg shadow-black/30 backdrop-blur-sm">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className="text-base md:text-lg font-semibold text-white/95 mb-2.5 group-hover:text-yellow-400/95 transition-colors duration-150 leading-snug">
+                  <h3 className="text-base md:text-lg font-semibold text-white mb-2.5 group-hover:text-orange-400 transition-colors duration-150 leading-snug">
                     Voir les chantiers
                   </h3>
-                  <p className="text-gray-400/70 text-sm leading-relaxed">Suivi chantiers</p>
+                  <p className="text-gray-400 text-sm leading-relaxed">Suivi chantiers</p>
                 </div>
-                <span className="text-gray-400/40 group-hover:text-yellow-400/60 transition-colors duration-150 text-lg ml-2">➜</span>
+                <span className="text-gray-500 group-hover:text-orange-400 transition-colors duration-150 text-lg ml-2">➜</span>
               </div>
             </div>
           </Link>
@@ -323,47 +323,47 @@ export default function PatronDashboard() {
 
       {/* Derniers devis - Design premium épuré */}
       <div>
-        <h2 className="text-xl md:text-2xl font-bold text-white/98 mb-6 md:mb-7 tracking-tight">
+        <h2 className="text-xl md:text-2xl font-bold text-white/98 mb-8 md:mb-10 tracking-tight">
           Derniers devis
         </h2>
-        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl border border-white/[0.06] overflow-hidden shadow-sm">
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 overflow-hidden shadow-lg shadow-black/30 backdrop-blur-sm">
           {loading ? (
-            <div className="p-10 text-center">
-              <p className="text-gray-400/70 text-sm font-normal">Chargement...</p>
+            <div className="p-12 text-center">
+              <p className="text-gray-300 text-sm font-normal">Chargement...</p>
             </div>
           ) : quotes.length === 0 ? (
-            <div className="p-10 text-center">
-              <p className="text-gray-400/70 text-sm font-normal mb-2">
+            <div className="p-12 text-center">
+              <p className="text-gray-300 text-sm font-normal mb-2">
                 Aucun devis pour le moment. Commencez par créer votre premier devis.
               </p>
-              <Link href="/dashboard/patron/devis/nouveau" className="inline-block text-xs text-yellow-400/80 hover:text-yellow-400/95 transition-colors duration-150 underline underline-offset-2">
+              <Link href="/dashboard/patron/devis/nouveau" className="inline-block text-xs text-orange-400 hover:text-orange-300 transition-colors duration-150 underline underline-offset-2 font-medium">
                 Créer un devis
               </Link>
             </div>
           ) : (
-            <div className="divide-y divide-white/[0.06]">
+            <div className="divide-y divide-white/10">
               {quotes.slice(0, 5).map((quote) => (
                 <Link
                   key={quote.id}
                   href={`/dashboard/patron/quotes/${quote.id}`}
-                  className="block p-4 md:p-5 hover:bg-white/[0.03] transition-colors duration-200 ease-out group"
+                  className="block p-6 md:p-7 hover:bg-white/5 transition-colors duration-200 ease-out group"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3.5">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2.5 md:gap-3 mb-2.5 flex-wrap">
-                        <h3 className="text-[15px] md:text-base font-semibold text-white/95 group-hover:text-yellow-400/95 transition-colors duration-150 truncate leading-snug">
+                        <h3 className="text-[15px] md:text-base font-semibold text-white group-hover:text-orange-400 transition-colors duration-150 truncate leading-snug">
                           {quote.title}
                         </h3>
                         {getStatusBadge(quote.status)}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-400/70">
+                      <div className="flex items-center gap-2 text-sm text-gray-400">
                         <span className="truncate">{quote.client}</span>
                         <span className="opacity-50">•</span>
                         <span className="whitespace-nowrap">{formatDate(quote.created_at)}</span>
                       </div>
                     </div>
                     <div className="flex-shrink-0">
-                      <p className="text-lg md:text-xl font-semibold text-white/95 tabular-nums tracking-tight leading-[1.1]">
+                      <p className="text-lg md:text-xl font-semibold text-white tabular-nums tracking-tight leading-[1.1]">
                         {formatAmount(quote.amount_ht || 0)}
                       </p>
                     </div>

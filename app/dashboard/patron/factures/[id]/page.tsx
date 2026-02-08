@@ -865,8 +865,8 @@ export default function InvoiceDetailPage() {
       </header>
 
       {/* Contenu principal */}
-      <div className="max-w-4xl mx-auto px-4 py-12 md:px-8">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="max-w-4xl mx-auto px-4 py-12 md:px-8 lg:py-16">
+        <div className="mb-10 md:mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex-1">
             {isEditing ? (
               <Input
@@ -875,6 +875,7 @@ export default function InvoiceDetailPage() {
                 onChange={(e) => updateEditedInvoice('title', e.target.value)}
                 placeholder="Titre de la facture"
                 className="text-3xl md:text-4xl font-bold"
+                variant="dark"
               />
             ) : (
               <>
@@ -902,9 +903,9 @@ export default function InvoiceDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-10 md:mb-12">
           {/* Informations client */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
             <h3 className="text-lg font-semibold text-white mb-4">Client</h3>
             {isEditing ? (
               <div className="space-y-4">
@@ -913,19 +914,21 @@ export default function InvoiceDetailPage() {
                   value={displayInvoice.client || ''}
                   onChange={(e) => updateEditedInvoice('client', e.target.value)}
                   placeholder="Nom du client"
-                  className="text-gray-200"
+                  className="text-white"
+                  variant="dark"
                 />
                 <Input
                   label=""
                   value={displayInvoice.contact || ''}
                   onChange={(e) => updateEditedInvoice('contact', e.target.value)}
                   placeholder="Contact (optionnel)"
-                  className="text-gray-400 text-sm"
+                  className="text-gray-300 text-sm"
+                  variant="dark"
                 />
               </div>
             ) : (
               <>
-                <p className="text-gray-200 mb-2">{invoice.client}</p>
+                <p className="text-white mb-2 font-medium">{invoice.client}</p>
                 {invoice.contact && (
                   <p className="text-gray-400 text-sm">{invoice.contact}</p>
                 )}
@@ -934,7 +937,7 @@ export default function InvoiceDetailPage() {
           </div>
 
           {/* Montant */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
             <h3 className="text-lg font-semibold text-white mb-4">Montant</h3>
             <p className="text-2xl font-bold text-white">
               {formatAmount(getTotalHT())}
@@ -943,7 +946,7 @@ export default function InvoiceDetailPage() {
           </div>
 
           {/* Statut */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
             <h3 className="text-lg font-semibold text-white mb-4">Statut</h3>
             {getStatusBadge(invoice.status)}
             {invoice.updated_at !== invoice.created_at && (
@@ -956,18 +959,18 @@ export default function InvoiceDetailPage() {
 
         {/* Description */}
         {(invoice.description || isEditing) && (
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a] mb-8">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm mb-10 md:mb-12">
             <h3 className="text-lg font-semibold text-white mb-4">Description des travaux</h3>
             {isEditing ? (
               <textarea
                 value={displayInvoice.description || ''}
                 onChange={(e) => updateEditedInvoice('description', e.target.value)}
                 placeholder="Description des travaux..."
-                className="w-full px-4 py-3 bg-[#0f1429] border border-gray-600 rounded-2xl text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all resize-none"
+                className="w-full px-5 py-4 bg-white border-2 border-gray-300 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none"
                 rows={5}
               />
             ) : (
-              <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">
+              <p className="text-gray-300 whitespace-pre-wrap leading-relaxed">
                 {invoice.description}
               </p>
             )}
@@ -976,7 +979,7 @@ export default function InvoiceDetailPage() {
 
         {/* Lignes de facture - Mode édition */}
         {isEditing && (
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a] mb-8">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm mb-10 md:mb-12">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <h3 className="text-lg font-semibold text-white">Lignes de facture</h3>
               <Button
@@ -1164,7 +1167,7 @@ export default function InvoiceDetailPage() {
 
         {/* Lignes de facture - Mode lecture */}
         {!isEditing && (
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a] mb-8">
+          <div className="bg-[#1a1f3a] rounded-3xl p-7 md:p-8 border border-[#2a2f4a] mb-10 md:mb-12">
             <h3 className="text-lg font-semibold text-white mb-4">Lignes de facture</h3>
             {invoiceLines.length === 0 ? (
               <p className="text-gray-400">Aucune ligne de facture</p>

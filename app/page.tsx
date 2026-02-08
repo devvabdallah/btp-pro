@@ -30,9 +30,9 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="w-full px-4 py-16 md:py-24 lg:py-32 md:px-8 bg-white">
+      <section className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
             {/* Texte à gauche */}
             <div className="text-center lg:text-left">
               <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 mb-6 md:mb-8 leading-tight tracking-tight">
@@ -84,11 +84,11 @@ export default function Home() {
       </section>
 
       {/* Bénéfices Section */}
-      <section id="features" className="w-full px-4 py-16 md:py-24 lg:py-32 md:px-8 bg-gray-50">
+      <section id="features" className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-gray-50">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 lg:gap-14">
             {/* Card 1 */}
-            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/20">
                 <span className="text-3xl">⚡</span>
               </div>
@@ -101,7 +101,7 @@ export default function Home() {
             </div>
 
             {/* Card 2 */}
-            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20">
                 <span className="text-3xl">📋</span>
               </div>
@@ -114,7 +114,7 @@ export default function Home() {
             </div>
 
             {/* Card 3 */}
-            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/20">
                 <span className="text-3xl">👥</span>
               </div>
@@ -130,12 +130,12 @@ export default function Home() {
       </section>
 
       {/* Comment ça marche Section */}
-      <section id="how" className="w-full px-4 py-16 md:py-24 lg:py-32 md:px-8 bg-white">
+      <section id="how" className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center mb-16 md:mb-20">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center mb-20 md:mb-24">
             Comment ça marche
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 lg:gap-14">
             {/* Étape 1 */}
             <div className="text-center">
               <div className="w-20 h-20 rounded-full bg-gradient-to-r from-orange-400 to-orange-600 text-white flex items-center justify-center font-bold text-3xl mb-6 mx-auto shadow-lg shadow-orange-500/20">
@@ -170,14 +170,14 @@ export default function Home() {
       </section>
 
       {/* Pour qui Section */}
-      <section className="w-full px-4 py-16 md:py-24 lg:py-32 md:px-8 bg-gray-50">
+      <section className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-gray-50">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center mb-16 md:mb-20">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 text-center mb-20 md:mb-24">
             Pour qui ?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12">
             {/* Patron */}
-            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-sm border border-gray-200">
+            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-sm border border-gray-200">
               <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/20">
                 <span className="text-4xl">👔</span>
               </div>
@@ -190,7 +190,7 @@ export default function Home() {
             </div>
 
             {/* Employé */}
-            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-sm border border-gray-200">
+            <div className="bg-white rounded-2xl p-10 md:p-12 shadow-sm border border-gray-200">
               <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center mb-6 shadow-lg shadow-blue-500/20">
                 <span className="text-4xl">👷</span>
               </div>
@@ -206,7 +206,7 @@ export default function Home() {
       </section>
 
       {/* CTA Final Section */}
-      <section className="w-full px-4 py-16 md:py-24 lg:py-32 md:px-8 bg-white">
+      <section className="w-full px-4 py-20 md:py-28 lg:py-36 md:px-8 bg-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 md:mb-8">
             Prêt à simplifier votre gestion ?

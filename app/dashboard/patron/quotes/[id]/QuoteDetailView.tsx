@@ -204,8 +204,8 @@ export default function QuoteDetailView({
       </header>
 
       {/* Contenu principal */}
-      <div className="max-w-4xl mx-auto px-4 py-12 md:px-8">
-        <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="max-w-4xl mx-auto px-4 py-12 md:px-8 lg:py-16">
+        <div className="mb-10 md:mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="flex-1">
             {isEditing && updateEditedQuote ? (
               <Input
@@ -214,6 +214,7 @@ export default function QuoteDetailView({
                 onChange={(e) => updateEditedQuote('title', e.target.value)}
                 placeholder="Titre du devis"
                 className="text-3xl md:text-4xl font-bold"
+                variant="dark"
               />
             ) : (
               <>
@@ -291,9 +292,9 @@ export default function QuoteDetailView({
           )
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-10 md:mb-12">
           {/* Informations client */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
             <h3 className="text-lg font-semibold text-white mb-4">Client</h3>
             {isEditing && updateEditedQuote ? (
               <div className="space-y-4">
@@ -302,19 +303,21 @@ export default function QuoteDetailView({
                   value={displayQuote.client || ''}
                   onChange={(e) => updateEditedQuote('client', e.target.value)}
                   placeholder="Nom du client"
-                  className="text-gray-200"
+                  className="text-white"
+                  variant="dark"
                 />
                 <Input
                   label=""
                   value={displayQuote.contact || ''}
                   onChange={(e) => updateEditedQuote('contact', e.target.value)}
                   placeholder="Contact (optionnel)"
-                  className="text-gray-400 text-sm"
+                  className="text-gray-300 text-sm"
+                  variant="dark"
                 />
               </div>
             ) : (
               <>
-                <p className="text-gray-200 mb-2">{quote.client}</p>
+                <p className="text-white mb-2 font-medium">{quote.client}</p>
                 {quote.contact && (
                   <p className="text-gray-400 text-sm">{quote.contact}</p>
                 )}
@@ -323,14 +326,14 @@ export default function QuoteDetailView({
           </div>
 
           {/* Montant */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
             <h3 className="text-lg font-semibold text-white mb-4">Montant</h3>
             <p className="text-2xl font-bold text-white">{formatAmount(getTotalHT())}</p>
             <p className="text-gray-400 text-sm mt-1">Hors taxes</p>
           </div>
 
           {/* Statut */}
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a]">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
             <h3 className="text-lg font-semibold text-white mb-4">Statut</h3>
             {getStatusBadge(quote.status)}
           </div>
@@ -338,18 +341,18 @@ export default function QuoteDetailView({
 
         {/* Description */}
         {(quote.description || isEditing) && (
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a] mb-8">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm mb-10 md:mb-12">
             <h3 className="text-lg font-semibold text-white mb-4">Description des travaux</h3>
             {isEditing && updateEditedQuote ? (
               <textarea
                 value={displayQuote.description || ''}
                 onChange={(e) => updateEditedQuote('description', e.target.value)}
                 placeholder="Description des travaux..."
-                className="w-full px-4 py-3 bg-[#0f1429] border border-gray-600 rounded-2xl text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all resize-none"
+                className="w-full px-5 py-4 bg-white border-2 border-gray-300 rounded-2xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none"
                 rows={5}
               />
             ) : (
-              <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">
+              <p className="text-gray-300 whitespace-pre-wrap leading-relaxed">
                 {quote.description}
               </p>
             )}
@@ -358,7 +361,7 @@ export default function QuoteDetailView({
 
         {/* Lignes de devis - Mode édition */}
         {isEditing && editedLines && updateEditedLine && addEditedLine && removeEditedLine && (
-          <div className="bg-[#1a1f3a] rounded-3xl p-6 border border-[#2a2f4a] mb-8">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm mb-10 md:mb-12">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <h3 className="text-lg font-semibold text-white">Lignes de devis</h3>
               <Button
@@ -375,7 +378,7 @@ export default function QuoteDetailView({
               {editedLines.map((line, index) => (
                 <div
                   key={line.id || index}
-                  className="bg-[#0f1429] rounded-2xl p-5 md:p-4 border-2 border-[#2a2f4a] hover:border-yellow-500/30 transition-all"
+                  className="bg-white/5 rounded-2xl p-5 md:p-4 border-2 border-white/10 hover:border-orange-500/40 transition-all"
                 >
                   {/* Mobile: Card layout */}
                   <div className="md:hidden space-y-4">
@@ -387,7 +390,7 @@ export default function QuoteDetailView({
                         type="text"
                         value={line.description || ''}
                         onChange={(e) => updateEditedLine(index, 'description', e.target.value)}
-                        className="w-full px-4 py-3 bg-[#020617] border border-gray-600 rounded-xl text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        className="w-full px-4 py-3 bg-white border-2 border-gray-300 rounded-xl text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         placeholder="Description de la tâche"
                       />
                     </div>

@@ -196,16 +196,19 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0e27] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center px-4 py-16 md:py-20">
+      <div className="w-full max-w-lg">
+        <div className="text-center mb-10 md:mb-12">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 tracking-tight">
             Créer un compte
           </h1>
+          <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+            Commencez votre essai gratuit de 5 jours
+          </p>
         </div>
 
-        <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a]">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-3xl p-10 md:p-12 border border-gray-200 shadow-xl shadow-gray-200/50">
+          <form onSubmit={handleSubmit} className="space-y-8">
             <Input
               label="Email"
               type="email"
@@ -235,18 +238,18 @@ export default function RegisterPage() {
             />
 
             {/* Choix du rôle */}
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+            <div className="space-y-4 pt-2">
+              <label className="block text-base font-semibold text-gray-900 mb-3">
                 Je suis
               </label>
               <div className="flex gap-4">
                 <button
                   type="button"
                   onClick={() => setRole('patron')}
-                  className={`flex-1 px-4 py-3 rounded-2xl font-semibold transition-all ${
+                  className={`flex-1 px-6 py-4 rounded-2xl font-semibold text-base transition-all ${
                     role === 'patron'
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27]'
-                      : 'bg-[#0f1429] border border-gray-600 text-gray-300'
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30'
+                      : 'bg-gray-100 border-2 border-gray-200 text-gray-700 hover:border-gray-300'
                   }`}
                 >
                   Patron
@@ -254,10 +257,10 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setRole('employe')}
-                  className={`flex-1 px-4 py-3 rounded-2xl font-semibold transition-all ${
+                  className={`flex-1 px-6 py-4 rounded-2xl font-semibold text-base transition-all ${
                     role === 'employe'
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27]'
-                      : 'bg-[#0f1429] border border-gray-600 text-gray-300'
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30'
+                      : 'bg-gray-100 border-2 border-gray-200 text-gray-700 hover:border-gray-300'
                   }`}
                 >
                   Employé
@@ -289,21 +292,23 @@ export default function RegisterPage() {
 
             <ErrorMessage message={error} />
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              className="w-full"
-              disabled={loading}
-            >
-              {loading ? 'Création en cours...' : 'Créer mon compte'}
-            </Button>
+            <div className="pt-2">
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="w-full min-h-[56px] text-lg font-semibold"
+                disabled={loading}
+              >
+                {loading ? 'Création en cours...' : 'Créer mon compte'}
+              </Button>
+            </div>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-gray-400">
+          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+            <p className="text-base text-gray-600">
               Déjà un compte ?{' '}
-              <Link href="/login" className="text-yellow-400 hover:text-yellow-500 font-semibold">
+              <Link href="/login" className="text-orange-600 hover:text-orange-700 font-semibold transition-colors">
                 Me connecter
               </Link>
             </p>
