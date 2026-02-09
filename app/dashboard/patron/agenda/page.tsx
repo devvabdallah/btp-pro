@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getAgendaEvents, AgendaEvent } from '@/lib/agenda-actions'
 import AgendaClient from './AgendaClient'
@@ -10,7 +9,7 @@ export default async function AgendaPage() {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    redirect('/login')
+    return <AgendaClient events={[]} error="Session expirée. Veuillez vous reconnecter." />
   }
 
   // Récupérer le profil pour obtenir entreprise_id
@@ -21,7 +20,7 @@ export default async function AgendaPage() {
     .single()
 
   if (!profile?.entreprise_id) {
-    redirect('/login')
+    return <AgendaClient events={[]} error="Session expirée. Veuillez vous reconnecter." />
   }
 
   // Vérifier que l'entreprise est active (même logique que middleware)
@@ -38,7 +37,7 @@ export default async function AgendaPage() {
       })
 
       if (!error && (isActive === null || isActive === undefined || !isActive)) {
-        redirect('/abonnement-expire')
+        return <AgendaClient events={[]} error="Abonnement expiré. Veuillez renouveler votre abonnement." />
       }
     }
   }
