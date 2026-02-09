@@ -16,6 +16,8 @@ export default function AbonnementPage() {
   const [entrepriseId, setEntrepriseId] = useState<string | null>(null)
   const [daysRemaining, setDaysRemaining] = useState<number | null>(null)
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null)
+  const [trialStartedAt, setTrialStartedAt] = useState<string | null>(null)
+  const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null)
   const [loadingCheckout, setLoadingCheckout] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [checkoutSuccess, setCheckoutSuccess] = useState(false)
@@ -165,27 +167,27 @@ export default function AbonnementPage() {
         // 4. Remplir les états avec les données de l'API
         setEntrepriseId(entrepriseData.entrepriseId)
         setTrialEndsAt(entrepriseData.trial_ends_at)
+        setTrialStartedAt(entrepriseData.trial_started_at)
+        setSubscriptionStatus(entrepriseData.subscription_status)
 
-        console.log('[Abonnement] Entreprise loaded:', {
-          id: entrepriseData.entrepriseId,
-          hasTrialEndsAt: !!entrepriseData.trial_ends_at
-        })
-
-        // 5. Calculer les jours restants si trial_ends_at existe
+        // 5. Calculer les jours restants à partir de trial_ends_at
         if (entrepriseData.trial_ends_at) {
-          const trialEnd = new Date(entrepriseData.trial_ends_at)
-          const now = new Date()
-          if (trialEnd > now) {
-            const diffTime = trialEnd.getTime() - now.getTime()
-            const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
-            setDaysRemaining(diffDays)
-            console.log('[Abonnement] Trial days remaining:', diffDays)
-          } else {
-            setDaysRemaining(0)
-          }
+          const diffTime = new Date(entrepriseData.trial_ends_at).getTime() - Date.now()
+          const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
+          setDaysRemaining(diffDays)
         } else {
           setDaysRemaining(null)
         }
+
+        // Log de debug
+        console.log('[Abonnement] Entreprise subscription:', {
+          subscription_status: entrepriseData.subscription_status,
+          trial_starts_at: entrepriseData.trial_started_at,
+          trial_ends_at: entrepriseData.trial_ends_at,
+          daysRemaining: entrepriseData.trial_ends_at 
+            ? Math.max(0, Math.ceil((new Date(entrepriseData.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+            : null
+        })
 
         // 6. Appeler RPC is_company_active avec plusieurs tentatives
         const isActiveResult = await checkCompanyActive(supabase, entrepriseData.entrepriseId)
@@ -214,30 +216,24 @@ export default function AbonnementPage() {
     load()
   }, [router])
 
-  // Déterminer le statut de l'abonnement
+  // Déterminer le statut de l'abonnement basé sur subscription_status de la DB
   const getSubscriptionStatus = () => {
     // Si le statut est inconnu (toutes les tentatives RPC ont échoué)
     if (statusUnknown) {
       return 'unknown'
     }
 
-    if (isActive === null) return null
-
-    // Si l'entreprise est active selon le RPC
-    if (isActive === true) {
-      // Si on a un trial_ends_at et qu'il est dans le futur, c'est un essai gratuit actif
-      if (trialEndsAt) {
-        const trialEnd = new Date(trialEndsAt)
-        const now = new Date()
-        if (trialEnd > now && daysRemaining !== null && daysRemaining > 0) {
-          return 'trial'
-        }
-      }
-      // Sinon, c'est un abonnement actif
+    // Si subscription_status === 'active' => afficher "Actif"
+    if (subscriptionStatus === 'active') {
       return 'active'
     }
 
-    // Si l'entreprise n'est pas active selon le RPC
+    // Sinon si daysRemaining !== null et daysRemaining > 0 => afficher "Essai gratuit"
+    if (daysRemaining !== null && daysRemaining > 0) {
+      return 'trial'
+    }
+
+    // Sinon => afficher "Expiré"
     return 'expired'
   }
 
@@ -398,14 +394,16 @@ export default function AbonnementPage() {
             <span className="text-gray-400/75 text-sm md:text-base">Prix :</span>
             <span className="text-white/95 font-semibold text-sm md:text-base tabular-nums tracking-tight">50€/mois</span>
           </div>
-          <div className="flex items-center justify-between py-3.5 border-b border-white/[0.06]">
-            <span className="text-gray-400/75 text-sm md:text-base">Essai :</span>
-            <span className="text-white/95 font-semibold text-sm md:text-base">5 jours</span>
-          </div>
           {status === 'trial' && daysRemaining !== null && daysRemaining > 0 && (
             <div className="flex items-center justify-between py-3.5 border-b border-white/[0.06]">
               <span className="text-gray-400/75 text-sm md:text-base">Jours restants :</span>
               <span className="text-yellow-400/95 font-semibold text-base md:text-lg tabular-nums tracking-tight">{daysRemaining} jour{daysRemaining > 1 ? 's' : ''}</span>
+            </div>
+          )}
+          {status === 'expired' && daysRemaining !== null && (
+            <div className="flex items-center justify-between py-3.5 border-b border-white/[0.06]">
+              <span className="text-gray-400/75 text-sm md:text-base">Jours restants :</span>
+              <span className="text-red-400/95 font-semibold text-base md:text-lg tabular-nums tracking-tight">0 jour</span>
             </div>
           )}
         </div>
