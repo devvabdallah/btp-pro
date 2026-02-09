@@ -1,6 +1,17 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+function redirectWithCookies(to: string, request: NextRequest, response: NextResponse): NextResponse {
+  const redirectResponse = NextResponse.redirect(new URL(to, request.url))
+  
+  // Copier tous les cookies de response vers redirectResponse
+  response.cookies.getAll().forEach((cookie) => {
+    redirectResponse.cookies.set(cookie.name, cookie.value)
+  })
+  
+  return redirectResponse
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -28,9 +39,9 @@ export async function middleware(request: NextRequest) {
       getAll() {
         return request.cookies.getAll()
       },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options)
+      setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
+        cookiesToSet.forEach((cookie) => {
+          response.cookies.set(cookie.name, cookie.value, cookie.options)
         })
       },
     },
@@ -95,14 +106,14 @@ export async function middleware(request: NextRequest) {
     // Si pas de données retournées, considérer comme inactif par sécurité
     if (data === null || data === undefined) {
       console.warn('[Middleware] RPC returned null/undefined, considering inactive')
-      return NextResponse.redirect(new URL('/abonnement-expire', request.url))
+      return redirectWithCookies('/abonnement-expire', request, response)
     }
 
     // Interpréter le résultat booléen
     const isActive = typeof data === 'boolean' ? data : Boolean(data)
     if (!isActive) {
       // Seulement rediriger si le RPC répond correctement ET que l'entreprise est inactive
-      return NextResponse.redirect(new URL('/abonnement-expire', request.url))
+      return redirectWithCookies('/abonnement-expire', request, response)
     }
   } catch (err) {
     // En cas d'exception technique (réseau, timeout, etc.), logger mais NE PAS rediriger
