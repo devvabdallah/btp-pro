@@ -57,8 +57,6 @@ export async function POST(request: NextRequest) {
   try {
     const supabaseAdmin = createSupabaseAdminClient()
 
-    console.log('[WEBHOOK] Event reçu:', event.type)
-
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
@@ -67,22 +65,14 @@ export async function POST(request: NextRequest) {
         const companyId = session.metadata?.companyId || session.client_reference_id || session.metadata?.company_id
 
         if (!companyId) {
-          console.warn('[WEBHOOK] companyId manquant dans metadata')
+          console.error('[Stripe Webhook] companyId manquant dans metadata/client_reference_id pour session:', session.id)
           return NextResponse.json({ received: true, warning: 'companyId manquant' })
         }
-
-        console.log('[WEBHOOK] checkout.session.completed', {
-          companyId,
-          customer: session.customer,
-          subscription: session.subscription
-        })
 
         if (session.mode === 'subscription' && session.subscription) {
           const subscription = await stripe.subscriptions.retrieve(
             session.subscription as string
           )
-          
-          console.log('[WEBHOOK] Activation entreprise:', companyId)
           
           // Mettre à jour l'entreprise avec statut ACTIVE après paiement réussi
           const updateData: any = {
