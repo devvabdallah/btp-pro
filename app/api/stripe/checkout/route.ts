@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
@@ -25,85 +24,64 @@ export async function POST(request: NextRequest) {
       apiVersion: '2023-10-16',
     })
 
-    // 3. Lire le body pour obtenir companyId (lecture robuste)
-    const body = await request.json().catch(() => ({}))
+    // 3. Lire et valider le header Authorization (source unique d'authentification)
+    const authHeader = request.headers.get('authorization') || request.headers.get('Authorization')
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Session non disponible' },
+        { status: 401 }
+      )
+    }
 
-    // Extraire l'identifiant entreprise de façon tolérante
+    const token = authHeader.replace('Bearer ', '').trim()
+
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Session non disponible' },
+        { status: 401 }
+      )
+    }
+
+    // 4. Lire le body pour obtenir companyId
+    const body = await request.json().catch(() => ({}))
     const companyId = body?.companyId || body?.entrepriseId || body?.entreprise_id
 
-    // Log pour debugging
-    console.log('[Stripe Checkout] companyId received:', companyId)
-
     if (!companyId) {
-      console.error('[Stripe Checkout] companyId manquant dans le body:', {
-        bodyKeys: Object.keys(body || {}),
-        bodyType: typeof body,
-        hasCompanyId: 'companyId' in (body || {}),
-        hasEntrepriseId: 'entrepriseId' in (body || {}),
-        hasEntreprise_id: 'entreprise_id' in (body || {})
-      })
       return NextResponse.json(
         { error: 'companyId manquant' },
         { status: 400 }
       )
     }
 
-    // 4. Récupérer l'utilisateur connecté
-    // Priorité: header Authorization Bearer token, sinon fallback sur cookies
-    let user = null
-    let supabase = null
+    // 5. Authentifier l'utilisateur avec le token (via admin)
+    const supabaseAdmin = createSupabaseAdminClient()
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
 
-    const authHeader = request.headers.get('authorization')
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      // Utiliser le token depuis le header Authorization
-      const token = authHeader.substring(7)
-      const adminSupabase = createSupabaseAdminClient()
-      const { data: { user: authUser }, error: userError } = await adminSupabase.auth.getUser(token)
-
-      if (userError || !authUser) {
-        return NextResponse.json(
-          { error: 'Non authentifié' },
-          { status: 401 }
-        )
-      }
-
-      user = authUser
-      // Utiliser le client admin pour les requêtes suivantes
-      supabase = adminSupabase
-    } else {
-      // Fallback: utiliser les cookies
-      supabase = await createSupabaseServerClient()
-      const { data: { user: authUser }, error: userError } = await supabase.auth.getUser()
-
-      if (userError || !authUser) {
-        return NextResponse.json(
-          { error: 'Non authentifié' },
-          { status: 401 }
-        )
-      }
-
-      user = authUser
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Session non disponible' },
+        { status: 401 }
+      )
     }
 
-    // 5. Utiliser un client admin pour lire profiles et entreprises (bypass RLS)
-    const supabaseAdmin = createSupabaseAdminClient()
-
-    // 5.1. Récupérer le profil pour vérifier le rôle et l'entreprise_id
+    // 6. Vérifier l'accès : lire le profil
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
-      .select('role, entreprise_id')
+      .select('entreprise_id, role')
       .eq('id', user.id)
       .single()
 
     if (profileError || !profile) {
-      console.error('[Stripe Checkout] Profil introuvable:', {
-        userId: user.id,
-        error: profileError,
-        errorMessage: profileError?.message,
-        errorCode: profileError?.code
-      })
       return NextResponse.json(
-        { error: 'Profil introuvable' },
+        { error: 'Entreprise introuvable' },
+        { status: 404 }
+      )
+    }
+
+    if (!profile.entreprise_id) {
+      return NextResponse.json(
+        { error: 'Entreprise introuvable' },
         { status: 404 }
       )
     }
@@ -116,62 +94,32 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 5.2. Vérifier que l'utilisateur a accès à cette entreprise
-    if (!profile.entreprise_id) {
-      console.error('[Stripe Checkout] Utilisateur sans entreprise:', {
-        userId: user.id,
-        companyId: companyId
-      })
-      return NextResponse.json(
-        { error: 'Entreprise introuvable' },
-        { status: 404 }
-      )
-    }
-
-    // 5.3. Comparer profile.entreprise_id avec companyId du body
+    // Comparer profile.entreprise_id avec companyId du body
     if (profile.entreprise_id !== companyId) {
-      console.error('[Stripe Checkout] Accès refusé - entreprise_id ne correspond pas:', {
-        userId: user.id,
-        profileEntrepriseId: profile.entreprise_id,
-        requestedCompanyId: companyId
-      })
       return NextResponse.json(
         { error: 'Accès refusé' },
         { status: 403 }
       )
     }
 
-    // 6. Récupérer l'entreprise pour vérifier/créer le customer Stripe
-    console.log('[Stripe Checkout] Recherche entreprise:', {
-      userId: user.id,
-      companyId: companyId,
-      table: 'entreprises',
-      colonne: 'id'
-    })
-    
+    // 7. Log clair (sans secrets)
+    console.log('[Stripe Checkout] user:', user.id, 'companyId:', companyId, 'profileEntrepriseId:', profile.entreprise_id)
+
+    // 8. Charger l'entreprise
     const { data: entreprise, error: entrepriseError } = await supabaseAdmin
       .from('entreprises')
-      .select('id, name, stripe_customer_id')
+      .select('*')
       .eq('id', companyId)
       .single()
 
     if (entrepriseError || !entreprise) {
-      console.error('[Stripe Checkout] Entreprise introuvable:', {
-        userId: user.id,
-        companyId: companyId,
-        error: entrepriseError,
-        errorMessage: entrepriseError?.message,
-        errorCode: entrepriseError?.code,
-        errorDetails: entrepriseError?.details,
-        errorHint: entrepriseError?.hint
-      })
       return NextResponse.json(
         { error: 'Entreprise introuvable' },
         { status: 404 }
       )
     }
 
-    // 7. Créer ou récupérer le customer Stripe
+    // 9. Créer ou récupérer le customer Stripe
     let customerId = entreprise.stripe_customer_id
 
     if (!customerId) {
@@ -192,7 +140,7 @@ export async function POST(request: NextRequest) {
         .eq('id', entreprise.id)
     }
 
-    // 8. Récupérer APP_URL depuis les variables d'environnement
+    // 10. Récupérer APP_URL depuis les variables d'environnement
     const appUrl = process.env.APP_URL
 
     if (!appUrl) {
@@ -203,7 +151,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 9. Créer la session Stripe Checkout
+    // 11. Créer la session Stripe Checkout
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
