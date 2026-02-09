@@ -61,60 +61,59 @@ export async function POST(request: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         
-        // Récupérer companyId depuis session.metadata.companyId OU session.client_reference_id
-        const companyId = session.metadata?.companyId || session.client_reference_id || session.metadata?.company_id
+        // Récupérer companyId depuis session.metadata.companyId
+        const companyId = session.metadata?.companyId
 
         if (!companyId) {
-          console.error('[Stripe Webhook] companyId manquant dans metadata/client_reference_id pour session:', session.id)
+          console.warn('[WEBHOOK] companyId manquant dans metadata')
           return NextResponse.json({ received: true, warning: 'companyId manquant' })
         }
 
-        if (session.mode === 'subscription' && session.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(
-            session.subscription as string
-          )
-          
-          // Mettre à jour l'entreprise avec statut ACTIVE après paiement réussi
-          const updateData: any = {
-            subscription_status: 'active',
-            stripe_customer_id: subscription.customer as string,
-            stripe_subscription_id: subscription.id,
-            subscription_current_period_end: subscription.current_period_end
-              ? new Date(subscription.current_period_end * 1000).toISOString()
-              : null,
-            updated_at: new Date().toISOString(),
-          }
+        console.log('[WEBHOOK] activation', {
+          companyId,
+          subscription: session.subscription,
+          customer: session.customer
+        })
 
-          const { error: updateError } = await supabaseAdmin
-            .from('entreprises')
-            .update(updateData)
-            .eq('id', companyId)
-
-          if (updateError) {
-            console.error('[Stripe Webhook] Erreur lors de la mise à jour de l\'entreprise:', updateError)
-            return NextResponse.json({ received: true, warning: 'Erreur mise à jour entreprise' })
-          }
-
-          console.log('[Stripe Webhook] Abonnement activé pour entreprise:', companyId)
-        } else if (session.customer) {
-          // Mode payment (one-time), mettre à jour stripe_customer_id si présent
-          const updateData: any = {
-            stripe_customer_id: session.customer as string,
-            updated_at: new Date().toISOString(),
-          }
-
-          const { error: updateError } = await supabaseAdmin
-            .from('entreprises')
-            .update(updateData)
-            .eq('id', companyId)
-
-          if (updateError) {
-            console.error('[Stripe Webhook] Erreur lors de la mise à jour customer_id:', updateError)
-          } else {
-            console.log('[Stripe Webhook] Customer ID mis à jour pour entreprise:', companyId)
-          }
+        // Mettre à jour l'entreprise avec statut ACTIVE après paiement réussi
+        const updateData: any = {
+          subscription_status: 'active',
+          updated_at: new Date().toISOString(),
         }
-        break
+
+        // Optionnel: mettre à jour trial_ends_at pour éviter "reste 5 jours" après paiement
+        if (session.mode === 'subscription' && session.subscription) {
+          try {
+            const subscription = await stripe.subscriptions.retrieve(
+              session.subscription as string
+            )
+            updateData.stripe_customer_id = subscription.customer as string
+            updateData.stripe_subscription_id = subscription.id
+            updateData.subscription_current_period_end = subscription.current_period_end
+              ? new Date(subscription.current_period_end * 1000).toISOString()
+              : null
+          } catch (err) {
+            console.error('[WEBHOOK] Erreur lors de la récupération de la subscription:', err)
+          }
+        } else if (session.customer) {
+          updateData.stripe_customer_id = session.customer as string
+        }
+
+        // Toujours mettre trial_ends_at à now() pour éviter "reste 5 jours" après paiement
+        updateData.trial_ends_at = new Date().toISOString()
+
+        const { error: updateError } = await supabaseAdmin
+          .from('entreprises')
+          .update(updateData)
+          .eq('id', companyId)
+
+        if (updateError) {
+          console.error('[WEBHOOK] Erreur lors de la mise à jour de l\'entreprise:', updateError)
+        } else {
+          console.log('[WEBHOOK] Entreprise activée:', companyId)
+        }
+
+        return NextResponse.json({ received: true })
       }
 
       case 'customer.subscription.created':
