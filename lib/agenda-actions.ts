@@ -1,6 +1,7 @@
 'use server'
 
-import { createSupabaseServerClient } from './supabase/server'
+import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
 
 export type AgendaEventStatus = 'planned' | 'confirmed' | 'completed' | 'cancelled'
 
@@ -38,55 +39,90 @@ export interface CreateAgendaEventData {
 }
 
 /**
+ * Crée un client Supabase serveur basé sur les cookies Next.js
+ */
+async function createSupabaseClient() {
+  const cookieStore = await cookies()
+  
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Variables d\'environnement Supabase manquantes')
+  }
+
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
+      },
+      setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          cookieStore.set(name, value, options)
+        })
+      },
+    },
+  })
+}
+
+/**
  * Récupère l'entreprise_id de l'utilisateur connecté
  */
 async function getUserEntrepriseId(): Promise<{ entrepriseId: string | null; error: string | null }> {
-  const supabase = await createSupabaseServerClient()
+  try {
+    const supabase = await createSupabaseClient()
 
-  // getUser() rafraîchit automatiquement le token si nécessaire
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
+    // getUser() rafraîchit automatiquement le token si nécessaire
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser()
 
-  if (userError) {
-    console.error('[Agenda] getUser error:', userError)
+    if (userError) {
+      console.error('[Agenda] getUser error:', userError)
+      return {
+        entrepriseId: null,
+        error: 'Session expirée. Reconnectez-vous.',
+      }
+    }
+
+    if (!user) {
+      return {
+        entrepriseId: null,
+        error: 'Session expirée. Reconnectez-vous.',
+      }
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('entreprise_id')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !profile) {
+      return {
+        entrepriseId: null,
+        error: 'Profil utilisateur introuvable',
+      }
+    }
+
+    if (!profile.entreprise_id) {
+      return {
+        entrepriseId: null,
+        error: 'Entreprise non liée au profil',
+      }
+    }
+
+    return {
+      entrepriseId: profile.entreprise_id,
+      error: null,
+    }
+  } catch (error) {
+    console.error('[Agenda] getUserEntrepriseId error:', error)
     return {
       entrepriseId: null,
-      error: 'Erreur de session',
+      error: 'Session expirée. Reconnectez-vous.',
     }
-  }
-
-  if (!user) {
-    return {
-      entrepriseId: null,
-      error: 'Utilisateur non connecté',
-    }
-  }
-
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('entreprise_id')
-    .eq('id', user.id)
-    .single()
-
-  if (profileError || !profile) {
-    return {
-      entrepriseId: null,
-      error: 'Profil utilisateur introuvable',
-    }
-  }
-
-  if (!profile.entreprise_id) {
-    return {
-      entrepriseId: null,
-      error: 'Entreprise non liée au profil',
-    }
-  }
-
-  return {
-    entrepriseId: profile.entreprise_id,
-    error: null,
   }
 }
 
@@ -104,7 +140,7 @@ export async function getAgendaEvents(): Promise<{ success: boolean; events?: Ag
       }
     }
 
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseClient()
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
@@ -153,16 +189,17 @@ export async function createAgendaEvent(data: CreateAgendaEventData): Promise<{ 
       }
     }
 
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseClient()
 
     const {
       data: { user },
+      error: userError,
     } = await supabase.auth.getUser()
 
-    if (!user) {
+    if (!user || userError) {
       return {
         success: false,
-        error: 'Utilisateur non connecté.',
+        error: 'Session expirée. Reconnectez-vous.',
       }
     }
 
@@ -241,7 +278,7 @@ export async function getChantiersForSelect(): Promise<{ success: boolean; chant
       }
     }
 
-    const supabase = await createSupabaseServerClient()
+    const supabase = await createSupabaseClient()
 
     const { data: chantiers, error } = await supabase
       .from('chantiers')
