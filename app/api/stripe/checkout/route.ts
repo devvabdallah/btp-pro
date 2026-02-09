@@ -25,19 +25,23 @@ export async function POST(request: NextRequest) {
       apiVersion: '2023-10-16',
     })
 
-    // 3. Lire le body pour obtenir companyId
-    let body
-    try {
-      body = await request.json()
-    } catch (error) {
-      return NextResponse.json(
-        { error: 'Body JSON invalide' },
-        { status: 400 }
-      )
-    }
+    // 3. Lire le body pour obtenir companyId (lecture robuste)
+    const body = await request.json().catch(() => ({}))
 
-    const companyId = body?.companyId
+    // Extraire l'identifiant entreprise de façon tolérante
+    const companyId = body?.companyId || body?.entrepriseId || body?.entreprise_id
+
+    // Log pour debugging
+    console.log('[Stripe Checkout] companyId received:', companyId)
+
     if (!companyId) {
+      console.error('[Stripe Checkout] companyId manquant dans le body:', {
+        bodyKeys: Object.keys(body || {}),
+        bodyType: typeof body,
+        hasCompanyId: 'companyId' in (body || {}),
+        hasEntrepriseId: 'entrepriseId' in (body || {}),
+        hasEntreprise_id: 'entreprise_id' in (body || {})
+      })
       return NextResponse.json(
         { error: 'companyId manquant' },
         { status: 400 }
