@@ -76,7 +76,7 @@ export async function middleware(request: NextRequest) {
   // Appeler le RPC uniquement APRÈS vérification de la session
   try {
     const { data, error } = await supabase.rpc('is_company_active', {
-      entreprise_id: profile.entreprise_id,
+      company_id: profile.entreprise_id,
     })
 
     // Si erreur technique (404, timeout, etc.), logger mais NE PAS rediriger

@@ -99,6 +99,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { label: 'Factures', href: '/dashboard/patron/factures' },
     { label: 'Clients', href: '/dashboard/patron/clients' },
     { label: 'Chantiers', href: '/dashboard/patron/chantiers' },
+    { label: 'Agenda', href: '/dashboard/patron/agenda' },
     { label: 'Abonnement', href: '/dashboard/patron/abonnement' },
   ]
 
@@ -111,6 +112,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { label: 'Accueil', href: '/dashboard/employe' },
     { label: 'Chantiers', href: '/dashboard/employe/chantiers' },
     { label: 'Clients', href: '/dashboard/employe/clients' },
+    { label: 'Agenda', href: '/dashboard/employe/agenda' },
   ]
 
   const navItems = isPatron ? patronNavItems : employeNavItems

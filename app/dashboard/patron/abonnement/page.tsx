@@ -22,62 +22,38 @@ export default function AbonnementPage() {
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [checkoutSuccess, setCheckoutSuccess] = useState(false)
 
-  // Helper pour vérifier si l'entreprise est active avec plusieurs tentatives de noms de paramètres
+  // Helper pour vérifier si l'entreprise est active
   async function checkCompanyActive(supabase: any, entrepriseIdValue: string): Promise<boolean | null> {
-    const attempts = [
-      { paramName: 'entreprise_id', value: entrepriseIdValue },
-      { paramName: 'p_entreprise_id', value: entrepriseIdValue },
-      { paramName: 'company_id', value: entrepriseIdValue },
-      { paramName: 'id', value: entrepriseIdValue }
-    ]
+    try {
+      const { data, error: rpcError } = await supabase.rpc('is_company_active', {
+        company_id: entrepriseIdValue
+      })
 
-    const errors: Array<{ paramName: string; error: any }> = []
-
-    for (const attempt of attempts) {
-      try {
-        const { data, error: rpcError } = await supabase.rpc('is_company_active', {
-          [attempt.paramName]: attempt.value
+      if (rpcError) {
+        console.error('[Abonnement] RPC is_company_active error:', {
+          entrepriseId: entrepriseIdValue,
+          error: rpcError.message,
+          code: rpcError.code
         })
-
-        if (!rpcError && data !== null && data !== undefined) {
-          console.log('[Abonnement] RPC success:', {
-            paramName: attempt.paramName,
-            entrepriseId: entrepriseIdValue,
-            isActive: data
-          })
-          return data === true
-        }
-
-        if (rpcError) {
-          errors.push({
-            paramName: attempt.paramName,
-            error: {
-              message: rpcError.message,
-              details: rpcError.details,
-              hint: rpcError.hint,
-              code: rpcError.code
-            }
-          })
-        }
-      } catch (err) {
-        errors.push({
-          paramName: attempt.paramName,
-          error: err instanceof Error ? err.message : 'Unknown error'
-        })
+        return null
       }
+
+      if (data !== null && data !== undefined) {
+        console.log('[Abonnement] RPC success:', {
+          entrepriseId: entrepriseIdValue,
+          isActive: data
+        })
+        return data === true
+      }
+
+      return null
+    } catch (err) {
+      console.error('[Abonnement] RPC is_company_active exception:', {
+        entrepriseId: entrepriseIdValue,
+        error: err instanceof Error ? err.message : 'Unknown error'
+      })
+      return null
     }
-
-    // Toutes les tentatives ont échoué
-    console.error('[Abonnement] All RPC attempts failed:', {
-      context: 'is_company_active',
-      entrepriseId: entrepriseIdValue,
-      attempts: errors.map(e => ({
-        paramName: e.paramName,
-        message: e.error?.message || e.error
-      }))
-    })
-
-    return null
   }
 
   // Vérifier les paramètres de query string pour success/canceled

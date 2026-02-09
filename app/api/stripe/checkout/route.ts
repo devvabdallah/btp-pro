@@ -290,13 +290,16 @@ export async function POST(request: NextRequest) {
         ],
         success_url: `${appUrl}/dashboard/patron/abonnement?success=1`,
         cancel_url: `${appUrl}/dashboard/patron/abonnement?canceled=1`,
+        client_reference_id: companyId,
         metadata: {
+          companyId: companyId,
           company_id: entreprise.id,
           entreprise_id: entreprise.id,
           user_id: user.id,
         },
         subscription_data: {
           metadata: {
+            companyId: companyId,
             company_id: entreprise.id,
             entreprise_id: entreprise.id,
           },
