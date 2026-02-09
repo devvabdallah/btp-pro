@@ -41,7 +41,7 @@ export async function checkCompanyActive(
 
   try {
     // Appeler le RPC is_company_active
-    const rpcParams = entrepriseId ? { company_id: entrepriseId } : {}
+    const rpcParams = entrepriseId ? { p_entreprise_id: entrepriseId } : {}
     console.log('[subscription-check] is_company_active args OK', { entrepriseId })
     const { data, error } = await supabase.rpc('is_company_active', rpcParams)
 

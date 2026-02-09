@@ -20,6 +20,12 @@ export interface AgendaEvent {
   chantiers?: {
     id: string
     title: string
+    address: string | null
+    client: {
+      id: string
+      first_name: string
+      last_name: string
+    } | null
   } | null
 }
 
@@ -99,20 +105,19 @@ export async function getAgendaEvents(): Promise<{ success: boolean; events?: Ag
     }
 
     const supabase = await createSupabaseServerClient()
-    const now = new Date()
-    const in7Days = new Date()
-    in7Days.setDate(in7Days.getDate() + 7)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
     const { data: events, error } = await supabase
       .from('agenda_events')
       .select(`
         *,
-        chantiers(id, title)
+        chantiers(id, title, address, client:clients(id, first_name, last_name))
       `)
       .eq('company_id', entrepriseId)
-      .gte('starts_at', now.toISOString())
-      .lte('starts_at', in7Days.toISOString())
+      .gte('starts_at', today.toISOString())
       .order('starts_at', { ascending: true })
+      .limit(50)
 
     if (error) {
       return {

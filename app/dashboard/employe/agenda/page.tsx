@@ -34,7 +34,7 @@ export default async function AgendaPage() {
     } else {
       // Appeler le RPC is_company_active
       const { data: isActive, error } = await supabase.rpc('is_company_active', {
-        company_id: profile.entreprise_id,
+        p_entreprise_id: profile.entreprise_id,
       })
 
       if (!error && (isActive === null || isActive === undefined || !isActive)) {
