@@ -57,31 +57,42 @@ export async function POST(request: NextRequest) {
   try {
     const supabaseAdmin = createSupabaseAdminClient()
 
+    console.log('[WEBHOOK] Event reçu:', event.type)
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         
+        // Récupérer companyId depuis session.metadata.companyId OU session.client_reference_id
+        const companyId = session.metadata?.companyId || session.client_reference_id || session.metadata?.company_id
+
+        if (!companyId) {
+          console.warn('[WEBHOOK] companyId manquant dans metadata')
+          return NextResponse.json({ received: true, warning: 'companyId manquant' })
+        }
+
+        console.log('[WEBHOOK] checkout.session.completed', {
+          companyId,
+          customer: session.customer,
+          subscription: session.subscription
+        })
+
         if (session.mode === 'subscription' && session.subscription) {
           const subscription = await stripe.subscriptions.retrieve(
             session.subscription as string
           )
           
-          // Récupérer company_id depuis les metadata (priorité: session.metadata puis subscription.metadata)
-          const companyId = session.metadata?.company_id || subscription.metadata?.company_id
-
-          if (!companyId) {
-            console.error('[Stripe Webhook] company_id manquant dans metadata pour session:', session.id)
-            return NextResponse.json({ received: true, warning: 'company_id manquant' })
-          }
-
-          // Mettre à jour l'entreprise avec toutes les informations de l'abonnement
+          console.log('[WEBHOOK] Activation entreprise:', companyId)
+          
+          // Mettre à jour l'entreprise avec statut ACTIVE après paiement réussi
           const updateData: any = {
+            subscription_status: 'active',
             stripe_customer_id: subscription.customer as string,
             stripe_subscription_id: subscription.id,
-            subscription_status: subscription.status,
             subscription_current_period_end: subscription.current_period_end
               ? new Date(subscription.current_period_end * 1000).toISOString()
               : null,
+            updated_at: new Date().toISOString(),
           }
 
           const { error: updateError } = await supabaseAdmin
@@ -95,6 +106,23 @@ export async function POST(request: NextRequest) {
           }
 
           console.log('[Stripe Webhook] Abonnement activé pour entreprise:', companyId)
+        } else if (session.customer) {
+          // Mode payment (one-time), mettre à jour stripe_customer_id si présent
+          const updateData: any = {
+            stripe_customer_id: session.customer as string,
+            updated_at: new Date().toISOString(),
+          }
+
+          const { error: updateError } = await supabaseAdmin
+            .from('entreprises')
+            .update(updateData)
+            .eq('id', companyId)
+
+          if (updateError) {
+            console.error('[Stripe Webhook] Erreur lors de la mise à jour customer_id:', updateError)
+          } else {
+            console.log('[Stripe Webhook] Customer ID mis à jour pour entreprise:', companyId)
+          }
         }
         break
       }
@@ -103,21 +131,23 @@ export async function POST(request: NextRequest) {
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription
         
-        const companyId = subscription.metadata?.company_id
+        // Récupérer companyId depuis subscription.metadata.companyId ou company_id
+        const companyId = subscription.metadata?.companyId || subscription.metadata?.company_id
 
         if (!companyId) {
-          console.error('[Stripe Webhook] company_id manquant dans metadata pour subscription:', subscription.id)
-          break
+          console.error('[Stripe Webhook] companyId manquant dans metadata pour subscription:', subscription.id)
+          return NextResponse.json({ received: true, warning: 'companyId manquant' })
         }
 
         // Mettre à jour toutes les informations de l'abonnement
         const updateData: any = {
           stripe_customer_id: subscription.customer as string,
           stripe_subscription_id: subscription.id,
-          subscription_status: subscription.status,
+          subscription_status: subscription.status === 'active' ? 'active' : subscription.status,
           subscription_current_period_end: subscription.current_period_end
             ? new Date(subscription.current_period_end * 1000).toISOString()
             : null,
+          updated_at: new Date().toISOString(),
         }
 
         const { error: updateError } = await supabaseAdmin
@@ -127,29 +157,32 @@ export async function POST(request: NextRequest) {
 
         if (updateError) {
           console.error('[Stripe Webhook] Erreur lors de la mise à jour de l\'entreprise:', updateError)
-        } else {
-          console.log('[Stripe Webhook] Abonnement mis à jour pour entreprise:', companyId, 'status:', subscription.status)
+          return NextResponse.json({ received: true, warning: 'Erreur mise à jour entreprise' })
         }
+
+        console.log('[Stripe Webhook] Abonnement mis à jour pour entreprise:', companyId, 'status:', subscription.status)
         break
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription
         
-        const companyId = subscription.metadata?.company_id
+        // Récupérer companyId depuis subscription.metadata.companyId ou company_id
+        const companyId = subscription.metadata?.companyId || subscription.metadata?.company_id
 
         if (!companyId) {
-          console.error('[Stripe Webhook] company_id manquant dans metadata pour subscription:', subscription.id)
-          break
+          console.error('[Stripe Webhook] companyId manquant dans metadata pour subscription:', subscription.id)
+          return NextResponse.json({ received: true, warning: 'companyId manquant' })
         }
 
-        // Mettre à jour le statut à 'canceled' ou 'expired'
+        // Mettre à jour le statut à inactive/expired
         const updateData: any = {
+          subscription_status: 'inactive',
           stripe_subscription_id: subscription.id,
-          subscription_status: 'canceled',
           subscription_current_period_end: subscription.current_period_end
             ? new Date(subscription.current_period_end * 1000).toISOString()
             : null,
+          updated_at: new Date().toISOString(),
         }
 
         const { error: updateError } = await supabaseAdmin
@@ -159,9 +192,54 @@ export async function POST(request: NextRequest) {
 
         if (updateError) {
           console.error('[Stripe Webhook] Erreur lors de la mise à jour de l\'entreprise:', updateError)
-        } else {
-          console.log('[Stripe Webhook] Abonnement supprimé pour entreprise:', companyId)
+          return NextResponse.json({ received: true, warning: 'Erreur mise à jour entreprise' })
         }
+
+        console.log('[Stripe Webhook] Abonnement supprimé pour entreprise:', companyId)
+        break
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice
+        
+        // Récupérer companyId depuis subscription metadata si présent
+        let companyId: string | null = null
+        
+        if (invoice.subscription) {
+          const subscriptionId = typeof invoice.subscription === 'string' 
+            ? invoice.subscription 
+            : invoice.subscription.id
+          
+          try {
+            const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+            companyId = subscription.metadata?.companyId || subscription.metadata?.company_id
+          } catch (err) {
+            console.error('[Stripe Webhook] Erreur lors de la récupération de la subscription:', err)
+          }
+        }
+
+        if (!companyId) {
+          console.error('[Stripe Webhook] companyId manquant pour invoice.payment_failed:', invoice.id)
+          return NextResponse.json({ received: true, warning: 'companyId manquant' })
+        }
+
+        // Mettre à jour le statut à inactive/expired
+        const updateData: any = {
+          subscription_status: 'past_due',
+          updated_at: new Date().toISOString(),
+        }
+
+        const { error: updateError } = await supabaseAdmin
+          .from('entreprises')
+          .update(updateData)
+          .eq('id', companyId)
+
+        if (updateError) {
+          console.error('[Stripe Webhook] Erreur lors de la mise à jour de l\'entreprise:', updateError)
+          return NextResponse.json({ received: true, warning: 'Erreur mise à jour entreprise' })
+        }
+
+        console.log('[Stripe Webhook] Paiement échoué pour entreprise:', companyId)
         break
       }
 
