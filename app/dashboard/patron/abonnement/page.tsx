@@ -280,8 +280,12 @@ export default function AbonnementPage() {
       })
 
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Erreur lors de la création de la session')
+        const data = await response.json().catch(() => ({}))
+        const msg =
+          data?.details?.message ||
+          data?.error ||
+          `Erreur checkout (${response.status})`
+        throw new Error(msg)
       }
 
       const { url } = await response.json()
