@@ -106,7 +106,7 @@ export default function AbonnementPage() {
       try {
         const supabase = createSupabaseBrowserClient()
 
-        // 1. Récupérer l'utilisateur
+        // 1. Récupérer l'utilisateur pour obtenir le token
         const { data: { user }, error: userError } = await supabase.auth.getUser()
 
         if (userError || !user) {
@@ -120,74 +120,75 @@ export default function AbonnementPage() {
 
         console.log('[Abonnement] User loaded:', user.id)
 
-        // 2. Récupérer le profile pour obtenir entreprise_id
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('entreprise_id')
-          .eq('id', user.id)
-          .single()
+        // 2. Récupérer la session pour obtenir le token d'accès
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
-        if (profileError || !profile || !profile.entreprise_id) {
-          console.error('[Abonnement] Profile error:', {
-            context: 'get_profile',
-            userId: user.id,
-            error: profileError,
-            profile: profile
+        if (sessionError || !session) {
+          console.error('[Abonnement] Session error:', {
+            context: 'get_session',
+            error: sessionError
           })
-          setError('Entreprise introuvable')
+          router.push('/login')
+          return
+        }
+
+        const accessToken = session.access_token
+
+        // 3. Appeler l'endpoint serveur pour obtenir les données de l'entreprise
+        const response = await fetch('/api/me/entreprise', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+        })
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}))
+          const errorMessage = data.error || 'Erreur lors du chargement des informations d\'abonnement'
+          
+          if (response.status === 404) {
+            setError('Entreprise introuvable')
+          } else if (response.status === 401) {
+            router.push('/login')
+            return
+          } else {
+            setError(errorMessage)
+          }
           setLoading(false)
           return
         }
 
-        const entrepriseIdValue = profile.entreprise_id
-        setEntrepriseId(entrepriseIdValue)
-        console.log('[Abonnement] Entreprise ID:', entrepriseIdValue)
+        const entrepriseData = await response.json()
 
-        // 3. Récupérer l'entreprise avec select('*') pour éviter les erreurs de colonnes manquantes
-        const { data: entrepriseData, error: entrepriseError } = await supabase
-          .from('entreprises')
-          .select('*')
-          .eq('id', entrepriseIdValue)
-          .single()
-
-        if (entrepriseError || !entrepriseData) {
-          console.error('[Abonnement] Entreprise fetch error:', {
-            context: 'get_entreprise',
-            entrepriseId: entrepriseIdValue,
-            error: entrepriseError,
-            message: entrepriseError?.message,
-            details: entrepriseError?.details,
-            hint: entrepriseError?.hint
-          })
-          setError('Erreur lors du chargement des informations d\'abonnement')
-          setLoading(false)
-          return
-        }
+        // 4. Remplir les états avec les données de l'API
+        setEntrepriseId(entrepriseData.entrepriseId)
+        setTrialEndsAt(entrepriseData.trial_ends_at)
 
         console.log('[Abonnement] Entreprise loaded:', {
-          id: entrepriseData.id,
-          name: entrepriseData.name,
+          id: entrepriseData.entrepriseId,
           hasTrialEndsAt: !!entrepriseData.trial_ends_at
         })
 
-        // 4. Calculer les jours restants si trial_ends_at existe
+        // 5. Calculer les jours restants si trial_ends_at existe
         if (entrepriseData.trial_ends_at) {
           const trialEnd = new Date(entrepriseData.trial_ends_at)
           const now = new Date()
           if (trialEnd > now) {
             const diffTime = trialEnd.getTime() - now.getTime()
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+            const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
             setDaysRemaining(diffDays)
-            setTrialEndsAt(entrepriseData.trial_ends_at)
             console.log('[Abonnement] Trial days remaining:', diffDays)
           } else {
             setDaysRemaining(0)
-            setTrialEndsAt(entrepriseData.trial_ends_at)
           }
+        } else {
+          setDaysRemaining(null)
         }
 
-        // 5. Appeler RPC is_company_active avec plusieurs tentatives
-        const isActiveResult = await checkCompanyActive(supabase, entrepriseIdValue)
+        // 6. Appeler RPC is_company_active avec plusieurs tentatives
+        const isActiveResult = await checkCompanyActive(supabase, entrepriseData.entrepriseId)
 
         if (isActiveResult === null) {
           // Toutes les tentatives ont échoué, afficher statut "unknown"
