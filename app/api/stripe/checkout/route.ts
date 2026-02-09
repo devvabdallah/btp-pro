@@ -81,14 +81,23 @@ export async function POST(request: NextRequest) {
       user = authUser
     }
 
-    // 5. Récupérer le profil pour vérifier le rôle (patron uniquement)
-    const { data: profile, error: profileError } = await supabase
+    // 5. Utiliser un client admin pour lire profiles et entreprises (bypass RLS)
+    const supabaseAdmin = createSupabaseAdminClient()
+
+    // 5.1. Récupérer le profil pour vérifier le rôle et l'entreprise_id
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
-      .select('role')
+      .select('role, entreprise_id')
       .eq('id', user.id)
       .single()
 
     if (profileError || !profile) {
+      console.error('[Stripe Checkout] Profil introuvable:', {
+        userId: user.id,
+        error: profileError,
+        errorMessage: profileError?.message,
+        errorCode: profileError?.code
+      })
       return NextResponse.json(
         { error: 'Profil introuvable' },
         { status: 404 }
@@ -103,6 +112,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 5.2. Vérifier que l'utilisateur a accès à cette entreprise
+    if (!profile.entreprise_id) {
+      console.error('[Stripe Checkout] Utilisateur sans entreprise:', {
+        userId: user.id,
+        companyId: companyId
+      })
+      return NextResponse.json(
+        { error: 'Entreprise introuvable' },
+        { status: 404 }
+      )
+    }
+
+    // 5.3. Comparer profile.entreprise_id avec companyId du body
+    if (profile.entreprise_id !== companyId) {
+      console.error('[Stripe Checkout] Accès refusé - entreprise_id ne correspond pas:', {
+        userId: user.id,
+        profileEntrepriseId: profile.entreprise_id,
+        requestedCompanyId: companyId
+      })
+      return NextResponse.json(
+        { error: 'Accès refusé' },
+        { status: 403 }
+      )
+    }
+
     // 6. Récupérer l'entreprise pour vérifier/créer le customer Stripe
     console.log('[Stripe Checkout] Recherche entreprise:', {
       userId: user.id,
@@ -111,7 +145,7 @@ export async function POST(request: NextRequest) {
       colonne: 'id'
     })
     
-    const { data: entreprise, error: entrepriseError } = await supabase
+    const { data: entreprise, error: entrepriseError } = await supabaseAdmin
       .from('entreprises')
       .select('id, name, stripe_customer_id')
       .eq('id', companyId)
@@ -147,8 +181,8 @@ export async function POST(request: NextRequest) {
       })
       customerId = customer.id
 
-      // Sauvegarder le customer_id dans Supabase
-      await supabase
+      // Sauvegarder le customer_id dans Supabase (utiliser admin pour bypass RLS)
+      await supabaseAdmin
         .from('entreprises')
         .update({ stripe_customer_id: customerId })
         .eq('id', entreprise.id)
