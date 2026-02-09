@@ -11,8 +11,6 @@ export default function AbonnementPage() {
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isActive, setIsActive] = useState<boolean | null>(null)
-  const [statusUnknown, setStatusUnknown] = useState(false)
   const [entrepriseId, setEntrepriseId] = useState<string | null>(null)
   const [daysRemaining, setDaysRemaining] = useState<number | null>(null)
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null)
@@ -21,40 +19,6 @@ export default function AbonnementPage() {
   const [loadingCheckout, setLoadingCheckout] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [checkoutSuccess, setCheckoutSuccess] = useState(false)
-
-  // Helper pour vérifier si l'entreprise est active
-  async function checkCompanyActive(supabase: any, entrepriseIdValue: string): Promise<boolean | null> {
-    try {
-      const { data, error: rpcError } = await supabase.rpc('is_company_active', {
-        company_id: entrepriseIdValue
-      })
-
-      if (rpcError) {
-        console.error('[Abonnement] RPC is_company_active error:', {
-          entrepriseId: entrepriseIdValue,
-          error: rpcError.message,
-          code: rpcError.code
-        })
-        return null
-      }
-
-      if (data !== null && data !== undefined) {
-        console.log('[Abonnement] RPC success:', {
-          entrepriseId: entrepriseIdValue,
-          isActive: data
-        })
-        return data === true
-      }
-
-      return null
-    } catch (err) {
-      console.error('[Abonnement] RPC is_company_active exception:', {
-        entrepriseId: entrepriseIdValue,
-        error: err instanceof Error ? err.message : 'Unknown error'
-      })
-      return null
-    }
-  }
 
   // Vérifier les paramètres de query string pour success/canceled
   useEffect(() => {
@@ -146,36 +110,26 @@ export default function AbonnementPage() {
         setTrialStartedAt(entrepriseData.trial_started_at)
         setSubscriptionStatus(entrepriseData.subscription_status)
 
-        // 5. Calculer les jours restants à partir de trial_ends_at
+        // 5. Calculer les jours restants à partir de trial_ends_at (DB)
         if (entrepriseData.trial_ends_at) {
-          const diffTime = new Date(entrepriseData.trial_ends_at).getTime() - Date.now()
+          const trialEndTime = new Date(entrepriseData.trial_ends_at).getTime()
+          const nowTime = Date.now()
+          const diffTime = trialEndTime - nowTime
           const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
           setDaysRemaining(diffDays)
         } else {
           setDaysRemaining(null)
         }
 
-        // Log de debug
+        // Log de debug temporaire pour validation
         console.log('[Abonnement] Entreprise subscription:', {
           subscription_status: entrepriseData.subscription_status,
           trial_starts_at: entrepriseData.trial_started_at,
           trial_ends_at: entrepriseData.trial_ends_at,
-          daysRemaining: entrepriseData.trial_ends_at 
+          days_remaining: entrepriseData.trial_ends_at 
             ? Math.max(0, Math.ceil((new Date(entrepriseData.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
             : null
         })
-
-        // 6. Appeler RPC is_company_active avec plusieurs tentatives
-        const isActiveResult = await checkCompanyActive(supabase, entrepriseData.entrepriseId)
-
-        if (isActiveResult === null) {
-          // Toutes les tentatives ont échoué, afficher statut "unknown"
-          setStatusUnknown(true)
-          setIsActive(null)
-        } else {
-          setIsActive(isActiveResult)
-          setStatusUnknown(false)
-        }
 
         setLoading(false)
       } catch (err) {
@@ -192,24 +146,23 @@ export default function AbonnementPage() {
     load()
   }, [router])
 
-  // Déterminer le statut de l'abonnement basé sur subscription_status de la DB
+  // Déterminer le statut de l'abonnement basé UNIQUEMENT sur les données DB
   const getSubscriptionStatus = () => {
-    // Si le statut est inconnu (toutes les tentatives RPC ont échoué)
-    if (statusUnknown) {
-      return 'unknown'
-    }
-
-    // Si subscription_status === 'active' => afficher "Actif"
+    // Si subscription_status === 'active' => afficher "Abonnement actif"
     if (subscriptionStatus === 'active') {
       return 'active'
     }
 
-    // Sinon si daysRemaining !== null et daysRemaining > 0 => afficher "Essai gratuit"
-    if (daysRemaining !== null && daysRemaining > 0) {
-      return 'trial'
+    // Si subscription_status != 'active' ET now() < trial_ends_at => afficher "Essai gratuit"
+    if (trialEndsAt) {
+      const trialEndTime = new Date(trialEndsAt).getTime()
+      const nowTime = Date.now()
+      if (nowTime < trialEndTime && daysRemaining !== null && daysRemaining > 0) {
+        return 'trial'
+      }
     }
 
-    // Sinon => afficher "Expiré"
+    // Si now() >= trial_ends_at ET subscription_status != 'active' => afficher "Expiré"
     return 'expired'
   }
 
@@ -335,7 +288,7 @@ export default function AbonnementPage() {
         <div className="mb-6">
           {status === 'active' && (
             <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300/95 border border-green-500/30">
-              Actif
+              Abonnement actif
             </span>
           )}
           {status === 'trial' && (
@@ -348,21 +301,7 @@ export default function AbonnementPage() {
               Expiré
             </span>
           )}
-          {status === 'unknown' && (
-            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-300/95 border border-gray-500/30">
-              Statut indisponible
-            </span>
-          )}
         </div>
-
-        {/* Message si statut inconnu */}
-        {status === 'unknown' && (
-          <div className="mb-6 bg-gray-500/20 border border-gray-500/50 rounded-xl p-4 backdrop-blur-sm">
-            <p className="text-gray-300/85 text-sm">
-              Statut indisponible (configuration en cours)
-            </p>
-          </div>
-        )}
 
         {/* Informations */}
         <div className="space-y-4 mb-8">
@@ -376,10 +315,10 @@ export default function AbonnementPage() {
               <span className="text-yellow-400/95 font-semibold text-base md:text-lg tabular-nums tracking-tight">{daysRemaining} jour{daysRemaining > 1 ? 's' : ''}</span>
             </div>
           )}
-          {status === 'expired' && daysRemaining !== null && (
+          {status === 'expired' && (
             <div className="flex items-center justify-between py-3.5 border-b border-white/[0.06]">
-              <span className="text-gray-400/75 text-sm md:text-base">Jours restants :</span>
-              <span className="text-red-400/95 font-semibold text-base md:text-lg tabular-nums tracking-tight">0 jour</span>
+              <span className="text-gray-400/75 text-sm md:text-base">Essai :</span>
+              <span className="text-red-400/95 font-semibold text-sm md:text-base">Essai terminé</span>
             </div>
           )}
         </div>
@@ -409,16 +348,6 @@ export default function AbonnementPage() {
               className="w-full sm:w-auto"
             >
               {loadingCheckout ? 'Chargement...' : 'Gérer mon abonnement'}
-            </Button>
-          ) : status === 'unknown' ? (
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handleSubscribe}
-              disabled={loadingCheckout}
-              className="w-full sm:w-auto"
-            >
-              {loadingCheckout ? 'Chargement...' : 'Aller au paiement'}
             </Button>
           ) : (
             <Button
