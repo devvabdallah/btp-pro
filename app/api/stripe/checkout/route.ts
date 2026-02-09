@@ -151,30 +151,75 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 11. Créer la session Stripe Checkout
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      mode: 'subscription',
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      success_url: `${appUrl}/dashboard/patron/abonnement?success=1`,
-      cancel_url: `${appUrl}/dashboard/patron/abonnement?canceled=1`,
-      metadata: {
-        company_id: entreprise.id,
-        entreprise_id: entreprise.id,
-        user_id: user.id,
-      },
-      subscription_data: {
+    // 11. Vérifier explicitement les variables d'environnement Stripe avant l'appel
+    if (!stripeSecretKey) {
+      return NextResponse.json(
+        { error: 'Config Stripe manquante: STRIPE_SECRET_KEY' },
+        { status: 500 }
+      )
+    }
+
+    if (!priceId) {
+      return NextResponse.json(
+        { error: 'Config Stripe manquante: STRIPE_PRICE_ID' },
+        { status: 500 }
+      )
+    }
+
+    // 12. Log avant l'appel Stripe (safe, sans secrets)
+    console.log('[Stripe Checkout] Creating session', {
+      companyId,
+      priceId: priceId || 'MISSING',
+      mode: 'subscription'
+    })
+
+    // 13. Créer la session Stripe Checkout avec gestion d'erreur détaillée
+    let session
+    try {
+      session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        mode: 'subscription',
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        success_url: `${appUrl}/dashboard/patron/abonnement?success=1`,
+        cancel_url: `${appUrl}/dashboard/patron/abonnement?canceled=1`,
         metadata: {
           company_id: entreprise.id,
           entreprise_id: entreprise.id,
+          user_id: user.id,
         },
-      },
-    })
+        subscription_data: {
+          metadata: {
+            company_id: entreprise.id,
+            entreprise_id: entreprise.id,
+          },
+        },
+      })
+    } catch (err) {
+      // Construire un objet d'erreur safe (sans secrets)
+      const stripeErr = err as any
+      const safe = {
+        type: stripeErr?.type,
+        code: stripeErr?.code,
+        message: stripeErr?.message,
+        param: stripeErr?.param,
+        statusCode: stripeErr?.statusCode,
+      }
+
+      console.error('[Stripe Checkout] Stripe error:', safe)
+
+      return NextResponse.json(
+        {
+          error: safe.message || 'Erreur Stripe',
+          details: safe,
+        },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({ url: session.url })
   } catch (error) {
