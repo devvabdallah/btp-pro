@@ -21,7 +21,7 @@ export default function AgendaClient({ events: initialEvents }: AgendaClientProp
     router.refresh()
   }
 
-  // Séparer les événements en "Aujourd'hui" et "Prochains"
+  // Séparer les événements en "Aujourd'hui" et "À venir"
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const endOfToday = new Date(today)
@@ -105,47 +105,60 @@ export default function AgendaClient({ events: initialEvents }: AgendaClientProp
     const hasAddress = event.chantiers?.address
 
     const cardContent = (
-      <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 hover:bg-white/5 transition-colors shadow-lg shadow-black/20">
+      <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 hover:bg-white/7 transition-colors shadow-lg shadow-black/20 bg-white/5">
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
-            <div className="text-2xl md:text-3xl font-bold text-white">
+            <div className="text-2xl md:text-3xl font-semibold text-white">
               {formatTime(event.starts_at)}
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base md:text-lg font-bold text-white mb-2">{event.title}</h3>
-            <div className="flex items-center gap-3 flex-wrap mb-2">
+            <h3 className="text-base md:text-lg font-bold text-white mb-2 truncate">{event.title}</h3>
+            <div className="flex items-center gap-2 flex-wrap mb-2">
               <span className="text-sm text-gray-400">{duration} min</span>
               {hasChantier && (
                 <>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                  <span className="text-gray-500">•</span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white/10 text-white/80 border border-white/10">
                     Chantier
                   </span>
-                  <span className="text-sm font-semibold text-white/90">
+                  <span className="text-sm font-semibold text-white">
                     {event.chantiers.title}
                   </span>
                   {event.chantiers.client && (
-                    <span className="text-sm text-gray-400">
-                      {event.chantiers.client.first_name} {event.chantiers.client.last_name}
-                    </span>
-                  )}
-                  {hasAddress && (
-                    <a
-                      href={getGoogleMapsUrl(event.chantiers.address)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-xs text-orange-400 hover:text-orange-300 transition-colors inline-flex items-center gap-1"
-                    >
-                      <span>📍</span>
-                      <span>Itinéraire</span>
-                    </a>
+                    <>
+                      <span className="text-gray-500">•</span>
+                      <span className="text-sm text-gray-400">
+                        {event.chantiers.client.first_name} {event.chantiers.client.last_name}
+                      </span>
+                    </>
                   )}
                 </>
               )}
+              {event.notes && (
+                <>
+                  <span className="text-gray-500">•</span>
+                  <span className="text-sm text-gray-400 truncate max-w-[200px]">{event.notes}</span>
+                </>
+              )}
             </div>
-            {event.notes && (
-              <p className="text-sm text-gray-400 mt-2 truncate">{event.notes}</p>
+            {hasChantier && (
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+                {hasAddress && (
+                  <a
+                    href={getGoogleMapsUrl(event.chantiers.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-xs text-white/70 hover:text-white transition-colors"
+                  >
+                    Itinéraire
+                  </a>
+                )}
+                {chantierUrl && (
+                  <span className="text-xs text-white/70 ml-auto">Ouvrir</span>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -172,20 +185,28 @@ export default function AgendaClient({ events: initialEvents }: AgendaClientProp
       />
       <div className="space-y-8 md:space-y-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6">
-          <div className="flex items-center gap-4">
-            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white">Agenda</h1>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
-              <span className="text-sm text-white/70">{formatTodayDate()}</span>
-              {todayEvents.length > 0 && (
-                <span className="text-sm font-semibold text-white">{todayEvents.length} rdv</span>
-              )}
+        <div className="space-y-4">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-4 flex-wrap">
+                <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white">Agenda</h1>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
+                  <span className="text-sm text-white/70">{formatTodayDate()}</span>
+                  {todayEvents.length > 0 && (
+                    <span className="text-sm font-semibold text-white">{todayEvents.length} rdv</span>
+                  )}
+                </div>
+              </div>
+              <p className="text-base text-white/70">Tes rendez-vous et chantiers, au clair.</p>
             </div>
-          </div>
-          <div className="hidden md:block">
-            <Button variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
-              Nouveau rendez-vous
-            </Button>
+            <div className="hidden md:block">
+              <div className="flex flex-col items-end gap-1">
+                <Button variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
+                  Nouveau rendez-vous
+                </Button>
+                <span className="text-xs text-white/50">2 clics — 1 minute</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -203,7 +224,10 @@ export default function AgendaClient({ events: initialEvents }: AgendaClientProp
 
         {/* Section Aujourd'hui */}
         <div>
-          <h2 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6">Aujourd'hui</h2>
+          <div className="flex items-center justify-between mb-4 md:mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-white">Aujourd'hui</h2>
+            <span className="text-sm text-white/50">{formatTodayDate()}</span>
+          </div>
           {todayEvents.length > 0 ? (
             <div className="space-y-3">
               {todayEvents.map((event) => (
@@ -211,21 +235,22 @@ export default function AgendaClient({ events: initialEvents }: AgendaClientProp
               ))}
             </div>
           ) : (
-            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-8 md:p-10 text-center shadow-lg shadow-black/20">
-              <p className="text-gray-400 mb-2">Rien aujourd'hui. Ajoute un rendez-vous pour t'organiser.</p>
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-8 md:p-10 text-center shadow-lg shadow-black/20 bg-white/5">
+              <p className="text-gray-400 mb-2">Rien aujourd'hui. Tu peux ajouter un rendez-vous.</p>
             </div>
           )}
         </div>
 
-        {/* Section Prochains */}
+        {/* Section À venir */}
         <div>
-          <h2 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6">Prochains</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-6">À venir</h2>
           {upcomingEvents.length > 0 ? (
             <div className="space-y-6">
               {Object.entries(upcomingGroups)
                 .sort(([dateA], [dateB]) => new Date(dateA).getTime() - new Date(dateB).getTime())
-                .map(([dateKey, events]) => (
+                .map(([dateKey, events], index) => (
                   <div key={dateKey}>
+                    {index > 0 && <div className="h-px bg-white/10 mb-6"></div>}
                     <div className="flex items-center gap-3 mb-4">
                       <h3 className="text-base md:text-lg font-semibold text-white/70">
                         {formatDateHeader(events[0].starts_at)}
@@ -241,15 +266,15 @@ export default function AgendaClient({ events: initialEvents }: AgendaClientProp
                 ))}
             </div>
           ) : (
-            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-8 md:p-10 text-center shadow-lg shadow-black/20">
-              <p className="text-gray-400 mb-2">Aucun rendez-vous à venir.</p>
+            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-8 md:p-10 text-center shadow-lg shadow-black/20 bg-white/5">
+              <p className="text-gray-400 mb-2">Aucun rendez-vous prévu.</p>
             </div>
           )}
         </div>
 
         {/* État vide global */}
         {initialEvents.length === 0 && todayEvents.length === 0 && upcomingEvents.length === 0 && (
-          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-12 md:p-16 text-center shadow-lg shadow-black/20">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-12 md:p-16 text-center shadow-lg shadow-black/20 bg-white/5">
             <p className="text-gray-400 mb-6">Aucun rendez-vous prévu.</p>
             <Button variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
               + Ajouter un rendez-vous
