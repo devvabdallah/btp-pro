@@ -35,14 +35,14 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
         return
       }
 
-      // Récupérer le profil pour obtenir entreprise_id
+      // Récupérer le profil pour obtenir company_id
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('entreprise_id')
+        .select('company_id')
         .eq('id', user.id)
         .single()
 
-      if (profileError || !profile || !profile.entreprise_id) {
+      if (profileError || !profile || !profile.company_id) {
         setEvents([])
         setLoading(false)
         return
@@ -54,20 +54,15 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
 
       const { data: eventsData, error: eventsError } = await supabase
         .from('agenda_events')
-        .select(`
-          *,
-          chantiers(id, title, address, client:clients(id, first_name, last_name))
-        `)
-        .eq('company_id', profile.entreprise_id)
-        .gte('starts_at', today.toISOString())
+        .select('*')
+        .eq('company_id', profile.company_id)
         .order('starts_at', { ascending: true })
-        .limit(50)
 
       if (eventsError) {
-        console.error('Error loading events:', eventsError)
+        console.error('Agenda select error', eventsError)
         setEvents([])
       } else {
-        setEvents(eventsData || [])
+        setEvents(eventsData ?? [])
       }
     } catch (err) {
       console.error('Error loading events:', err)
