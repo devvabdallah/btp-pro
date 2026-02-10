@@ -18,6 +18,7 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
   const [editingEvent, setEditingEvent] = useState<AgendaEvent | null>(null)
   const [allEvents, setAllEvents] = useState<AgendaEvent[]>(initialEvents)
   const [loading, setLoading] = useState(true)
+  const [isCompanyActive, setIsCompanyActive] = useState<boolean | null>(null)
   const router = useRouter()
   const pathname = usePathname()
   const role = pathname.includes('/patron/') ? 'patron' : 'employe'
@@ -90,10 +91,52 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     setEditingEvent(null)
   }
 
-  const handleEditEvent = (event: AgendaEvent) => {
+  const handleEditEvent = async (event: AgendaEvent) => {
+    // Vérifier si l'entreprise est active avant d'ouvrir le modal
+    if (isCompanyActive === false) {
+      return // Empêcher l'édition si l'entreprise est inactive
+    }
+    
     setEditingEvent(event)
     setIsModalOpen(true)
   }
+
+  // Vérifier le statut de l'entreprise au chargement
+  useEffect(() => {
+    async function checkCompanyStatus() {
+      try {
+        const supabase = createSupabaseBrowserClient()
+        const { data: sess } = await supabase.auth.getSession()
+        
+        if (!sess?.session?.user) {
+          setIsCompanyActive(null)
+          return
+        }
+
+        // Récupérer entreprise_id depuis profiles (nécessaire pour la vérification)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('entreprise_id')
+          .eq('id', sess.session.user.id)
+          .single()
+
+        if (!profile?.entreprise_id) {
+          setIsCompanyActive(null)
+          return
+        }
+
+        // Vérifier si l'entreprise est active
+        const { checkCompanyActive } = await import('@/lib/subscription-check')
+        const { active } = await checkCompanyActive(supabase, profile.entreprise_id)
+        setIsCompanyActive(active)
+      } catch (err) {
+        console.error('[Agenda] Error checking company status:', err)
+        setIsCompanyActive(null)
+      }
+    }
+
+    checkCompanyStatus()
+  }, [])
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
@@ -192,7 +235,11 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
 
     const cardContent = (
       <div 
-        className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 hover:bg-white/7 transition-colors shadow-lg shadow-black/20 bg-white/5 cursor-pointer"
+        className={`bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 ${
+          isCompanyActive === false 
+            ? 'opacity-60 cursor-not-allowed' 
+            : 'hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer'
+        }`}
         onClick={() => handleEditEvent(event)}
       >
         <div className="flex items-start gap-4">
