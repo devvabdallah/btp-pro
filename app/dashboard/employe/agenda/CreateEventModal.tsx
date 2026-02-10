@@ -62,53 +62,6 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
     setLoadingChantiers(false)
   }
 
-  const createEventWithRetry = async (supabase: ReturnType<typeof createSupabaseBrowserClient>) => {
-    // Récupérer la session
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-
-    if (!session || !session.user || sessionError) {
-      throw new Error('Session expirée. Reconnectez-vous.')
-    }
-
-    // Récupérer le profil pour obtenir entreprise_id
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('entreprise_id')
-      .eq('id', session.user.id)
-      .single()
-
-    if (profileError || !profile || !profile.entreprise_id) {
-      throw new Error('Erreur lors de la récupération du profil.')
-    }
-
-    // Calculer ends_at
-    const startsAt = new Date(formData.starts_at)
-    const endsAt = new Date(startsAt.getTime() + formData.duration_minutes * 60 * 1000)
-
-    // Insérer l'événement directement côté client
-    const { data: event, error: insertError } = await supabase
-      .from('agenda_events')
-      .insert({
-        company_id: profile.entreprise_id,
-        created_by: session.user.id,
-        title: formData.title.trim(),
-        starts_at: startsAt.toISOString(),
-        ends_at: endsAt.toISOString(),
-        chantier_id: formData.chantier_id || null,
-        notes: formData.notes.trim() || null,
-        status: 'planned',
-      })
-      .select()
-      .single()
-
-    if (insertError || !event) {
-      const errorMessage = insertError?.message || 'Erreur lors de la création de l\'événement.'
-      throw new Error(errorMessage)
-    }
-
-    return event
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -128,44 +81,57 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
     try {
       const supabase = createSupabaseBrowserClient()
 
-      // Première tentative
-      try {
-        await createEventWithRetry(supabase)
-        // Succès
-        onSuccess()
-        onClose()
-        return
-      } catch (firstError: any) {
-        // Vérifier si c'est une erreur de session
-        const errorMessage = firstError?.message || String(firstError)
-        const isSessionError = 
-          errorMessage.includes('Session expirée') || 
-          errorMessage.includes('session') ||
-          errorMessage.includes('unauthorized') ||
-          errorMessage.includes('JWT')
+      // Récupérer l'utilisateur
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-        if (isSessionError) {
-          // Refresh de session et retry une seule fois
-          try {
-            await supabase.auth.refreshSession()
-            await createEventWithRetry(supabase)
-            // Succès après retry
-            onSuccess()
-            onClose()
-            return
-          } catch (retryError: any) {
-            // Échec après retry, afficher l'erreur
-            setError(retryError?.message || 'Session expirée. Reconnectez-vous.')
-            setLoading(false)
-            return
-          }
-        } else {
-          // Autre erreur (validation, etc.), afficher directement
-          setError(errorMessage)
-          setLoading(false)
-          return
-        }
+      if (!user || userError) {
+        setError('Session expirée. Reconnectez-vous.')
+        setLoading(false)
+        return
       }
+
+      // Récupérer le profil pour obtenir entreprise_id
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('entreprise_id')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError || !profile || !profile.entreprise_id) {
+        setError('Erreur lors de la récupération du profil.')
+        setLoading(false)
+        return
+      }
+
+      // Calculer ends_at
+      const startsAt = new Date(formData.starts_at)
+      const endsAt = new Date(startsAt.getTime() + formData.duration_minutes * 60 * 1000)
+
+      // Insérer l'événement directement côté client
+      const { data: event, error: insertError } = await supabase
+        .from('agenda_events')
+        .insert({
+          company_id: profile.entreprise_id,
+          created_by: user.id,
+          title: formData.title.trim(),
+          starts_at: startsAt.toISOString(),
+          ends_at: endsAt.toISOString(),
+          chantier_id: formData.chantier_id || null,
+          notes: formData.notes.trim() || null,
+          status: 'planned',
+        })
+        .select()
+        .single()
+
+      if (insertError || !event) {
+        setError(insertError?.message || 'Erreur lors de la création de l\'événement.')
+        setLoading(false)
+        return
+      }
+
+      // Succès
+      onSuccess()
+      onClose()
     } catch (err: any) {
       setError(err?.message || 'Une erreur inattendue est survenue.')
     } finally {
