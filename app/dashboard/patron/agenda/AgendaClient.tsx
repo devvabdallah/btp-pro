@@ -30,10 +30,9 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
       const supabase = createSupabaseBrowserClient()
 
       // Vérifier l'utilisateur
-      const { data: u, error: uErr } = await supabase.auth.getUser()
-      console.log('[Agenda] user', u?.user?.id, uErr)
+      const { data: userRes } = await supabase.auth.getUser()
       
-      if (!u?.user) {
+      if (!userRes?.user) {
         setAllEvents([])
         setLoading(false)
         return
@@ -52,48 +51,18 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
         return
       }
 
-      // Mode normal : récupérer company_id depuis profiles avec fallback
-      let companyId: string | null = null
-      
-      // Tentative 1: par id
-      const { data: profile1, error: profileError1 } = await supabase
-        .from('profiles')
-        .select('company_id')
-        .eq('id', u.user.id)
-        .single()
-
-      if (profile1?.company_id) {
-        companyId = profile1.company_id
-      } else {
-        // Tentative 2: par user_id
-        const { data: profile2, error: profileError2 } = await supabase
-          .from('profiles')
-          .select('company_id')
-          .eq('user_id', u.user.id)
-          .single()
-
-        if (profile2?.company_id) {
-          companyId = profile2.company_id
-        } else {
-          console.error('[Agenda] profile not found for user', u.user.id)
-          setAllEvents([])
-          setLoading(false)
-          return
-        }
-      }
-
-      // Charger les événements
-      const { data: eventsData, error: eventsError } = await supabase
+      // Charger les événements filtrés par user_id
+      const { data: events, error } = await supabase
         .from('agenda_events')
-        .select('id,title,starts_at,ends_at,duration_minutes,status,chantier_id,notes,company_id,user_id,created_at')
-        .eq('company_id', companyId)
+        .select('*')
+        .eq('user_id', userRes.user.id)
         .order('starts_at', { ascending: true })
 
-      if (eventsError) {
-        console.error('[Agenda] select error', eventsError)
+      if (error) {
+        console.error('[Agenda] select agenda_events error', error)
         setAllEvents([])
       } else {
-        setAllEvents(eventsData ?? [])
+        setAllEvents(events ?? [])
       }
     } catch (err) {
       console.error('Error loading events:', err)
