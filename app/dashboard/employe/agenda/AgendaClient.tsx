@@ -21,28 +21,45 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
   const pathname = usePathname()
   const role = pathname.includes('/patron/') ? 'patron' : 'employe'
 
+  // Mode debug activé par URL
+  const debug = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1'
+
   const loadEvents = async () => {
     try {
       setLoading(true)
       const supabase = createSupabaseBrowserClient()
 
       // Vérifier l'utilisateur
-      const { data: userRes } = await supabase.auth.getUser()
+      const { data: u, error: uErr } = await supabase.auth.getUser()
+      console.log('[Agenda] user', u?.user?.id, uErr)
       
-      if (!userRes?.user) {
+      if (!u?.user) {
         setAllEvents([])
         setLoading(false)
         return
       }
 
-      // Récupérer company_id depuis profiles avec fallback
+      // En mode debug, charger tous les événements sans filtre
+      if (debug) {
+        const { data, error } = await supabase
+          .from('agenda_events')
+          .select('*')
+          .order('starts_at', { ascending: true })
+        
+        console.log('[Agenda] select agenda_events', { count: data?.length ?? 0, error, sample: data?.[0] })
+        setAllEvents(data ?? [])
+        setLoading(false)
+        return
+      }
+
+      // Mode normal : récupérer company_id depuis profiles avec fallback
       let companyId: string | null = null
       
       // Tentative 1: par id
       const { data: profile1, error: profileError1 } = await supabase
         .from('profiles')
         .select('company_id')
-        .eq('id', userRes.user.id)
+        .eq('id', u.user.id)
         .single()
 
       if (profile1?.company_id) {
@@ -52,13 +69,13 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
         const { data: profile2, error: profileError2 } = await supabase
           .from('profiles')
           .select('company_id')
-          .eq('user_id', userRes.user.id)
+          .eq('user_id', u.user.id)
           .single()
 
         if (profile2?.company_id) {
           companyId = profile2.company_id
         } else {
-          console.error('[Agenda] profile not found for user', userRes.user.id)
+          console.error('[Agenda] profile not found for user', u.user.id)
           setAllEvents([])
           setLoading(false)
           return
@@ -280,6 +297,18 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
         onSuccess={handleSuccess}
       />
       <div className="space-y-8 md:space-y-10">
+        {/* Bloc debug */}
+        {debug && (
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-sm">
+            <p className="text-yellow-300 font-semibold mb-2">Events total: {allEvents.length}</p>
+            {allEvents.length > 0 && (
+              <pre className="text-xs text-yellow-200 overflow-auto max-h-96 bg-black/20 p-3 rounded">
+                {JSON.stringify(allEvents.slice(0, 10), null, 2)}
+              </pre>
+            )}
+          </div>
+        )}
+
         {/* Header */}
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 md:gap-6">
