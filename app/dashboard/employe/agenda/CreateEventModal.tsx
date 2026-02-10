@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { getChantiersForSelect, AgendaEvent } from '@/lib/agenda-actions'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
@@ -24,6 +25,20 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
   const [loadingChantiers, setLoadingChantiers] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [chantiers, setChantiers] = useState<Chantier[]>([])
+
+  // DB constraint: agenda_events.status_check => only allowed values
+  // Normalise le statut de l'UI vers les valeurs DB autorisées
+  const normalizeStatus = (input: string | null | undefined): string => {
+    if (!input) return 'scheduled'
+    const normalized = input.toLowerCase().trim()
+    // Mapper les valeurs de l'UI vers les valeurs DB valides
+    if (normalized === 'planned' || normalized === 'planifié') return 'scheduled'
+    if (normalized === 'confirmed' || normalized === 'confirmé') return 'scheduled' // ou 'confirmed' si autorisé
+    if (normalized === 'completed' || normalized === 'terminé' || normalized === 'done') return 'completed'
+    if (normalized === 'cancelled' || normalized === 'annulé') return 'cancelled'
+    // Valeur par défaut sécurisée
+    return 'scheduled'
+  }
 
   const [formData, setFormData] = useState({
     title: '',
@@ -59,7 +74,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
           duration_minutes: duration,
           chantier_id: event.chantier_id || '',
           notes: event.notes || '',
-          status: event.status || 'planned',
+          status: (event.status || 'planned') as 'planned' | 'confirmed' | 'completed' | 'cancelled',
         })
         setError(null)
       } else {
@@ -147,6 +162,8 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
 
       if (mode === 'edit' && event && event.id) {
         // Mode édition : mettre à jour l'événement
+        // DB constraint: normaliser le status avant l'envoi
+        const normalizedStatus = normalizeStatus(formData.status)
         const { data: updatedEvent, error: updateError } = await supabase
           .from('agenda_events')
           .update({
@@ -155,7 +172,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
             ends_at: endsAt.toISOString(),
             chantier_id: formData.chantier_id || null,
             notes: formData.notes.trim() || null,
-            status: formData.status,
+            status: normalizedStatus,
           })
           .eq('id', event.id)
           .select()
@@ -172,6 +189,8 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
         onClose()
       } else {
         // Mode création : insérer un nouvel événement
+        // DB constraint: normaliser le status avant l'envoi
+        const normalizedStatus = normalizeStatus(formData.status || 'planned')
         const { data: newEvent, error: insertError } = await supabase
           .from('agenda_events')
           .insert({
@@ -182,7 +201,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
             ends_at: endsAt.toISOString(),
             chantier_id: formData.chantier_id || null,
             notes: formData.notes.trim() || null,
-            status: 'planned',
+            status: normalizedStatus,
           })
           .select()
           .single()
@@ -240,11 +259,39 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
     }
   }
 
+  // Gestion de la fermeture avec ESC
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    // Empêcher le scroll du body quand le modal est ouvert
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = ''
+    }
+  }, [isOpen, onClose])
+
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 rounded-2xl border border-white/10 shadow-2xl w-[92vw] max-w-[720px] max-h-[85vh] flex flex-col">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={(e) => {
+        // Fermer au clic sur l'overlay (pas sur le contenu)
+        if (e.target === e.currentTarget) {
+          onClose()
+        }
+      }}
+    >
+      <div className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 rounded-2xl border border-white/10 shadow-2xl w-[92vw] max-w-[720px] max-h-[85vh] flex flex-col overflow-hidden">
         <div className="flex-shrink-0 p-6 md:p-8 border-b border-white/10">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl md:text-3xl font-bold text-white">
@@ -409,4 +456,8 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
       </div>
     </div>
   )
+
+  // Rendre le modal via Portal directement dans le body
+  if (typeof window === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }
