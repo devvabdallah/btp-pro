@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createAgendaEvent, getChantiersForSelect } from '@/lib/agenda-actions'
+import { getChantiersForSelect } from '@/lib/agenda-actions'
+import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 
@@ -61,6 +62,53 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
     setLoadingChantiers(false)
   }
 
+  const createEventWithRetry = async (supabase: ReturnType<typeof createSupabaseBrowserClient>) => {
+    // Récupérer l'utilisateur
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+    if (!user || userError) {
+      throw new Error('Session expirée. Reconnectez-vous.')
+    }
+
+    // Récupérer le profil pour obtenir entreprise_id
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('entreprise_id')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !profile || !profile.entreprise_id) {
+      throw new Error('Erreur lors de la récupération du profil.')
+    }
+
+    // Calculer ends_at
+    const startsAt = new Date(formData.starts_at)
+    const endsAt = new Date(startsAt.getTime() + formData.duration_minutes * 60 * 1000)
+
+    // Insérer l'événement
+    const { data: event, error: insertError } = await supabase
+      .from('agenda_events')
+      .insert({
+        company_id: profile.entreprise_id,
+        created_by: user.id,
+        title: formData.title.trim(),
+        starts_at: startsAt.toISOString(),
+        ends_at: endsAt.toISOString(),
+        chantier_id: formData.chantier_id || null,
+        notes: formData.notes.trim() || null,
+        status: 'planned',
+      })
+      .select()
+      .single()
+
+    if (insertError || !event) {
+      const errorMessage = insertError?.message || 'Erreur lors de la création de l\'événement.'
+      throw new Error(errorMessage)
+    }
+
+    return event
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -78,22 +126,48 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
     setLoading(true)
 
     try {
-      const result = await createAgendaEvent({
-        title: formData.title.trim(),
-        starts_at: formData.starts_at,
-        duration_minutes: formData.duration_minutes,
-        chantier_id: formData.chantier_id || null,
-        notes: formData.notes.trim() || null,
-      })
+      const supabase = createSupabaseBrowserClient()
 
-      if (result.success) {
+      // Première tentative
+      try {
+        await createEventWithRetry(supabase)
+        // Succès
         onSuccess()
         onClose()
-      } else {
-        setError(result.error || 'Erreur lors de la création de l\'événement.')
+        return
+      } catch (firstError: any) {
+        // Vérifier si c'est une erreur de session
+        const errorMessage = firstError?.message || String(firstError)
+        const isSessionError = 
+          errorMessage.includes('Session expirée') || 
+          errorMessage.includes('session') ||
+          errorMessage.includes('unauthorized') ||
+          errorMessage.includes('JWT')
+
+        if (isSessionError) {
+          // Refresh de session et retry une seule fois
+          try {
+            await supabase.auth.refreshSession()
+            await createEventWithRetry(supabase)
+            // Succès après retry
+            onSuccess()
+            onClose()
+            return
+          } catch (retryError: any) {
+            // Échec après retry, afficher l'erreur
+            setError(retryError?.message || 'Session expirée. Reconnectez-vous.')
+            setLoading(false)
+            return
+          }
+        } else {
+          // Autre erreur (validation, etc.), afficher directement
+          setError(errorMessage)
+          setLoading(false)
+          return
+        }
       }
-    } catch (err) {
-      setError('Une erreur inattendue est survenue.')
+    } catch (err: any) {
+      setError(err?.message || 'Une erreur inattendue est survenue.')
     } finally {
       setLoading(false)
     }

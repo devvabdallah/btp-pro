@@ -9,9 +9,10 @@ import CreateEventModal from './CreateEventModal'
 
 interface AgendaClientProps {
   events: AgendaEvent[]
+  error?: string
 }
 
-export default function AgendaClient({ events: initialEvents }: AgendaClientProps) {
+export default function AgendaClient({ events: initialEvents, error }: AgendaClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
@@ -174,6 +175,22 @@ export default function AgendaClient({ events: initialEvents }: AgendaClientProp
     }
 
     return cardContent
+  }
+
+  // Afficher l'erreur si présente
+  if (error) {
+    return (
+      <div className="space-y-8 md:space-y-10">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 md:p-8 text-center">
+          <p className="text-red-300 mb-4">{error}</p>
+          <Link href="/login">
+            <Button variant="primary" size="md">
+              Se reconnecter
+            </Button>
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
