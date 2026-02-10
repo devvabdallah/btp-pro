@@ -269,15 +269,22 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
       <div 
         role="button"
         tabIndex={isCompanyActive === false ? -1 : 0}
-        className={`bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 pointer-events-auto ${
+        className={`relative bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 pointer-events-auto ${
           isCompanyActive === false 
             ? 'opacity-60 cursor-not-allowed' 
             : 'hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500/50'
-        } ${isInProgress ? 'ring-2 ring-orange-500/30' : ''}`}
+        }`}
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
       >
-        <div className="flex items-start gap-4 pointer-events-none">
+        {/* Overlay décoratif pour le ring "En cours" - non-interactif */}
+        {isInProgress && (
+          <div 
+            className="absolute inset-0 rounded-xl ring-2 ring-orange-500/30 pointer-events-none"
+            aria-hidden="true"
+          />
+        )}
+        <div className="flex items-start gap-4 pointer-events-none relative z-10">
           <div className="flex-shrink-0 pointer-events-none">
             <div className="text-2xl md:text-3xl font-semibold text-white pointer-events-none">
               {formatTime(event.starts_at)}
