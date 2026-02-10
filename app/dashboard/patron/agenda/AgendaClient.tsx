@@ -29,14 +29,22 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
       setLoading(true)
       const supabase = createSupabaseBrowserClient()
 
-      // Vérifier l'utilisateur
-      const { data: userRes } = await supabase.auth.getUser()
+      // Récupérer la session de façon robuste avec fallback
+      let { data: sess } = await supabase.auth.getSession()
       
-      if (!userRes?.user) {
+      if (!sess?.session) {
+        await supabase.auth.refreshSession()
+        sess = await supabase.auth.getSession()
+      }
+
+      if (!sess?.session) {
+        console.warn('[Agenda] no session')
         setAllEvents([])
         setLoading(false)
         return
       }
+
+      const userId = sess.session.user.id
 
       // En mode debug, charger tous les événements sans filtre
       if (debug) {
@@ -52,17 +60,17 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
       }
 
       // Charger les événements filtrés par user_id
-      const { data: events, error } = await supabase
+      const { data, error } = await supabase
         .from('agenda_events')
         .select('*')
-        .eq('user_id', userRes.user.id)
+        .eq('user_id', userId)
         .order('starts_at', { ascending: true })
 
       if (error) {
-        console.error('[Agenda] select agenda_events error', error)
+        console.error('[Agenda] agenda_events select error', error)
         setAllEvents([])
       } else {
-        setAllEvents(events ?? [])
+        setAllEvents(data ?? [])
       }
     } catch (err) {
       console.error('Error loading events:', err)
