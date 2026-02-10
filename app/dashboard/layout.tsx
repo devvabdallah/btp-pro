@@ -120,8 +120,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Composant Sidebar réutilisable
   const SidebarContent = () => (
     <>
-      <div className="p-7 md:p-8 border-b border-white/[0.08]">
-        <Logo size="md" showText={true} />
+      <div className="p-7 md:p-8 border-b border-white/[0.08] flex items-center justify-start">
+        <Logo size="lg" showText={false} />
       </div>
 
       <nav className="flex-1 p-5 md:p-6 space-y-3">
@@ -189,7 +189,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Sidebar mobile */}
           <aside className="md:hidden fixed left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-[#111827]/98 backdrop-blur-md border-r border-white/[0.08] flex flex-col z-50 overflow-y-auto">
             <div className="p-4 border-b border-white/[0.08] flex items-center justify-between">
-              <Logo size="sm" showText={true} />
+              <Logo size="lg" showText={false} />
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 text-gray-400 hover:text-white transition-colors duration-200"
