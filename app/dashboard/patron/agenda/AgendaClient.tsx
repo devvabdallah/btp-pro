@@ -15,7 +15,7 @@ interface AgendaClientProps {
 
 export default function AgendaClient({ events: initialEvents = [], error }: AgendaClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [events, setEvents] = useState<AgendaEvent[]>(initialEvents)
+  const [allEvents, setAllEvents] = useState<AgendaEvent[]>(initialEvents)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
@@ -27,46 +27,60 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
       const supabase = createSupabaseBrowserClient()
 
       // Vérifier l'utilisateur
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      const { data: userRes } = await supabase.auth.getUser()
       
-      if (!user || userError) {
-        setEvents([])
+      if (!userRes?.user) {
+        setAllEvents([])
         setLoading(false)
         return
       }
 
-      // Récupérer le profil pour obtenir company_id
-      const { data: profile, error: profileError } = await supabase
+      // Récupérer company_id depuis profiles avec fallback
+      let companyId: string | null = null
+      
+      // Tentative 1: par id
+      const { data: profile1, error: profileError1 } = await supabase
         .from('profiles')
         .select('company_id')
-        .eq('id', user.id)
+        .eq('id', userRes.user.id)
         .single()
 
-      if (profileError || !profile || !profile.company_id) {
-        setEvents([])
-        setLoading(false)
-        return
+      if (profile1?.company_id) {
+        companyId = profile1.company_id
+      } else {
+        // Tentative 2: par user_id
+        const { data: profile2, error: profileError2 } = await supabase
+          .from('profiles')
+          .select('company_id')
+          .eq('user_id', userRes.user.id)
+          .single()
+
+        if (profile2?.company_id) {
+          companyId = profile2.company_id
+        } else {
+          console.error('[Agenda] profile not found for user', userRes.user.id)
+          setAllEvents([])
+          setLoading(false)
+          return
+        }
       }
 
       // Charger les événements
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
-
       const { data: eventsData, error: eventsError } = await supabase
         .from('agenda_events')
-        .select('*')
-        .eq('company_id', profile.company_id)
+        .select('id,title,starts_at,ends_at,duration_minutes,status,chantier_id,notes,company_id,user_id,created_at')
+        .eq('company_id', companyId)
         .order('starts_at', { ascending: true })
 
       if (eventsError) {
-        console.error('Agenda select error', eventsError)
-        setEvents([])
+        console.error('[Agenda] select error', eventsError)
+        setAllEvents([])
       } else {
-        setEvents(eventsData ?? [])
+        setAllEvents(eventsData ?? [])
       }
     } catch (err) {
       console.error('Error loading events:', err)
-      setEvents([])
+      setAllEvents([])
     } finally {
       setLoading(false)
     }
@@ -80,20 +94,27 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     loadEvents()
   }
 
+  // Fonction timezone-safe pour comparer les dates locales
+  const isSameLocalDay = (iso: string, ref: Date) => {
+    const d = new Date(iso)
+    return d.getFullYear() === ref.getFullYear()
+      && d.getMonth() === ref.getMonth()
+      && d.getDate() === ref.getDate()
+  }
+
   // Séparer les événements en "Aujourd'hui" et "À venir"
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const endOfToday = new Date(today)
-  endOfToday.setHours(23, 59, 59, 999)
+  const now = new Date()
 
   const todayEvents: AgendaEvent[] = []
   const upcomingEvents: AgendaEvent[] = []
 
-  events.forEach((event) => {
+  allEvents.forEach((event) => {
     const eventDate = new Date(event.starts_at)
-    if (eventDate >= today && eventDate <= endOfToday) {
+    if (isSameLocalDay(event.starts_at, today)) {
       todayEvents.push(event)
-    } else if (eventDate > endOfToday) {
+    } else if (eventDate >= now) {
       upcomingEvents.push(event)
     }
   })
@@ -347,8 +368,31 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
           )}
         </div>
 
+        {/* Liste brute de debug si les sections filtrées sont vides mais qu'il y a des événements */}
+        {!loading && allEvents.length > 0 && todayEvents.length === 0 && upcomingEvents.length === 0 && (
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-8 md:p-10 shadow-lg shadow-black/20 bg-white/5">
+            <h3 className="text-lg font-semibold text-white mb-4">Rendez-vous (debug)</h3>
+            <div className="space-y-2">
+              {allEvents.map((event) => (
+                <div key={event.id} className="text-sm text-gray-300 border-b border-white/10 pb-2">
+                  <span className="font-medium">{event.title}</span>
+                  <span className="text-gray-500 ml-2">
+                    {new Date(event.starts_at).toLocaleString('fr-FR', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* État vide global */}
-        {!loading && events.length === 0 && todayEvents.length === 0 && upcomingEvents.length === 0 && (
+        {!loading && allEvents.length === 0 && todayEvents.length === 0 && upcomingEvents.length === 0 && (
           <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-12 md:p-16 text-center shadow-lg shadow-black/20 bg-white/5">
             <p className="text-gray-400 mb-6">Aucun rendez-vous prévu.</p>
             <Button variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
