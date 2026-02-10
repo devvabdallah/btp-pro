@@ -1,25 +1,88 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { AgendaEvent } from '@/lib/agenda-actions'
+import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import CreateEventModal from './CreateEventModal'
 
 interface AgendaClientProps {
-  events: AgendaEvent[]
+  events?: AgendaEvent[]
   error?: string
 }
 
-export default function AgendaClient({ events: initialEvents, error }: AgendaClientProps) {
+export default function AgendaClient({ events: initialEvents = [], error }: AgendaClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [events, setEvents] = useState<AgendaEvent[]>(initialEvents)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
   const role = pathname.includes('/patron/') ? 'patron' : 'employe'
 
+  const loadEvents = async () => {
+    try {
+      setLoading(true)
+      const supabase = createSupabaseBrowserClient()
+
+      // Vérifier l'utilisateur
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      
+      if (!user || userError) {
+        setEvents([])
+        setLoading(false)
+        return
+      }
+
+      // Récupérer le profil pour obtenir entreprise_id
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('entreprise_id')
+        .eq('id', user.id)
+        .single()
+
+      if (profileError || !profile || !profile.entreprise_id) {
+        setEvents([])
+        setLoading(false)
+        return
+      }
+
+      // Charger les événements
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      const { data: eventsData, error: eventsError } = await supabase
+        .from('agenda_events')
+        .select(`
+          *,
+          chantiers(id, title, address, client:clients(id, first_name, last_name))
+        `)
+        .eq('company_id', profile.entreprise_id)
+        .gte('starts_at', today.toISOString())
+        .order('starts_at', { ascending: true })
+        .limit(50)
+
+      if (eventsError) {
+        console.error('Error loading events:', eventsError)
+        setEvents([])
+      } else {
+        setEvents(eventsData || [])
+      }
+    } catch (err) {
+      console.error('Error loading events:', err)
+      setEvents([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadEvents()
+  }, [])
+
   const handleSuccess = () => {
-    router.refresh()
+    loadEvents()
   }
 
   // Séparer les événements en "Aujourd'hui" et "À venir"
@@ -31,7 +94,7 @@ export default function AgendaClient({ events: initialEvents, error }: AgendaCli
   const todayEvents: AgendaEvent[] = []
   const upcomingEvents: AgendaEvent[] = []
 
-  initialEvents.forEach((event) => {
+  events.forEach((event) => {
     const eventDate = new Date(event.starts_at)
     if (eventDate >= today && eventDate <= endOfToday) {
       todayEvents.push(event)
@@ -290,12 +353,19 @@ export default function AgendaClient({ events: initialEvents, error }: AgendaCli
         </div>
 
         {/* État vide global */}
-        {initialEvents.length === 0 && todayEvents.length === 0 && upcomingEvents.length === 0 && (
+        {!loading && events.length === 0 && todayEvents.length === 0 && upcomingEvents.length === 0 && (
           <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-12 md:p-16 text-center shadow-lg shadow-black/20 bg-white/5">
             <p className="text-gray-400 mb-6">Aucun rendez-vous prévu.</p>
             <Button variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
               + Ajouter un rendez-vous
             </Button>
+          </div>
+        )}
+
+        {/* État de chargement */}
+        {loading && (
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-12 md:p-16 text-center shadow-lg shadow-black/20 bg-white/5">
+            <p className="text-gray-400">Chargement des rendez-vous...</p>
           </div>
         )}
 
