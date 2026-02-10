@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getChantiersForSelect } from '@/lib/agenda-actions'
+import { getChantiersForSelect, AgendaEvent } from '@/lib/agenda-actions'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -15,9 +15,11 @@ interface CreateEventModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
+  mode?: 'create' | 'edit'
+  event?: AgendaEvent | null
 }
 
-export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateEventModalProps) {
+export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'create', event = null }: CreateEventModalProps) {
   const [loading, setLoading] = useState(false)
   const [loadingChantiers, setLoadingChantiers] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -29,17 +31,51 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
     duration_minutes: 60,
     chantier_id: '',
     notes: '',
+    status: 'planned' as 'planned' | 'confirmed' | 'completed' | 'cancelled',
   })
 
   useEffect(() => {
     if (isOpen) {
       loadChantiers()
-      // Générer la valeur par défaut pour starts_at (maintenant + 1 heure)
-      const now = new Date()
-      now.setHours(now.getHours() + 1)
-      now.setMinutes(0)
-      const defaultDateTime = now.toISOString().slice(0, 16)
-      setFormData((prev) => ({ ...prev, starts_at: prev.starts_at || defaultDateTime }))
+      
+      if (mode === 'edit' && event) {
+        // Pré-remplir avec les données de l'événement
+        const startsAt = new Date(event.starts_at)
+        const startsAtLocal = new Date(startsAt.getTime() - startsAt.getTimezoneOffset() * 60000)
+        const startsAtFormatted = startsAtLocal.toISOString().slice(0, 16)
+        
+        // Calculer la durée en minutes depuis starts_at et ends_at
+        let duration = 60
+        if (event.ends_at) {
+          const endsAt = new Date(event.ends_at)
+          duration = Math.round((endsAt.getTime() - startsAt.getTime()) / (1000 * 60))
+        } else if ((event as any).duration_minutes) {
+          duration = (event as any).duration_minutes
+        }
+        
+        setFormData({
+          title: event.title || '',
+          starts_at: startsAtFormatted,
+          duration_minutes: duration,
+          chantier_id: event.chantier_id || '',
+          notes: event.notes || '',
+          status: event.status || 'planned',
+        })
+      } else {
+        // Générer la valeur par défaut pour starts_at (maintenant + 1 heure)
+        const now = new Date()
+        now.setHours(now.getHours() + 1)
+        now.setMinutes(0)
+        const defaultDateTime = now.toISOString().slice(0, 16)
+        setFormData({
+          title: '',
+          starts_at: defaultDateTime,
+          duration_minutes: 60,
+          chantier_id: '',
+          notes: '',
+          status: 'planned',
+        })
+      }
     } else {
       // Reset form when closing
       setFormData({
@@ -48,10 +84,11 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
         duration_minutes: 60,
         chantier_id: '',
         notes: '',
+        status: 'planned',
       })
       setError(null)
     }
-  }, [isOpen])
+  }, [isOpen, mode, event])
 
   async function loadChantiers() {
     setLoadingChantiers(true)
@@ -107,24 +144,82 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
       const startsAt = new Date(formData.starts_at)
       const endsAt = new Date(startsAt.getTime() + formData.duration_minutes * 60 * 1000)
 
-      // Insérer l'événement directement côté client
-      const { data: event, error: insertError } = await supabase
-        .from('agenda_events')
-        .insert({
-          company_id: profile.entreprise_id,
-          created_by: user.id,
-          title: formData.title.trim(),
-          starts_at: startsAt.toISOString(),
-          ends_at: endsAt.toISOString(),
-          chantier_id: formData.chantier_id || null,
-          notes: formData.notes.trim() || null,
-          status: 'planned',
-        })
-        .select()
-        .single()
+      if (mode === 'edit' && event) {
+        // Mode édition : mettre à jour l'événement
+        const { error: updateError } = await supabase
+          .from('agenda_events')
+          .update({
+            title: formData.title.trim(),
+            starts_at: startsAt.toISOString(),
+            ends_at: endsAt.toISOString(),
+            chantier_id: formData.chantier_id || null,
+            notes: formData.notes.trim() || null,
+            status: formData.status,
+          })
+          .eq('id', event.id)
 
-      if (insertError || !event) {
-        setError(insertError?.message || 'Erreur lors de la création de l\'événement.')
+        if (updateError) {
+          setError(updateError.message || 'Erreur lors de la modification de l\'événement.')
+          setLoading(false)
+          return
+        }
+
+        // Succès
+        onSuccess()
+        onClose()
+      } else {
+        // Mode création : insérer un nouvel événement
+        const { data: newEvent, error: insertError } = await supabase
+          .from('agenda_events')
+          .insert({
+            company_id: profile.entreprise_id,
+            created_by: user.id,
+            title: formData.title.trim(),
+            starts_at: startsAt.toISOString(),
+            ends_at: endsAt.toISOString(),
+            chantier_id: formData.chantier_id || null,
+            notes: formData.notes.trim() || null,
+            status: 'planned',
+          })
+          .select()
+          .single()
+
+        if (insertError || !newEvent) {
+          setError(insertError?.message || 'Erreur lors de la création de l\'événement.')
+          setLoading(false)
+          return
+        }
+
+        // Succès
+        onSuccess()
+        onClose()
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Une erreur inattendue est survenue.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!event) return
+
+    const confirmed = window.confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')
+    if (!confirmed) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const supabase = createSupabaseBrowserClient()
+
+      const { error: deleteError } = await supabase
+        .from('agenda_events')
+        .delete()
+        .eq('id', event.id)
+
+      if (deleteError) {
+        setError(deleteError.message || 'Erreur lors de la suppression de l\'événement.')
         setLoading(false)
         return
       }
@@ -146,7 +241,9 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
       <div className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 rounded-2xl border border-white/10 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="p-6 md:p-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-white">Ajouter un événement</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-white">
+              {mode === 'edit' ? 'Modifier le rendez-vous' : 'Ajouter un événement'}
+            </h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-white transition-colors text-2xl leading-none"
@@ -237,6 +334,25 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
               />
             </div>
 
+            {mode === 'edit' && (
+              <div>
+                <label className="block mb-3 text-sm font-medium text-gray-300">
+                  Statut *
+                </label>
+                <select
+                  required
+                  className="w-full px-5 py-4 rounded-2xl bg-[#1a1f3a] border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                >
+                  <option value="planned">Planifié</option>
+                  <option value="confirmed">Confirmé</option>
+                  <option value="completed">Terminé</option>
+                  <option value="cancelled">Annulé</option>
+                </select>
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button
                 type="submit"
@@ -245,8 +361,23 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
                 disabled={loading}
                 className="w-full sm:w-auto"
               >
-                {loading ? 'Création...' : 'Créer l\'événement'}
+                {loading 
+                  ? (mode === 'edit' ? 'Enregistrement...' : 'Création...') 
+                  : (mode === 'edit' ? 'Enregistrer' : 'Créer l\'événement')
+                }
               </Button>
+              {mode === 'edit' && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="lg"
+                  onClick={handleDelete}
+                  disabled={loading}
+                  className="w-full sm:w-auto bg-red-500/20 hover:bg-red-500/30 text-red-300 border-red-500/30"
+                >
+                  Supprimer
+                </Button>
+              )}
               <Button
                 type="button"
                 variant="secondary"

@@ -15,6 +15,7 @@ interface AgendaClientProps {
 
 export default function AgendaClient({ events: initialEvents = [], error }: AgendaClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingEvent, setEditingEvent] = useState<AgendaEvent | null>(null)
   const [allEvents, setAllEvents] = useState<AgendaEvent[]>(initialEvents)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -86,6 +87,17 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
 
   const handleSuccess = () => {
     loadEvents()
+    setEditingEvent(null)
+  }
+
+  const handleEditEvent = (event: AgendaEvent) => {
+    setEditingEvent(event)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setEditingEvent(null)
   }
 
   // Fonction timezone-safe pour comparer les dates locales
@@ -179,7 +191,10 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     const hasAddress = event.chantiers?.address
 
     const cardContent = (
-      <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 hover:bg-white/7 transition-colors shadow-lg shadow-black/20 bg-white/5">
+      <div 
+        className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 hover:bg-white/7 transition-colors shadow-lg shadow-black/20 bg-white/5 cursor-pointer"
+        onClick={() => handleEditEvent(event)}
+      >
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
             <div className="text-2xl md:text-3xl font-semibold text-white">
@@ -241,9 +256,9 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
 
     if (chantierUrl) {
       return (
-        <Link href={chantierUrl} className="block">
+        <div onClick={() => handleEditEvent(event)}>
           {cardContent}
-        </Link>
+        </div>
       )
     }
 
@@ -270,8 +285,10 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     <>
       <CreateEventModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
         onSuccess={handleSuccess}
+        mode={editingEvent ? 'edit' : 'create'}
+        event={editingEvent}
       />
       <div className="space-y-8 md:space-y-10">
         {/* Bloc debug */}
@@ -303,7 +320,10 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
             </div>
             <div className="hidden md:block">
               <div className="flex flex-col items-end gap-1">
-                <Button variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
+                <Button variant="primary" size="md" onClick={() => {
+                  setEditingEvent(null)
+                  setIsModalOpen(true)
+                }}>
                   Nouveau rendez-vous
                 </Button>
                 <span className="text-xs text-white/50">2 clics — 1 minute</span>
@@ -317,7 +337,10 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
           <Button
             variant="primary"
             size="lg"
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setEditingEvent(null)
+              setIsModalOpen(true)
+            }}
             className="w-full shadow-xl shadow-orange-500/30"
           >
             Nouveau rendez-vous
@@ -401,7 +424,10 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
         {!loading && allEvents.length === 0 && todayEvents.length === 0 && upcomingEvents.length === 0 && (
           <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-12 md:p-16 text-center shadow-lg shadow-black/20 bg-white/5">
             <p className="text-gray-400 mb-6">Aucun rendez-vous prévu.</p>
-            <Button variant="primary" size="md" onClick={() => setIsModalOpen(true)}>
+            <Button variant="primary" size="md" onClick={() => {
+              setEditingEvent(null)
+              setIsModalOpen(true)
+            }}>
               + Ajouter un rendez-vous
             </Button>
           </div>
