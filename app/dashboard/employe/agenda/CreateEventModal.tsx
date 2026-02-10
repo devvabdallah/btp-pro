@@ -63,10 +63,10 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
   }
 
   const createEventWithRetry = async (supabase: ReturnType<typeof createSupabaseBrowserClient>) => {
-    // Récupérer l'utilisateur
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    // Récupérer la session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
 
-    if (!user || userError) {
+    if (!session || !session.user || sessionError) {
       throw new Error('Session expirée. Reconnectez-vous.')
     }
 
@@ -74,7 +74,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('entreprise_id')
-      .eq('id', user.id)
+      .eq('id', session.user.id)
       .single()
 
     if (profileError || !profile || !profile.entreprise_id) {
@@ -85,12 +85,12 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: CreateE
     const startsAt = new Date(formData.starts_at)
     const endsAt = new Date(startsAt.getTime() + formData.duration_minutes * 60 * 1000)
 
-    // Insérer l'événement
+    // Insérer l'événement directement côté client
     const { data: event, error: insertError } = await supabase
       .from('agenda_events')
       .insert({
         company_id: profile.entreprise_id,
-        created_by: user.id,
+        created_by: session.user.id,
         title: formData.title.trim(),
         starts_at: startsAt.toISOString(),
         ends_at: endsAt.toISOString(),
