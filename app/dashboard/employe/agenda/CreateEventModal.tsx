@@ -38,7 +38,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
     if (isOpen) {
       loadChantiers()
       
-      if (mode === 'edit' && event) {
+      if (mode === 'edit' && event && event.id) {
         // Pré-remplir avec les données de l'événement
         const startsAt = new Date(event.starts_at)
         const startsAtLocal = new Date(startsAt.getTime() - startsAt.getTimezoneOffset() * 60000)
@@ -61,6 +61,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
           notes: event.notes || '',
           status: event.status || 'planned',
         })
+        setError(null)
       } else {
         // Générer la valeur par défaut pour starts_at (maintenant + 1 heure)
         const now = new Date()
@@ -144,9 +145,9 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
       const startsAt = new Date(formData.starts_at)
       const endsAt = new Date(startsAt.getTime() + formData.duration_minutes * 60 * 1000)
 
-      if (mode === 'edit' && event) {
+      if (mode === 'edit' && event && event.id) {
         // Mode édition : mettre à jour l'événement
-        const { error: updateError } = await supabase
+        const { data: updatedEvent, error: updateError } = await supabase
           .from('agenda_events')
           .update({
             title: formData.title.trim(),
@@ -157,9 +158,11 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
             status: formData.status,
           })
           .eq('id', event.id)
+          .select()
+          .single()
 
-        if (updateError) {
-          setError(updateError.message || 'Erreur lors de la modification de l\'événement.')
+        if (updateError || !updatedEvent) {
+          setError(updateError?.message || 'Erreur lors de la modification de l\'événement.')
           setLoading(false)
           return
         }
@@ -202,7 +205,10 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
   }
 
   const handleDelete = async () => {
-    if (!event) return
+    if (!event || !event.id) {
+      setError('Impossible de supprimer : événement invalide.')
+      return
+    }
 
     const confirmed = window.confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')
     if (!confirmed) return
@@ -335,22 +341,30 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
             </div>
 
             {mode === 'edit' && (
-              <div>
-                <label className="block mb-3 text-sm font-medium text-gray-300">
-                  Statut *
-                </label>
-                <select
-                  required
-                  className="w-full px-5 py-4 rounded-2xl bg-[#1a1f3a] border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                >
-                  <option value="planned">Planifié</option>
-                  <option value="confirmed">Confirmé</option>
-                  <option value="completed">Terminé</option>
-                  <option value="cancelled">Annulé</option>
-                </select>
-              </div>
+              <>
+                {!event || !event.id ? (
+                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-4">
+                    <p className="text-yellow-400 text-sm">Impossible de modifier : événement invalide.</p>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block mb-3 text-sm font-medium text-gray-300">
+                      Statut *
+                    </label>
+                    <select
+                      required
+                      className="w-full px-5 py-4 rounded-2xl bg-[#1a1f3a] border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                      value={formData.status}
+                      onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                    >
+                      <option value="planned">Planifié</option>
+                      <option value="confirmed">Confirmé</option>
+                      <option value="completed">Terminé</option>
+                      <option value="cancelled">Annulé</option>
+                    </select>
+                  </div>
+                )}
+              </>
             )}
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -358,7 +372,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
                 type="submit"
                 variant="primary"
                 size="lg"
-                disabled={loading}
+                disabled={loading || (mode === 'edit' && (!event || !event.id))}
                 className="w-full sm:w-auto"
               >
                 {loading 
@@ -366,7 +380,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
                   : (mode === 'edit' ? 'Enregistrer' : 'Créer l\'événement')
                 }
               </Button>
-              {mode === 'edit' && (
+              {mode === 'edit' && event && event.id && (
                 <Button
                   type="button"
                   variant="secondary"

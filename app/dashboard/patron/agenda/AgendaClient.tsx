@@ -245,7 +245,6 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
   const EventCard = ({ event }: { event: AgendaEvent }) => {
     const duration = getDuration(event.starts_at, event.ends_at)
     const hasChantier = event.chantiers && event.chantiers.id
-    const chantierUrl = hasChantier ? `/dashboard/${role}/chantiers/${event.chantiers.id}` : null
     const hasAddress = event.chantiers?.address
 
     // Vérifier si l'événement est "En cours"
@@ -253,7 +252,7 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     const endsAt = new Date(event.ends_at)
     const isInProgress = now >= startsAt && now < endsAt
 
-    const cardContent = (
+    return (
       <div 
         className={`bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 ${
           isCompanyActive === false 
@@ -319,16 +318,6 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
         </div>
       </div>
     )
-
-    if (chantierUrl) {
-      return (
-        <div onClick={() => handleEditEvent(event)}>
-          {cardContent}
-        </div>
-      )
-    }
-
-    return cardContent
   }
 
   // Afficher l'erreur si présente
