@@ -244,9 +244,9 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 rounded-2xl border border-white/10 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 md:p-8">
-          <div className="flex items-center justify-between mb-6">
+      <div className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 rounded-2xl border border-white/10 shadow-2xl w-[92vw] max-w-[720px] max-h-[85vh] flex flex-col">
+        <div className="flex-shrink-0 p-6 md:p-8 border-b border-white/10">
+          <div className="flex items-center justify-between">
             <h2 className="text-2xl md:text-3xl font-bold text-white">
               {mode === 'edit' ? 'Modifier le rendez-vous' : 'Ajouter un événement'}
             </h2>
@@ -258,7 +258,9 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
               ×
             </button>
           </div>
+        </div>
 
+        <div className="flex-1 overflow-y-auto p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4">
