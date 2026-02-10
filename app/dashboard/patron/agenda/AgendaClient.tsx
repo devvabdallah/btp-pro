@@ -168,6 +168,21 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     }
   })
 
+  // Tri intelligent pour "Aujourd'hui" : événements à venir en haut, passés en bas
+  todayEvents.sort((a, b) => {
+    const aDate = new Date(a.starts_at)
+    const bDate = new Date(b.starts_at)
+    const aIsPast = aDate < now
+    const bIsPast = bDate < now
+    
+    // Si l'un est passé et l'autre non, le passé va en bas
+    if (aIsPast && !bIsPast) return 1
+    if (!aIsPast && bIsPast) return -1
+    
+    // Sinon, trier par heure croissante
+    return aDate.getTime() - bDate.getTime()
+  })
+
   // Formater l'heure
   const formatTime = (dateString: string) => {
     const date = new Date(dateString)
@@ -233,13 +248,18 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     const chantierUrl = hasChantier ? `/dashboard/${role}/chantiers/${event.chantiers.id}` : null
     const hasAddress = event.chantiers?.address
 
+    // Vérifier si l'événement est "En cours"
+    const startsAt = new Date(event.starts_at)
+    const endsAt = new Date(event.ends_at)
+    const isInProgress = now >= startsAt && now < endsAt
+
     const cardContent = (
       <div 
         className={`bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 ${
           isCompanyActive === false 
             ? 'opacity-60 cursor-not-allowed' 
             : 'hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer'
-        }`}
+        } ${isInProgress ? 'ring-2 ring-orange-500/30' : ''}`}
         onClick={() => handleEditEvent(event)}
       >
         <div className="flex items-start gap-4">
@@ -250,7 +270,14 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
             <div className="text-xs text-gray-400 mt-1">{duration} min</div>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base md:text-lg font-bold text-white mb-3 truncate">{event.title}</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="text-base md:text-lg font-bold text-white truncate">{event.title}</h3>
+              {isInProgress && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                  En cours
+                </span>
+              )}
+            </div>
             
             {hasChantier && (
               <div className="space-y-2 mb-3">
