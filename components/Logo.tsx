@@ -40,9 +40,11 @@ export default function Logo({ size = 'md', showText = true }: LogoProps) {
           <Image
             src="/brand/logo.png"
             alt="BTP PRO"
-            width={40}
-            height={40}
+            width={64}
+            height={64}
             className="w-full h-full object-contain rounded-xl"
+            quality={100}
+            sizes="(max-width: 768px) 48px, 64px"
             priority
             onError={() => setImageError(true)}
           />
