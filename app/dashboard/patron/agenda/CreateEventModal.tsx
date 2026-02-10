@@ -229,7 +229,8 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
       return
     }
 
-    const confirmed = window.confirm('Êtes-vous sûr de vouloir supprimer ce rendez-vous ?')
+    // Demander confirmation avant suppression
+    const confirmed = window.confirm('Supprimer ce rendez-vous ? Cette action est irréversible.')
     if (!confirmed) return
 
     setLoading(true)
