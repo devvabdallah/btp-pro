@@ -252,45 +252,61 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     const endsAt = new Date(event.ends_at)
     const isInProgress = now >= startsAt && now < endsAt
 
+    const handleCardClick = () => {
+      if (isCompanyActive !== false) {
+        handleEditEvent(event)
+      }
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        handleCardClick()
+      }
+    }
+
     return (
       <div 
-        className={`bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 ${
+        role="button"
+        tabIndex={isCompanyActive === false ? -1 : 0}
+        className={`bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 pointer-events-auto ${
           isCompanyActive === false 
             ? 'opacity-60 cursor-not-allowed' 
-            : 'hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer'
+            : 'hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500/50'
         } ${isInProgress ? 'ring-2 ring-orange-500/30' : ''}`}
-        onClick={() => handleEditEvent(event)}
+        onClick={handleCardClick}
+        onKeyDown={handleKeyDown}
       >
-        <div className="flex items-start gap-4">
-          <div className="flex-shrink-0">
-            <div className="text-2xl md:text-3xl font-semibold text-white">
+        <div className="flex items-start gap-4 pointer-events-none">
+          <div className="flex-shrink-0 pointer-events-none">
+            <div className="text-2xl md:text-3xl font-semibold text-white pointer-events-none">
               {formatTime(event.starts_at)}
             </div>
-            <div className="text-xs text-gray-400 mt-1">{duration} min</div>
+            <div className="text-xs text-gray-400 mt-1 pointer-events-none">{duration} min</div>
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="text-base md:text-lg font-bold text-white truncate">{event.title}</h3>
+          <div className="flex-1 min-w-0 pointer-events-none">
+            <div className="flex items-center gap-2 mb-2 pointer-events-none">
+              <h3 className="text-base md:text-lg font-bold text-white truncate pointer-events-none">{event.title}</h3>
               {isInProgress && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30 pointer-events-none">
                   En cours
                 </span>
               )}
             </div>
             
             {hasChantier && (
-              <div className="space-y-2 mb-3">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-white/10 text-white/90 border border-white/10">
+              <div className="space-y-2 mb-3 pointer-events-none">
+                <div className="flex items-center gap-2 flex-wrap pointer-events-none">
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-white/10 text-white/90 border border-white/10 pointer-events-none">
                     Chantier
                   </span>
-                  <span className="text-sm font-semibold text-white">
+                  <span className="text-sm font-semibold text-white pointer-events-none">
                     {event.chantiers.title}
                   </span>
                   {event.chantiers.client && (
                     <>
-                      <span className="text-gray-500">•</span>
-                      <span className="text-sm text-gray-300">
+                      <span className="text-gray-500 pointer-events-none">•</span>
+                      <span className="text-sm text-gray-300 pointer-events-none">
                         {event.chantiers.client.first_name} {event.chantiers.client.last_name}
                       </span>
                     </>
@@ -302,7 +318,7 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30 hover:bg-orange-500/30 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30 hover:bg-orange-500/30 transition-colors pointer-events-auto"
                   >
                     <span>📍</span>
                     <span>Itinéraire</span>
@@ -312,7 +328,7 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
             )}
             
             {event.notes && (
-              <p className="text-sm text-gray-400 line-clamp-2">{event.notes}</p>
+              <p className="text-sm text-gray-400 line-clamp-2 pointer-events-none">{event.notes}</p>
             )}
           </div>
         </div>
