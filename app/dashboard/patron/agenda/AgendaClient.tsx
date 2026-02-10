@@ -247,15 +247,15 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
             <div className="text-2xl md:text-3xl font-semibold text-white">
               {formatTime(event.starts_at)}
             </div>
+            <div className="text-xs text-gray-400 mt-1">{duration} min</div>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-base md:text-lg font-bold text-white mb-2 truncate">{event.title}</h3>
-            <div className="flex items-center gap-2 flex-wrap mb-2">
-              <span className="text-sm text-gray-400">{duration} min</span>
-              {hasChantier && (
-                <>
-                  <span className="text-gray-500">•</span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white/10 text-white/80 border border-white/10">
+            <h3 className="text-base md:text-lg font-bold text-white mb-3 truncate">{event.title}</h3>
+            
+            {hasChantier && (
+              <div className="space-y-2 mb-3">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-white/10 text-white/90 border border-white/10">
                     Chantier
                   </span>
                   <span className="text-sm font-semibold text-white">
@@ -264,37 +264,29 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
                   {event.chantiers.client && (
                     <>
                       <span className="text-gray-500">•</span>
-                      <span className="text-sm text-gray-400">
+                      <span className="text-sm text-gray-300">
                         {event.chantiers.client.first_name} {event.chantiers.client.last_name}
                       </span>
                     </>
                   )}
-                </>
-              )}
-              {event.notes && (
-                <>
-                  <span className="text-gray-500">•</span>
-                  <span className="text-sm text-gray-400 truncate max-w-[200px]">{event.notes}</span>
-                </>
-              )}
-            </div>
-            {hasChantier && (
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+                </div>
                 {hasAddress && (
                   <a
                     href={getGoogleMapsUrl(event.chantiers.address)}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="text-xs text-white/70 hover:text-white transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30 hover:bg-orange-500/30 transition-colors"
                   >
-                    Itinéraire
+                    <span>📍</span>
+                    <span>Itinéraire</span>
                   </a>
                 )}
-                {chantierUrl && (
-                  <span className="text-xs text-white/70 ml-auto">Ouvrir</span>
-                )}
               </div>
+            )}
+            
+            {event.notes && (
+              <p className="text-sm text-gray-400 line-clamp-2">{event.notes}</p>
             )}
           </div>
         </div>
