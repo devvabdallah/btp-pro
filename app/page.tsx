@@ -62,21 +62,21 @@ export default function Home() {
         <div className="absolute inset-0 bg-white/[0.02]"></div>
       </div>
       {/* Header */}
-      <header className="w-full bg-[#0a0e27]/95 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 shadow-lg shadow-black/20 relative">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 md:px-8 py-5 md:py-6">
-          <Link href="/">
+      <header className="w-full bg-[#0a0e27]/95 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 shadow-lg shadow-black/20 relative min-h-[72px]">
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
             <Logo size="md" showText={true} />
           </Link>
           <div className="flex items-center gap-2 md:gap-3">
             <Link href="/login">
-              <Button variant="secondary" size="sm" className="border-white/20 text-gray-300 hover:border-white/30 hover:bg-white/5">
+              <button className="px-6 py-2.5 rounded-xl border border-white/20 text-gray-300 hover:bg-white/5 transition-all duration-200">
                 Connexion
-              </Button>
+              </button>
             </Link>
             <Link href="/register">
-              <Button variant="primary" size="sm" className="relative">
+              <button className="px-7 py-2.5 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg hover:scale-[1.03] transition-all duration-200">
                 Inscription
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
