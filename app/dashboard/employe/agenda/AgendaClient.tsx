@@ -49,6 +49,22 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
 
       const userId = sess.session.user.id
 
+      // Récupérer l'entreprise_id depuis le profil
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('entreprise_id')
+        .eq('id', userId)
+        .single()
+
+      if (profileError || !profile || !profile.entreprise_id) {
+        console.error('[Agenda] Error getting profile or entreprise_id:', profileError)
+        setAllEvents([])
+        setLoading(false)
+        return
+      }
+
+      const entrepriseId = profile.entreprise_id
+
       // En mode debug, charger tous les événements sans filtre
       if (debug) {
         const { data, error } = await supabase
@@ -67,11 +83,11 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
         return
       }
 
-      // Charger les événements filtrés par user_id
+      // Charger les événements filtrés par company_id (qui correspond à entreprise_id)
       const { data, error } = await supabase
         .from('agenda_events')
         .select('*')
-        .eq('user_id', userId)
+        .eq('company_id', entrepriseId)
         .order('starts_at', { ascending: true })
 
       if (error) {
