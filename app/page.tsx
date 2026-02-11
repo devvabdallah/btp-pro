@@ -65,15 +65,15 @@ export default function Home() {
       <header className="sticky top-0 z-50 backdrop-blur-md bg-[#0a0e27]/70 border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link href="/">
-            <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden shadow-lg shadow-black/30 bg-white/5 backdrop-blur-sm flex items-center justify-center">
+            <div className="w-16 h-16 md:w-18 md:h-18 rounded-xl bg-white shadow-md flex items-center justify-center">
               <Image
                 src="/brand/logo.png"
                 alt="BTP PRO"
-                width={128}
-                height={128}
+                width={160}
+                height={160}
                 quality={100}
                 priority
-                className="w-[85%] h-[85%] object-contain"
+                className="w-[90%] h-[90%] object-contain"
               />
             </div>
           </Link>
