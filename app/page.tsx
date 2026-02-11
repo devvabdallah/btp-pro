@@ -65,7 +65,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 backdrop-blur-md bg-[#0a0e27]/70 border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link href="/">
-            <div className="w-16 h-16 md:w-18 md:h-18 rounded-xl bg-white shadow-md flex items-center justify-center">
+            <div className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-xl bg-white shadow-md flex items-center justify-center">
               <Image
                 src="/brand/logo.png"
                 alt="BTP PRO"
@@ -74,6 +74,7 @@ export default function Home() {
                 quality={100}
                 priority
                 className="w-[90%] h-[90%] object-contain"
+                style={{ imageRendering: "auto" }}
               />
             </div>
           </Link>
