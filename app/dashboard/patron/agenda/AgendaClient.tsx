@@ -315,7 +315,22 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
       <div 
         role="button"
         tabIndex={0}
-        className={`relative bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border-2 ${statusStyles.border} p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 pointer-events-auto hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500/50`}
+        className={`
+          relative bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border transition-all duration-200 p-4 md:p-5 shadow-lg shadow-black/20 bg-white/5 pointer-events-auto hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500/50
+          ${
+            status === "in_progress"
+              ? "border-orange-400/40 shadow-[0_0_0_1px_rgba(251,146,60,0.15)]"
+              : status === "confirmed"
+              ? "border-yellow-400/40 shadow-[0_0_0_1px_rgba(250,204,21,0.15)]"
+              : status === "planned"
+              ? "border-blue-400/40 shadow-[0_0_0_1px_rgba(96,165,250,0.15)]"
+              : status === "done"
+              ? "border-green-400/40 shadow-[0_0_0_1px_rgba(74,222,128,0.15)]"
+              : status === "cancelled"
+              ? "border-red-400/40 shadow-[0_0_0_1px_rgba(248,113,113,0.15)]"
+              : "border-white/10"
+          }
+        `}
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
       >
