@@ -14,13 +14,13 @@ export default function Logo({ size = 'md', showText = true }: LogoProps) {
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-10 h-10',
-    lg: 'w-14 h-14',
+    lg: 'w-10 h-10 md:w-12 md:h-12',
   }
 
   const imageSizes = {
     sm: 32,
     md: 40,
-    lg: 56,
+    lg: 48,
   }
 
   const textSizeClasses = {

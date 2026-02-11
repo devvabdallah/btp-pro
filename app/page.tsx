@@ -62,8 +62,8 @@ export default function Home() {
         <div className="absolute inset-0 bg-white/[0.02]"></div>
       </div>
       {/* Header */}
-      <header className="w-full bg-[#0a0e27]/95 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 shadow-lg shadow-black/20 relative min-h-[80px]">
-        <div className="max-w-7xl mx-auto px-6 md:px-10 py-5 flex items-center justify-between">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-[#0a0e27]/70 border-b border-white/10">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link href="/">
             <Logo size="lg" showText={false} />
           </Link>
