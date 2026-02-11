@@ -171,52 +171,20 @@ export default function Home() {
       <section id="comment" className="w-full px-4 py-24 md:px-8 relative">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white text-center mb-16">
-            Comment ça marche
+            Tout votre BTP, au même endroit.
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-            {/* Étape 1 */}
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 text-white font-bold text-xl mb-6">
-                1
+          
+          <div className="space-y-16 md:space-y-24">
+            {/* Bloc 1 : Chantiers */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div>
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                  Chantiers clairs
+                </h3>
+                <p className="text-lg text-white/70 leading-relaxed">
+                  Suivez l'avancement, les infos et vos priorités en un coup d'œil.
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">
-                Créez vos chantiers
-              </h3>
-              <p className="text-white/70 leading-relaxed">
-                Centralisez les informations clients et projets.
-              </p>
-            </div>
-
-            {/* Étape 2 */}
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 text-white font-bold text-xl mb-6">
-                2
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">
-                Générez vos devis
-              </h3>
-              <p className="text-white/70 leading-relaxed">
-                Créez et transformez vos devis en facture en un clic.
-              </p>
-            </div>
-
-            {/* Étape 3 */}
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 text-white font-bold text-xl mb-6">
-                3
-              </div>
-              <h3 className="text-xl font-bold text-white mb-3">
-                Suivez votre activité
-              </h3>
-              <p className="text-white/70 leading-relaxed">
-                Visualisez vos rendez-vous et l'état de vos documents en temps réel.
-              </p>
-            </div>
-          </div>
-
-          {/* Section Screenshots */}
-          <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="rounded-xl border border-white/10 shadow-lg overflow-hidden">
                 <img
                   src="/screens/chantiers.png"
@@ -224,17 +192,43 @@ export default function Home() {
                   className="w-full h-auto block"
                 />
               </div>
-              <div className="rounded-xl border border-white/10 shadow-lg overflow-hidden">
-                <img
-                  src="/screens/devis.png"
-                  alt="Écran devis BTP PRO"
-                  className="w-full h-auto block"
-                />
+            </div>
+
+            {/* Bloc 2 : Devis */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div className="order-2 lg:order-1">
+                <div className="rounded-xl border border-white/10 shadow-lg overflow-hidden">
+                  <img
+                    src="/screens/devis.png"
+                    alt="Écran devis BTP PRO"
+                    className="w-full h-auto block"
+                  />
+                </div>
+              </div>
+              <div className="order-1 lg:order-2">
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                  Devis → Facture en 1 clic
+                </h3>
+                <p className="text-lg text-white/70 leading-relaxed">
+                  Créez, modifiez et transformez vos devis sans friction.
+                </p>
+              </div>
+            </div>
+
+            {/* Bloc 3 : Clients */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div>
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                  Clients centralisés
+                </h3>
+                <p className="text-lg text-white/70 leading-relaxed">
+                  Contacts et historique au même endroit, sans perdre de temps.
+                </p>
               </div>
               <div className="rounded-xl border border-white/10 shadow-lg overflow-hidden">
                 <img
-                  src="/screens/chantiers.png"
-                  alt="Écran gestion BTP PRO"
+                  src="/clients.png"
+                  alt="Écran clients BTP PRO"
                   className="w-full h-auto block"
                 />
               </div>
