@@ -14,7 +14,13 @@ export default function Logo({ size = 'md', showText = true }: LogoProps) {
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-10 h-10',
-    lg: 'w-12 h-12 md:w-16 md:h-16',
+    lg: 'w-14 h-14',
+  }
+
+  const imageSizes = {
+    sm: 32,
+    md: 40,
+    lg: 56,
   }
 
   const textSizeClasses = {
@@ -40,11 +46,10 @@ export default function Logo({ size = 'md', showText = true }: LogoProps) {
           <Image
             src="/brand/logo.png"
             alt="BTP PRO"
-            width={64}
-            height={64}
+            width={imageSizes[size]}
+            height={imageSizes[size]}
             className="w-full h-full object-contain rounded-xl"
             quality={100}
-            sizes="(max-width: 768px) 48px, 64px"
             priority
             onError={() => setImageError(true)}
           />

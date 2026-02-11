@@ -62,19 +62,19 @@ export default function Home() {
         <div className="absolute inset-0 bg-white/[0.02]"></div>
       </div>
       {/* Header */}
-      <header className="w-full bg-[#0a0e27]/95 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 shadow-lg shadow-black/20 relative min-h-[72px]">
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <Logo size="md" showText={true} />
+      <header className="w-full bg-[#0a0e27]/95 backdrop-blur-sm border-b border-white/10 sticky top-0 z-50 shadow-lg shadow-black/20 relative min-h-[80px]">
+        <div className="max-w-7xl mx-auto px-6 md:px-10 py-5 flex items-center justify-between">
+          <Link href="/">
+            <Logo size="lg" showText={false} />
           </Link>
           <div className="flex items-center gap-2 md:gap-3">
             <Link href="/login">
-              <button className="px-6 py-2.5 rounded-xl border border-white/20 text-gray-300 hover:bg-white/5 transition-all duration-200">
+              <button className="px-6 py-2.5 rounded-xl border border-white/15 text-gray-300 hover:bg-white/5 transition">
                 Connexion
               </button>
             </Link>
             <Link href="/register">
-              <button className="px-7 py-2.5 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg hover:scale-[1.03] transition-all duration-200">
+              <button className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold hover:scale-[1.03] transition">
                 Inscription
               </button>
             </Link>
