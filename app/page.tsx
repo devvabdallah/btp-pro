@@ -94,24 +94,24 @@ export default function Home() {
       </header>
 
       {/* 1) HERO Section */}
-      <section className="w-full px-4 py-20 md:py-28 md:px-8 relative">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-6 md:mb-8">
-            BTP PRO — Devis & factures sans prise de tête
+      <section className="w-full px-4 py-24 md:py-32 md:px-8 relative">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6 leading-tight">
+            BTP PRO — Gérez vos devis, factures et chantiers avec rigueur.
           </h1>
-          <p className="text-xl md:text-2xl text-white/70 mb-10 md:mb-12 leading-relaxed">
-            Pensé pour artisans et petites équipes. Devis, factures PDF et suivi chantier, au même endroit.
+          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mt-6 mb-10 md:mb-12 leading-relaxed">
+            Solution digitale conçue pour les artisans et petites entreprises du BTP. Centralisez vos clients, chantiers et facturation dans un outil professionnel unique.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Link href="/register" className="w-full sm:w-auto">
-              <Button variant="primary" size="lg" className="w-full sm:w-auto shadow-lg shadow-orange-500/20 hover:brightness-110 hover:shadow-xl hover:shadow-orange-500/30 transition-all text-lg px-8 py-4">
+              <button className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg hover:scale-[1.02] transition-all duration-200 text-base md:text-lg">
                 Essai gratuit 5 jours
-              </Button>
+              </button>
             </Link>
             <Link href="#comment" className="w-full sm:w-auto">
-              <Button variant="secondary" size="lg" className="w-full sm:w-auto border-white/20 text-white hover:border-white/30 hover:bg-white/5 text-lg px-8 py-4">
+              <button className="w-full sm:w-auto px-8 py-3 rounded-xl border border-white/20 text-white bg-transparent hover:bg-white/5 transition-all duration-200 text-base md:text-lg">
                 Voir une démo
-              </Button>
+              </button>
             </Link>
           </div>
           <p className="text-base md:text-lg text-white/70">
