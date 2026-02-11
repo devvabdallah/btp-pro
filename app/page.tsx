@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import Button from '@/components/ui/Button'
-import Logo from '@/components/Logo'
 
 interface ScreenshotImgProps {
   src: string
@@ -65,7 +65,17 @@ export default function Home() {
       <header className="sticky top-0 z-50 backdrop-blur-md bg-[#0a0e27]/70 border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link href="/">
-            <Logo size="lg" showText={false} />
+            <div className="w-14 h-14 md:w-16 md:h-16">
+              <Image
+                src="/brand/logo.png"
+                alt="BTP PRO"
+                width={128}
+                height={128}
+                quality={100}
+                priority
+                className="w-full h-full object-contain"
+              />
+            </div>
           </Link>
           <div className="flex items-center gap-2 md:gap-3">
             <Link href="/login">
