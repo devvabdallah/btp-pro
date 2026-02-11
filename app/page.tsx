@@ -65,7 +65,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 backdrop-blur-md bg-[#0a0e27]/70 border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <Link href="/">
-            <div className="w-[72px] h-[72px] md:w-20 md:h-20 rounded-xl bg-white shadow-md flex items-center justify-center">
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-xl bg-white shadow-md flex items-center justify-center">
               <Image
                 src="/brand/logo.png"
                 alt="BTP PRO"
@@ -97,25 +97,20 @@ export default function Home() {
       <section className="w-full px-4 py-24 md:py-32 md:px-8 relative">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-6 leading-tight">
-            BTP PRO — Gérez vos devis, factures et chantiers avec rigueur.
+            Gérez vos devis, factures et chantiers. Simplement.
           </h1>
           <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mt-6 mb-10 md:mb-12 leading-relaxed">
-            Solution digitale conçue pour les artisans et petites entreprises du BTP. Centralisez vos clients, chantiers et facturation dans un outil professionnel unique.
+            Conçu pour les artisans et petites équipes BTP. Centralisez clients, chantiers et facturation dans un outil professionnel unique.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <div className="flex justify-center mb-6">
             <Link href="/register" className="w-full sm:w-auto">
-              <button className="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg hover:scale-[1.02] transition-all duration-200 text-base md:text-lg">
-                Essai gratuit 5 jours
-              </button>
-            </Link>
-            <Link href="#comment" className="w-full sm:w-auto">
-              <button className="w-full sm:w-auto px-8 py-3 rounded-xl border border-white/20 text-white bg-transparent hover:bg-white/5 transition-all duration-200 text-base md:text-lg">
-                Voir une démo
+              <button className="w-full sm:w-auto px-10 py-4 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg hover:scale-[1.02] transition-all duration-200 text-lg md:text-xl">
+                Essayer gratuitement 5 jours
               </button>
             </Link>
           </div>
           <p className="text-base md:text-lg text-white/70">
-            Sans carte bancaire. Annulable.
+            Sans carte bancaire requise.
           </p>
         </div>
       </section>
