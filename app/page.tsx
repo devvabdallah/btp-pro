@@ -94,29 +94,33 @@ export default function Home() {
       </header>
 
       {/* 1) HERO Section */}
-      <section className="w-full px-4 py-24 md:py-32 md:px-8 relative">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-8 leading-tight">
-            Gérez vos devis, factures et chantiers. Simplement.
+      <section className="w-full px-4 py-20 md:py-28 md:px-8 relative">
+        <div className="max-w-5xl mx-auto text-center">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-6 md:mb-8 leading-[1.1]">
+            Gérez vos devis, factures et chantiers.
+            <br />
+            Dans un seul outil professionnel.
           </h1>
-          <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-12 md:mb-16 leading-relaxed">
-            Conçu pour les artisans et petites équipes BTP. Centralisez clients, chantiers et facturation dans un outil professionnel unique.
+          <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto mb-10 md:mb-12 leading-relaxed">
+            Conçu pour les artisans et petites entreprises du BTP.
+            <br />
+            Centralisez vos clients, documents et suivi chantier avec rigueur et simplicité.
           </p>
-          <div className="flex justify-center mb-6">
+          <div className="flex flex-col items-center gap-3">
             <Link href="/register" className="w-full sm:w-auto">
-              <button className="w-full sm:w-auto px-10 py-4 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg hover:scale-[1.02] transition-all duration-200 text-lg md:text-xl">
+              <button className="w-full sm:w-auto px-12 py-5 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg hover:scale-[1.02] transition-all duration-200 text-lg md:text-xl">
                 Essayer gratuitement 5 jours
               </button>
             </Link>
+            <p className="text-sm md:text-base text-white/60">
+              Sans carte bancaire requise.
+            </p>
           </div>
-          <p className="text-base md:text-lg text-white/70">
-            Sans carte bancaire requise.
-          </p>
         </div>
       </section>
 
       {/* 2) PROOF / BENEFITS Section */}
-      <section className="w-full px-4 py-24 md:py-28 md:px-8 relative">
+      <section className="w-full px-4 py-20 md:py-24 md:px-8 relative">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Carte 1 */}
@@ -167,14 +171,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3) COMMENT ÇA MARCHE Section */}
-      <section id="comment" className="w-full px-4 py-24 md:py-28 md:px-8 relative">
+      {/* 3) VISUAL Section */}
+      <section id="comment" className="w-full px-4 py-16 md:py-20 md:px-8 relative">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white text-center mb-20">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white text-center mb-12 md:mb-16">
             Tout votre BTP, au même endroit.
           </h2>
           
-          <div className="space-y-16 md:space-y-24">
+          <div className="space-y-12 md:space-y-16">
             {/* Bloc 1 : Chantiers */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
               <div>
@@ -240,7 +244,7 @@ export default function Home() {
       {/* 4) PRICING Section */}
       <section className="w-full px-4 py-16 md:py-20 md:px-8 relative">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-12 md:mb-16">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-10 md:mb-12">
             Tarification simple
           </h2>
           <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-10 md:p-16 border border-white/10 shadow-xl shadow-black/30 backdrop-blur-sm bg-white/5">
@@ -265,12 +269,12 @@ export default function Home() {
       </section>
 
       {/* 5) FINAL CTA Section */}
-      <section className="w-full px-4 py-20 md:py-28 md:px-8 relative">
+      <section className="w-full px-4 py-16 md:py-20 md:px-8 relative">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-6 md:mb-8">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white mb-5 md:mb-6">
             Prêt à gagner du temps dès aujourd'hui ?
           </h2>
-          <p className="text-lg md:text-xl text-gray-300 mb-10 md:mb-12 leading-relaxed">
+          <p className="text-lg md:text-xl text-white/80 mb-8 md:mb-10 leading-relaxed">
             Essayez BTP PRO gratuitement pendant 5 jours. Sans carte bancaire.
           </p>
           <Link href="/register" className="inline-block">
