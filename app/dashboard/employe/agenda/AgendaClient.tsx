@@ -7,7 +7,7 @@ import { AgendaEvent } from '@/lib/agenda-actions'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import CreateEventModal from './CreateEventModal'
-import { normalizeAgendaStatus } from '@/lib/agendaStatus'
+import { normalizeAgendaStatus, getAgendaStatusLabel, AgendaStatus } from '@/lib/agendaStatus'
 
 interface AgendaClientProps {
   events?: AgendaEvent[]
@@ -253,10 +253,52 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     const hasChantier = event.chantiers && event.chantiers.id
     const hasAddress = event.chantiers?.address
 
-    // Vérifier si l'événement est "En cours"
+    // Normaliser et obtenir le statut
+    const status = normalizeAgendaStatus(event.status)
+    const statusLabel = getAgendaStatusLabel(status)
+
+    // Vérifier si l'événement est "En cours" (basé sur la date)
     const startsAt = new Date(event.starts_at)
     const endsAt = new Date(event.ends_at)
     const isInProgress = now >= startsAt && now < endsAt
+
+    // Styles de bordure et badge selon le statut
+    const getStatusStyles = (stat: AgendaStatus) => {
+      switch (stat) {
+        case 'planned':
+          return {
+            border: 'border-blue-500/40',
+            badge: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+          }
+        case 'confirmed':
+          return {
+            border: 'border-amber-500/40',
+            badge: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+          }
+        case 'in_progress':
+          return {
+            border: 'border-orange-500/40',
+            badge: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+          }
+        case 'done':
+          return {
+            border: 'border-green-500/40',
+            badge: 'bg-green-500/20 text-green-300 border-green-500/30',
+          }
+        case 'cancelled':
+          return {
+            border: 'border-red-500/40',
+            badge: 'bg-red-500/20 text-red-300 border-red-500/30',
+          }
+        default:
+          return {
+            border: 'border-white/10',
+            badge: 'bg-white/10 text-white/90 border-white/10',
+          }
+      }
+    }
+
+    const statusStyles = getStatusStyles(status)
 
     const handleCardClick = () => {
       handleEditEvent(event)
@@ -273,12 +315,12 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
       <div 
         role="button"
         tabIndex={0}
-        className="relative bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 pointer-events-auto hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+        className={`relative bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border-2 ${statusStyles.border} p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 pointer-events-auto hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500/50`}
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
       >
         {/* Overlay décoratif pour le ring "En cours" - non-interactif */}
-        {isInProgress && (
+        {isInProgress && status === 'in_progress' && (
           <div 
             className="absolute inset-0 rounded-xl ring-2 ring-orange-500/30 pointer-events-none"
             aria-hidden="true"
@@ -294,11 +336,9 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
           <div className="flex-1 min-w-0 pointer-events-none">
             <div className="flex items-center gap-2 mb-2 pointer-events-none">
               <h3 className="text-base md:text-lg font-bold text-white truncate pointer-events-none">{event.title}</h3>
-              {isInProgress && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-500/20 text-orange-300 border border-orange-500/30 pointer-events-none">
-                  En cours
-                </span>
-              )}
+              <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${statusStyles.badge} pointer-events-none`}>
+                {statusLabel}
+              </span>
             </div>
             
             {hasChantier && (
