@@ -121,45 +121,51 @@ export default function Home() {
       </section>
 
       {/* 2) PROOF / BENEFITS Section */}
-      <section className="w-full px-4 py-16 md:py-20 md:px-8 relative">
+      <section className="w-full px-4 py-24 md:px-8 relative">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Carte 1 */}
-            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl p-8 md:p-10 border border-white/10 shadow-xl shadow-black/30 backdrop-blur-sm bg-white/5">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30">
-                <span className="text-3xl">⚡</span>
+            <div className="bg-white/5 rounded-xl border border-white/10 p-8 transition-all duration-300 hover:border-orange-400/40">
+              <div className="w-12 h-12 flex items-center justify-center mb-6 text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">
-                Devis → Facture en 1 clic
+              <h3 className="text-xl font-bold text-white mb-3">
+                Devis & factures instantanés
               </h3>
               <p className="text-white/70 leading-relaxed">
-                Transforme un devis en facture PDF, prêt à envoyer.
+                Créez, modifiez et envoyez vos devis en quelques secondes. Transformation en facture en 1 clic.
               </p>
             </div>
 
             {/* Carte 2 */}
-            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl p-8 md:p-10 border border-white/10 shadow-xl shadow-black/30 backdrop-blur-sm bg-white/5">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6 shadow-lg shadow-blue-500/30">
-                <span className="text-3xl">📋</span>
+            <div className="bg-white/5 rounded-xl border border-white/10 p-8 transition-all duration-300 hover:border-orange-400/40">
+              <div className="w-12 h-12 flex items-center justify-center mb-6 text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">
-                Suivi chantiers clair
+              <h3 className="text-xl font-bold text-white mb-3">
+                Suivi chantier structuré
               </h3>
               <p className="text-white/70 leading-relaxed">
-                Clients, chantiers, statuts : tout est centralisé.
+                Centralisez vos rendez-vous, tâches et informations client au même endroit.
               </p>
             </div>
 
             {/* Carte 3 */}
-            <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-2xl p-8 md:p-10 border border-white/10 shadow-xl shadow-black/30 backdrop-blur-sm bg-white/5">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center mb-6 shadow-lg shadow-orange-500/30">
-                <span className="text-3xl">👥</span>
+            <div className="bg-white/5 rounded-xl border border-white/10 p-8 transition-all duration-300 hover:border-orange-400/40">
+              <div className="w-12 h-12 flex items-center justify-center mb-6 text-white">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">
-                Patron + Employés
+              <h3 className="text-xl font-bold text-white mb-3">
+                Gestion d'équipe simplifiée
               </h3>
               <p className="text-white/70 leading-relaxed">
-                Accès limité pour l'équipe, contrôle total côté patron.
+                Patron et employés travaillent ensemble avec des accès sécurisés.
               </p>
             </div>
           </div>
