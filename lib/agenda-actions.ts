@@ -3,7 +3,8 @@
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 
-export type AgendaEventStatus = 'planned' | 'confirmed' | 'completed' | 'cancelled'
+// DB constraint: agenda_events.status_check => only these values allowed
+export type AgendaEventStatus = 'planned' | 'confirmed' | 'in_progress' | 'done' | 'cancelled'
 
 export interface AgendaEvent {
   id: string

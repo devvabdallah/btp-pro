@@ -7,6 +7,7 @@ import { AgendaEvent } from '@/lib/agenda-actions'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import CreateEventModal from './CreateEventModal'
+import { normalizeAgendaStatus } from '@/lib/agendaStatus'
 
 interface AgendaClientProps {
   events?: AgendaEvent[]
@@ -56,7 +57,12 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
           .order('starts_at', { ascending: true })
         
         console.log('[Agenda] select agenda_events', { count: data?.length ?? 0, error, sample: data?.[0] })
-        setAllEvents(data ?? [])
+        // Normaliser les statuts des événements avant de les stocker
+        const normalizedEvents = (data ?? []).map(event => ({
+          ...event,
+          status: normalizeAgendaStatus(event.status),
+        }))
+        setAllEvents(normalizedEvents)
         setLoading(false)
         return
       }
@@ -72,7 +78,12 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
         console.error('[Agenda] agenda_events select error', error)
         setAllEvents([])
       } else {
-        setAllEvents(data ?? [])
+        // Normaliser les statuts des événements avant de les stocker
+        const normalizedEvents = (data ?? []).map(event => ({
+          ...event,
+          status: normalizeAgendaStatus(event.status),
+        }))
+        setAllEvents(normalizedEvents)
       }
     } catch (err) {
       console.error('Error loading events:', err)

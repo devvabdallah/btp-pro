@@ -6,6 +6,7 @@ import { getChantiersForSelect, AgendaEvent } from '@/lib/agenda-actions'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import { AgendaStatus, AGENDA_STATUS_OPTIONS, normalizeAgendaStatus } from '@/lib/agendaStatus'
 
 interface Chantier {
   id: string
@@ -26,27 +27,13 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
   const [error, setError] = useState<string | null>(null)
   const [chantiers, setChantiers] = useState<Chantier[]>([])
 
-  // DB constraint: agenda_events.status_check => only allowed values
-  // Normalise le statut de l'UI vers les valeurs DB autorisées
-  const normalizeStatus = (input: string | null | undefined): string => {
-    if (!input) return 'scheduled'
-    const normalized = input.toLowerCase().trim()
-    // Mapper les valeurs de l'UI vers les valeurs DB valides
-    if (normalized === 'planned' || normalized === 'planifié') return 'scheduled'
-    if (normalized === 'confirmed' || normalized === 'confirmé') return 'scheduled' // ou 'confirmed' si autorisé
-    if (normalized === 'completed' || normalized === 'terminé' || normalized === 'done') return 'completed'
-    if (normalized === 'cancelled' || normalized === 'annulé') return 'cancelled'
-    // Valeur par défaut sécurisée
-    return 'scheduled'
-  }
-
   const [formData, setFormData] = useState({
     title: '',
     starts_at: '',
     duration_minutes: 60,
     chantier_id: '',
     notes: '',
-    status: 'planned' as 'planned' | 'confirmed' | 'completed' | 'cancelled',
+    status: 'planned' as AgendaStatus,
   })
 
   useEffect(() => {
@@ -74,7 +61,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
           duration_minutes: duration,
           chantier_id: event.chantier_id || '',
           notes: event.notes || '',
-          status: (event.status || 'planned') as 'planned' | 'confirmed' | 'completed' | 'cancelled',
+          status: normalizeAgendaStatus(event.status || 'planned'),
         })
         setError(null)
       } else {
@@ -150,7 +137,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
       if (mode === 'edit' && event && event.id) {
         // Mode édition : mettre à jour l'événement
         // DB constraint: normaliser le status avant l'envoi
-        const normalizedStatus = normalizeStatus(formData.status)
+        const normalizedStatus = normalizeAgendaStatus(formData.status)
         const { data: updatedEvent, error: updateError } = await supabase
           .from('agenda_events')
           .update({
@@ -190,7 +177,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
         }
 
         // DB constraint: normaliser le status avant l'envoi
-        const normalizedStatus = normalizeStatus(formData.status || 'planned')
+        const normalizedStatus = normalizeAgendaStatus(formData.status || 'planned')
         const { data: newEvent, error: insertError } = await supabase
           .from('agenda_events')
           .insert({
@@ -405,12 +392,13 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
                       required
                       className="w-full px-5 py-4 rounded-2xl bg-[#1a1f3a] border border-gray-600 text-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                       value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                      onChange={(e) => setFormData({ ...formData, status: normalizeAgendaStatus(e.target.value) })}
                     >
-                      <option value="planned">Planifié</option>
-                      <option value="confirmed">Confirmé</option>
-                      <option value="completed">Terminé</option>
-                      <option value="cancelled">Annulé</option>
+                      {AGENDA_STATUS_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 )}
