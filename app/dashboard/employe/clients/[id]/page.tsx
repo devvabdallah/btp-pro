@@ -2,8 +2,20 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { getClientById, Client } from '@/lib/clients-actions'
+import { supabase } from '@/lib/supabaseClient'
 import Link from 'next/link'
+
+interface Client {
+  id: string
+  entreprise_id: string
+  first_name: string
+  last_name: string
+  phone: string
+  address: string
+  email: string | null
+  notes: string | null
+  created_at: string
+}
 
 export default function ClientDetailEmployePage() {
   const params = useParams()
@@ -15,13 +27,66 @@ export default function ClientDetailEmployePage() {
 
   useEffect(() => {
     async function load() {
-      const result = await getClientById(clientId)
-      if (result.success && result.client) {
-        setClient(result.client)
-      } else {
-        setError('Client introuvable.')
+      if (!clientId) {
+        setError('ID client manquant.')
+        setLoading(false)
+        return
       }
-      setLoading(false)
+
+      setLoading(true)
+      setError(null)
+
+      try {
+        // 1) Vérifier l'authentification
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+        if (userError || !user) {
+          setError('Utilisateur non connecté')
+          setLoading(false)
+          return
+        }
+
+        // 2) Récupérer le profil avec profiles.id = user.id
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('entreprise_id')
+          .eq('id', user.id)
+          .single()
+
+        if (profileError || !profile) {
+          setError('Profil utilisateur introuvable.')
+          setLoading(false)
+          return
+        }
+
+        if (!profile.entreprise_id) {
+          setError('Entreprise non liée au profil.')
+          setLoading(false)
+          return
+        }
+
+        // 3) Charger le client avec filtre id ET entreprise_id
+        const { data: clientData, error: clientError } = await supabase
+          .from('clients')
+          .select('*')
+          .eq('id', clientId)
+          .eq('entreprise_id', profile.entreprise_id)
+          .single()
+
+        if (clientError || !clientData) {
+          console.error('Error fetching client:', clientError)
+          setError('Client introuvable.')
+          setLoading(false)
+          return
+        }
+
+        setClient(clientData)
+      } catch (err) {
+        console.error('Unexpected error:', err)
+        setError('Une erreur inattendue est survenue.')
+      } finally {
+        setLoading(false)
+      }
     }
     load()
   }, [clientId])
