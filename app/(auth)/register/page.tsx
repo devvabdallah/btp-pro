@@ -196,18 +196,26 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center px-4 py-16 md:py-20">
+    <main className="min-h-screen relative bg-[#0a0e27] overflow-hidden flex items-center justify-center px-4 py-16 md:py-20">
+      {/* Fond premium avec halos */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-[#0a0e27]"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 bg-white/[0.02]"></div>
+      </div>
+
       <div className="w-full max-w-lg">
         <div className="text-center mb-10 md:mb-12">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 tracking-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-4 md:mb-6">
             Créer un compte
           </h1>
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
             Commencez votre essai gratuit de 5 jours
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-10 md:p-12 border border-gray-200 shadow-xl shadow-gray-200/50">
+        <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-xl p-10 md:p-12 border border-white/10 shadow-xl shadow-black/30 bg-white/5">
           <form onSubmit={handleSubmit} className="space-y-8">
             <Input
               label="Email"
@@ -216,6 +224,7 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="votre@email.com"
+              variant="dark"
             />
 
             <Input
@@ -225,6 +234,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="••••••••"
+              variant="dark"
             />
 
             <Input
@@ -234,12 +244,13 @@ export default function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               placeholder="••••••••"
+              variant="dark"
               error={password && confirmPassword && password !== confirmPassword ? 'Les mots de passe ne correspondent pas' : ''}
             />
 
             {/* Choix du rôle */}
             <div className="space-y-4 pt-2">
-              <label className="block text-base font-semibold text-gray-900 mb-3">
+              <label className="block text-base font-semibold text-gray-300 mb-3">
                 Je suis
               </label>
               <div className="flex gap-4">
@@ -248,8 +259,8 @@ export default function RegisterPage() {
                   onClick={() => setRole('patron')}
                   className={`flex-1 px-6 py-4 rounded-2xl font-semibold text-base transition-all ${
                     role === 'patron'
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30'
-                      : 'bg-gray-100 border-2 border-gray-200 text-gray-700 hover:border-gray-300'
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] shadow-lg shadow-orange-500/25'
+                      : 'bg-white/5 border-2 border-white/10 text-gray-300 hover:border-white/20'
                   }`}
                 >
                   Patron
@@ -259,8 +270,8 @@ export default function RegisterPage() {
                   onClick={() => setRole('employe')}
                   className={`flex-1 px-6 py-4 rounded-2xl font-semibold text-base transition-all ${
                     role === 'employe'
-                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30'
-                      : 'bg-gray-100 border-2 border-gray-200 text-gray-700 hover:border-gray-300'
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] shadow-lg shadow-orange-500/25'
+                      : 'bg-white/5 border-2 border-white/10 text-gray-300 hover:border-white/20'
                   }`}
                 >
                   Employé
@@ -277,6 +288,7 @@ export default function RegisterPage() {
                 onChange={(e) => setEnterpriseName(e.target.value)}
                 required
                 placeholder="Mon Entreprise BTP"
+                variant="dark"
               />
             ) : (
               <Input
@@ -287,28 +299,27 @@ export default function RegisterPage() {
                 required
                 placeholder="123456"
                 maxLength={6}
+                variant="dark"
               />
             )}
 
-            <ErrorMessage message={error} />
+            <ErrorMessage message={error} variant="dark" />
 
             <div className="pt-2">
-              <Button
+              <button
                 type="submit"
-                variant="primary"
-                size="lg"
-                className="w-full min-h-[56px] text-lg font-semibold"
+                className="w-full h-14 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? 'Création en cours...' : 'Créer mon compte'}
-              </Button>
+              </button>
             </div>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-            <p className="text-base text-gray-600">
+          <div className="mt-8 pt-6 border-t border-white/10 text-center">
+            <p className="text-base text-gray-300">
               Déjà un compte ?{' '}
-              <Link href="/login" className="text-orange-600 hover:text-orange-700 font-semibold transition-colors">
+              <Link href="/login" className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
                 Me connecter
               </Link>
             </p>
