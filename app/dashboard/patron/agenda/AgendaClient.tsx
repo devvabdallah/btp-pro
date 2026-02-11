@@ -103,11 +103,6 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
   }
 
   const handleEditEvent = async (event: AgendaEvent) => {
-    // Vérifier si l'entreprise est active avant d'ouvrir le modal
-    if (isCompanyActive === false) {
-      return // Empêcher l'édition si l'entreprise est inactive
-    }
-    
     setEditingEvent(event)
     setIsModalOpen(true)
   }
@@ -264,9 +259,7 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     const isInProgress = now >= startsAt && now < endsAt
 
     const handleCardClick = () => {
-      if (isCompanyActive !== false) {
-        handleEditEvent(event)
-      }
+      handleEditEvent(event)
     }
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -279,12 +272,8 @@ export default function AgendaClient({ events: initialEvents = [], error }: Agen
     return (
       <div 
         role="button"
-        tabIndex={isCompanyActive === false ? -1 : 0}
-        className={`relative bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 pointer-events-auto ${
-          isCompanyActive === false 
-            ? 'opacity-60 cursor-not-allowed' 
-            : 'hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500/50'
-        }`}
+        tabIndex={0}
+        className="relative bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-xl border border-white/10 p-4 md:p-5 transition-all shadow-lg shadow-black/20 bg-white/5 pointer-events-auto hover:bg-white/7 hover:shadow-xl hover:shadow-black/30 hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500/50"
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
       >
