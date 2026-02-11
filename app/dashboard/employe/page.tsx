@@ -3,15 +3,70 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getQuotes } from '@/lib/quotes-actions'
+import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
 export default function EmployeDashboard() {
   const [quotes, setQuotes] = useState<any[]>([])
+  const [nbChantiers, setNbChantiers] = useState<number>(0)
+  const [nbClients, setNbClients] = useState<number>(0)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
-      // Récupérer les devis (lecture seule)
-      const quotesResult = await getQuotes()
-      setQuotes(quotesResult.success ? quotesResult.quotes || [] : [])
+      setLoading(true)
+      try {
+        const supabase = createSupabaseBrowserClient()
+
+        // 1. Récupérer l'utilisateur
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        
+        if (userError || !user) {
+          setLoading(false)
+          return
+        }
+
+        // 2. Récupérer le profil avec entreprise_id
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('entreprise_id')
+          .eq('id', user.id)
+          .single()
+
+        if (profileError || !profile || !profile.entreprise_id) {
+          setLoading(false)
+          return
+        }
+
+        const entrepriseId = profile.entreprise_id
+
+        // 3. Récupérer les devis (lecture seule)
+        const quotesResult = await getQuotes()
+        setQuotes(quotesResult.success ? quotesResult.quotes || [] : [])
+
+        // 4. Compter les chantiers de l'entreprise
+        const { count: chantiersCount, error: chantiersError } = await supabase
+          .from('chantiers')
+          .select('*', { count: 'exact', head: true })
+          .eq('entreprise_id', entrepriseId)
+
+        if (!chantiersError) {
+          setNbChantiers(chantiersCount || 0)
+        }
+
+        // 5. Compter les clients de l'entreprise
+        const { count: clientsCount, error: clientsError } = await supabase
+          .from('clients')
+          .select('*', { count: 'exact', head: true })
+          .eq('entreprise_id', entrepriseId)
+
+        if (!clientsError) {
+          setNbClients(clientsCount || 0)
+        }
+      } catch (err) {
+        console.error('Erreur lors du chargement:', err)
+      } finally {
+        setLoading(false)
+      }
     }
 
     load()
@@ -57,10 +112,6 @@ export default function EmployeDashboard() {
     )
   }
 
-  const chantiersAssignes = 0
-  const nbClients = quotes.length > 0 ? new Set(quotes.map(q => q.client)).size : 0
-  const tachesAFaire = 0
-
   return (
     <div className="space-y-12 md:space-y-16 lg:space-y-20">
       <div>
@@ -69,18 +120,14 @@ export default function EmployeDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a]">
-          <p className="text-gray-400 text-sm mb-2">Chantiers assignés</p>
-          <p className="text-3xl font-bold text-green-300">{chantiersAssignes}</p>
+          <p className="text-gray-400 text-sm mb-2">Chantiers</p>
+          <p className="text-3xl font-bold text-green-300">{loading ? '...' : nbChantiers}</p>
         </div>
         <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a]">
           <p className="text-gray-400 text-sm mb-2">Clients de l'entreprise</p>
-          <p className="text-3xl font-bold text-blue-300">{nbClients}</p>
-        </div>
-        <div className="bg-[#1a1f3a] rounded-3xl p-8 border border-[#2a2f4a]">
-          <p className="text-gray-400 text-sm mb-2">Tâches à faire</p>
-          <p className="text-3xl font-bold text-yellow-300">{tachesAFaire}</p>
+          <p className="text-3xl font-bold text-blue-300">{loading ? '...' : nbClients}</p>
         </div>
       </div>
 
@@ -91,7 +138,7 @@ export default function EmployeDashboard() {
           <Link href="/dashboard/employe/chantiers">
             <div className="bg-gradient-to-br from-[#1a1f3a] to-[#0f1429] rounded-3xl p-8 border border-[#2a2f4a] hover:border-yellow-500/50 transition-all cursor-pointer">
               <h3 className="text-xl font-bold text-white mb-2">Voir les chantiers</h3>
-              <p className="text-gray-400 text-sm">Mes chantiers assignés</p>
+              <p className="text-gray-400 text-sm">Chantiers de l'entreprise</p>
             </div>
           </Link>
           <Link href="/dashboard/employe/clients">
