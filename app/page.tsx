@@ -173,83 +173,75 @@ export default function Home() {
       </section>
 
       {/* 3) COMMENT ÇA MARCHE Section */}
-      <section id="comment" className="w-full px-4 py-16 md:py-20 md:px-8 relative">
+      <section id="comment" className="w-full px-4 py-24 md:px-8 relative">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white text-center mb-12 md:mb-16">
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white text-center mb-16">
             Comment ça marche
           </h2>
-          <div className="space-y-12 md:space-y-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
             {/* Étape 1 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center border border-white/10 rounded-2xl p-6 md:p-8 bg-white/5 backdrop-blur-sm">
-              <div className="text-center lg:text-left">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 text-white font-bold text-xl mb-6">
-                  1
-                </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                  Crée ton compte
-                </h3>
-                <p className="text-lg text-white/70 leading-relaxed">
-                  Inscription rapide. Essai lancé.
-                </p>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 text-white font-bold text-xl mb-6">
+                1
               </div>
-              <div className="flex items-center justify-center lg:justify-end">
-                <div className="w-full max-w-md">
-                  <MockScreenshot label="Création de compte" />
-                </div>
-              </div>
+              <h3 className="text-xl font-bold text-white mb-3">
+                Créez vos chantiers
+              </h3>
+              <p className="text-white/70 leading-relaxed">
+                Centralisez les informations clients et projets.
+              </p>
             </div>
 
             {/* Étape 2 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center border border-white/10 rounded-2xl p-6 md:p-8 bg-white/5 backdrop-blur-sm">
-              <div className="flex items-center justify-center lg:justify-start order-2 lg:order-1">
-                <div className="w-full max-w-md">
-                  <ScreenshotImg 
-                    src="/screens/devis.png" 
-                    alt="Écran création de devis – BTP PRO"
-                    width={1200}
-                    height={800}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 text-white font-bold text-xl mb-6">
+                2
               </div>
-              <div className="text-center lg:text-left order-1 lg:order-2">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 text-white font-bold text-xl mb-6">
-                  2
-                </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                  Fais ton 1er devis
-                </h3>
-                <p className="text-lg text-white/70 leading-relaxed">
-                  Clients + devis en quelques clics.
-                </p>
-              </div>
+              <h3 className="text-xl font-bold text-white mb-3">
+                Générez vos devis
+              </h3>
+              <p className="text-white/70 leading-relaxed">
+                Créez et transformez vos devis en facture en un clic.
+              </p>
             </div>
 
             {/* Étape 3 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center border border-white/10 rounded-2xl p-6 md:p-8 bg-white/5 backdrop-blur-sm">
-              <div className="text-center lg:text-left">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-500 text-white font-bold text-xl mb-6">
-                  3
-                </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                  Suis tes chantiers & facture
-                </h3>
-                <p className="text-lg text-white/70 leading-relaxed">
-                  Chantiers + facture PDF prêts à envoyer.
-                </p>
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/10 text-white font-bold text-xl mb-6">
+                3
               </div>
-              <div className="flex items-center justify-center lg:justify-end">
-                <div className="w-full max-w-md">
-                  <ScreenshotImg 
-                    src="/screens/chantiers.png" 
-                    alt="Écran gestion chantiers – BTP PRO"
-                    width={1200}
-                    height={800}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </div>
+              <h3 className="text-xl font-bold text-white mb-3">
+                Suivez votre activité
+              </h3>
+              <p className="text-white/70 leading-relaxed">
+                Visualisez vos rendez-vous et l'état de vos documents en temps réel.
+              </p>
+            </div>
+          </div>
+
+          {/* Section Screenshots */}
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="rounded-xl border border-white/10 shadow-lg overflow-hidden">
+                <img
+                  src="/screens/chantiers.png"
+                  alt="Écran chantiers BTP PRO"
+                  className="w-full h-auto block"
+                />
+              </div>
+              <div className="rounded-xl border border-white/10 shadow-lg overflow-hidden">
+                <img
+                  src="/screens/devis.png"
+                  alt="Écran devis BTP PRO"
+                  className="w-full h-auto block"
+                />
+              </div>
+              <div className="rounded-xl border border-white/10 shadow-lg overflow-hidden">
+                <img
+                  src="/screens/chantiers.png"
+                  alt="Écran gestion BTP PRO"
+                  className="w-full h-auto block"
+                />
               </div>
             </div>
           </div>
