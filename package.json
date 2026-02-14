@@ -9,7 +9,8 @@
     "lint": "next lint",
     "test:e2e": "cross-env DOTENV_CONFIG_PATH=.env.local.test node -r dotenv/config ./node_modules/@playwright/test/cli.js test",
     "test:e2e:ui": "cross-env DOTENV_CONFIG_PATH=.env.local.test node -r dotenv/config ./node_modules/@playwright/test/cli.js test --ui",
-    "generate-icons": "node scripts/generate-icons.js"
+    "generate-icons": "node scripts/generate-icons.js",
+    "rls:check": "tsx scripts/rls-check.ts"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.15.0",
@@ -33,6 +34,7 @@
     "postcss": "^8.4.35",
     "sharp": "^0.34.5",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   }
 }

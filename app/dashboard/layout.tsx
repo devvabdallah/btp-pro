@@ -20,49 +20,115 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null
+    let isMounted = true
+
     async function checkAuth() {
-      const supabase = createSupabaseBrowserClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      try {
+        const supabase = createSupabaseBrowserClient()
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-      if (!user) {
-        setIsCompanyActive(null)
-        router.replace('/login')
-        return
-      }
+        // Timeout anti-boucle: 4 secondes max
+        timeoutId = setTimeout(() => {
+          if (isMounted) {
+            console.warn('[Dashboard Layout] Timeout lors de la vérification auth, déconnexion et redirection')
+            setLoading(false)
+            router.replace('/login?error=session_stuck')
+          }
+        }, 4000)
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role, entreprise_id')
-        .eq('id', user.id)
-        .single()
+        if (userError || !user) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Dashboard Layout] Pas d\'utilisateur, redirection /login')
+          }
+          setIsCompanyActive(null)
+          setLoading(false)
+          router.replace('/login')
+          return
+        }
 
-      if (!profile) {
-        setIsCompanyActive(null)
-        router.replace('/login')
-        return
-      }
+        if (!isMounted) return
 
-      setUserRole(profile.role as 'patron' | 'employe')
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role, entreprise_id')
+          .eq('id', user.id)
+          .single()
 
-      // Vérifier si l'entreprise est active (pour patrons et employés)
-      if (profile.entreprise_id) {
-        try {
-          const { checkCompanyActive } = await import('@/lib/subscription-check')
-          const { active } = await checkCompanyActive(supabase, profile.entreprise_id)
-          setIsCompanyActive(active)
-        } catch (err) {
-          // En cas d'erreur, on laisse null (afficher le menu par défaut)
+        if (!isMounted) return
+
+        if (profileError || !profile) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('[Dashboard Layout] Profil manquant, déconnexion et redirection')
+          }
+          // Profil manquant: signOut et redirection avec erreur
+          await supabase.auth.signOut()
+          setIsCompanyActive(null)
+          setLoading(false)
+          router.replace('/login?error=profile_missing')
+          return
+        }
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[Dashboard Layout] Profil OK, entreprise_id:', profile.entreprise_id)
+        }
+
+        setUserRole(profile.role as 'patron' | 'employe')
+
+        // Vérifier si l'entreprise est active (pour patrons et employés)
+        if (profile.entreprise_id) {
+          try {
+            const { checkCompanyActive } = await import('@/lib/subscription-check')
+            const { active, error: activeError } = await checkCompanyActive(supabase, profile.entreprise_id)
+            
+            if (!isMounted) return
+
+            if (process.env.NODE_ENV === 'development') {
+              console.log('[Dashboard Layout] Entreprise active:', active, 'error:', activeError)
+            }
+
+            setIsCompanyActive(active)
+
+            // Si entreprise inactive, rediriger vers abonnement-expire
+            if (active === false) {
+              setLoading(false)
+              router.replace('/abonnement-expire')
+              return
+            }
+          } catch (err) {
+            console.error('[Dashboard Layout] Erreur lors de la vérification de l\'entreprise:', err)
+            // En cas d'erreur technique, on laisse null (afficher le menu par défaut)
+            setIsCompanyActive(null)
+          }
+        } else {
+          // Si pas d'entreprise_id, on laisse null
           setIsCompanyActive(null)
         }
-      } else {
-        // Si pas d'entreprise_id, on laisse null
-        setIsCompanyActive(null)
-      }
 
-      setLoading(false)
+        if (isMounted) {
+          setLoading(false)
+        }
+      } catch (err) {
+        console.error('[Dashboard Layout] Erreur fatale lors de checkAuth:', err)
+        if (isMounted) {
+          setLoading(false)
+          router.replace('/login?error=session_stuck')
+        }
+      } finally {
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+        }
+      }
     }
 
     checkAuth()
+
+    return () => {
+      isMounted = false
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
   }, [router])
 
   // Empêcher le scroll du body quand le menu mobile est ouvert

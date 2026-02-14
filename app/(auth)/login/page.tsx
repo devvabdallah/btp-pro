@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -10,12 +10,23 @@ import { createBrowserClient } from '@supabase/ssr'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
   const [checkingSession, setCheckingSession] = useState(true)
+
+  // Lire les erreurs depuis l'URL
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam === 'profile_missing') {
+      setError('Profil utilisateur introuvable. Veuillez vous reconnecter.')
+    } else if (errorParam === 'session_stuck') {
+      setError('Session bloquée. Veuillez vous reconnecter.')
+    }
+  }, [searchParams])
 
   // Créer un client Supabase avec le bon storage selon rememberMe
   const supabase = useMemo(() => {
@@ -63,10 +74,21 @@ export default function LoginPage() {
   // Vérifier la session au mount et rediriger si connecté
   // Vérifier d'abord localStorage, puis sessionStorage
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null
+    let isMounted = true
+
     async function checkSession() {
       try {
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
         const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+        // Timeout anti-boucle: 4 secondes max
+        timeoutId = setTimeout(() => {
+          if (isMounted) {
+            console.warn('[Login] Timeout lors de la vérification de session, arrêt du chargement')
+            setCheckingSession(false)
+          }
+        }, 4000)
 
         // Vérifier localStorage d'abord (rememberMe = true par défaut)
         const localStorageClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
@@ -113,34 +135,73 @@ export default function LoginPage() {
           session = sessionResult.data.session
         }
 
+        if (!isMounted) return
+
         if (session) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Login] Session trouvée, vérification du profil...')
+          }
+
           // Utiliser le client avec le bon storage pour récupérer le profil
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', session.user.id)
             .single()
 
-          if (profile) {
-            if (profile.role === 'patron') {
-              router.replace('/dashboard/patron')
-            } else if (profile.role === 'employe') {
-              router.replace('/dashboard/employe')
-            } else {
-              router.replace('/dashboard/patron')
+          if (!isMounted) return
+
+          if (profileError || !profile) {
+            // Profil manquant: signOut et redirection avec erreur
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('[Login] Profil manquant, déconnexion et redirection')
             }
+            await supabase.auth.signOut()
+            router.replace('/login?error=profile_missing')
+            setCheckingSession(false)
+            return
+          }
+
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Login] Profil OK, redirection vers dashboard')
+          }
+
+          // Redirection selon le rôle
+          if (profile.role === 'patron') {
+            router.replace('/dashboard/patron')
+          } else if (profile.role === 'employe') {
+            router.replace('/dashboard/employe')
           } else {
             router.replace('/dashboard/patron')
           }
+          setCheckingSession(false)
+        } else {
+          // Pas de session: on peut afficher le formulaire
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Login] Aucune session trouvée')
+          }
+          setCheckingSession(false)
         }
       } catch (err) {
         console.error('[Login] Erreur lors de la vérification de session:', err)
+        if (isMounted) {
+          setCheckingSession(false)
+        }
       } finally {
-        setCheckingSession(false)
+        if (timeoutId) {
+          clearTimeout(timeoutId)
+        }
       }
     }
 
     checkSession()
+
+    return () => {
+      isMounted = false
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router])
 

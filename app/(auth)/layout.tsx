@@ -10,25 +10,34 @@ export default async function AuthLayout({
 
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser()
 
-  if (user) {
-    // Récupérer le profil pour rediriger vers le bon dashboard
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (profile) {
-      if (profile.role === 'patron') {
-        redirect('/dashboard/patron')
-      } else if (profile.role === 'employe') {
-        redirect('/dashboard/employe')
-      }
-    }
+  // Pas de session: laisser passer (afficher login/register)
+  if (userError || !user) {
+    return <>{children}</>
   }
 
-  return <>{children}</>
+  // Session trouvée: vérifier le profil
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  // Profil manquant: rediriger vers login avec erreur
+  if (profileError || !profile) {
+    redirect('/login?error=profile_missing')
+  }
+
+  // Profil OK: rediriger vers le bon dashboard
+  if (profile.role === 'patron') {
+    redirect('/dashboard/patron')
+  } else if (profile.role === 'employe') {
+    redirect('/dashboard/employe')
+  }
+
+  // Rôle inconnu: rediriger vers patron par défaut
+  redirect('/dashboard/patron')
 }
 

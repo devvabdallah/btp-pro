@@ -50,10 +50,10 @@ export async function middleware(request: NextRequest) {
   // Vérifier la session utilisateur
   const { data: { user }, error: userError } = await supabase.auth.getUser()
   
-  // Si pas d'utilisateur ou erreur de session, laisser passer (la page gérera la redirection)
+  // Si pas d'utilisateur ou erreur de session, rediriger vers login
   if (userError || !user) {
     console.log('[Middleware] No user session or session error:', userError?.message)
-    return response
+    return redirectWithCookies('/login', request, response)
   }
 
   // Bypass ADMIN : si la variable d'environnement est activée ET email match
@@ -70,10 +70,12 @@ export async function middleware(request: NextRequest) {
     .eq('id', user.id)
     .single()
 
-  // Si pas de profil ou erreur, laisser passer
+  // Si pas de profil ou erreur, rediriger vers login avec erreur
   if (profileError || !profile?.entreprise_id) {
     console.log('[Middleware] No profile or entreprise_id:', profileError?.message)
-    return response
+    // SignOut pour nettoyer la session invalide
+    await supabase.auth.signOut()
+    return redirectWithCookies('/login?error=profile_missing', request, response)
   }
 
   // Vérifier l'abonnement avec fallback et bypass DEV
