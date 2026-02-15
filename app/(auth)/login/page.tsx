@@ -71,6 +71,35 @@ export default function LoginPage() {
     })
   }, [rememberMe])
 
+  // Fonction helper pour obtenir le chemin de redirection selon le rôle
+  async function getDashboardPath(session: any): Promise<string> {
+    try {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single()
+
+      if (profileError || !profile) {
+        // Fallback vers /dashboard/patron si profil manquant ou erreur
+        return '/dashboard/patron'
+      }
+
+      if (profile.role === 'patron') {
+        return '/dashboard/patron'
+      } else if (profile.role === 'employe') {
+        return '/dashboard/employe'
+      } else {
+        // Fallback vers /dashboard/patron si rôle manquant ou invalide
+        return '/dashboard/patron'
+      }
+    } catch (err) {
+      console.error('[Login] Erreur lors de la récupération du profil:', err)
+      // Fallback vers /dashboard/patron en cas d'erreur
+      return '/dashboard/patron'
+    }
+  }
+
   // Vérifier la session au mount et s'abonner aux changements d'auth
   useEffect(() => {
     let isMounted = true
@@ -82,7 +111,8 @@ export default function LoginPage() {
         if (!isMounted) return
 
         if (session) {
-          router.replace('/dashboard')
+          const dashboardPath = await getDashboardPath(session)
+          router.replace(dashboardPath)
           return
         }
 
@@ -101,11 +131,12 @@ export default function LoginPage() {
     // S'abonner aux changements d'état d'authentification
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted) return
 
       if (event === 'SIGNED_IN' && session) {
-        router.replace('/dashboard')
+        const dashboardPath = await getDashboardPath(session)
+        router.replace(dashboardPath)
       }
     })
 
@@ -150,9 +181,10 @@ export default function LoginPage() {
       return
     }
 
-    // 5. Si session existe: rediriger immédiatement vers /dashboard
+    // 5. Si session existe: récupérer le profil et rediriger vers le dashboard approprié
     if (sessionData?.session) {
-      router.replace('/dashboard')
+      const dashboardPath = await getDashboardPath(sessionData.session)
+      router.replace(dashboardPath)
       return
     }
 
