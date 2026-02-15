@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
 
@@ -33,27 +34,26 @@ export default function LoginPage() {
 
     setLoading(true)
     setError(null)
+    setErrorMsg(null)
 
     try {
-      const r = await fetch("/api/auth/sign-in", {
+      const res = await fetch("/api/auth/sign-in", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       })
 
-      const result = await r.json().catch(() => null)
+      const json = await res.json().catch(() => null)
 
-      if (!r.ok || !result?.ok) {
-        console.log("[LOGIN] signIn error", result?.error)
-        setError(result?.error || "Erreur de connexion")
+      if (!res.ok || !json?.ok) {
+        setErrorMsg(json?.error || "Connexion impossible.")
         return
       }
 
-      console.log("[LOGIN] signIn ok")
-      window.location.href = "/dashboard"
+      window.location.assign("/dashboard")
     } catch (err) {
       console.log("[LOGIN] unexpected error", err)
-      setError("Erreur inattendue. Réessaie.")
+      setErrorMsg("Erreur inattendue. Réessaie.")
     } finally {
       setLoading(false)
     }
@@ -129,6 +129,9 @@ export default function LoginPage() {
               >
                 {loading ? 'Connexion...' : 'Se connecter'}
               </button>
+              {errorMsg ? (
+                <p className="mt-3 text-sm text-red-400 text-center">{errorMsg}</p>
+              ) : null}
             </div>
           </form>
 
