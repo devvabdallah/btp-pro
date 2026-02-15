@@ -48,8 +48,8 @@ export default function LoginPage() {
     }
 
     await supabase.auth.getSession()
-    await new Promise((r) => setTimeout(r, 200))
-    window.location.href = "/dashboard/patron"
+    await new Promise((r) => setTimeout(r, 150))
+    window.location.assign("/dashboard/patron")
   }
 
   return (
