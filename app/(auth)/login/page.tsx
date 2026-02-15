@@ -48,7 +48,7 @@ export default function LoginPage() {
       return
     }
 
-    window.location.assign(REDIRECT_URL)
+    window.location.href = "/dashboard/patron/abonnement"
   }
 
   return (
