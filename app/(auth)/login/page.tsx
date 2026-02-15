@@ -1,23 +1,19 @@
 "use client";
 
 import { useState, useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { supabaseBrowser } from '@/lib/supabase/browser'
 
 export default function LoginPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
-
-  const supabase = supabaseBrowser()
 
   // Lire les erreurs depuis l'URL
   useEffect(() => {
@@ -39,51 +35,22 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const r = await fetch("/api/auth/sign-in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       })
 
-      if (error) {
-        console.log("[LOGIN] signIn error", error.message)
-        setError(error.message)
-        return
-      }
+      const result = await r.json().catch(() => null)
 
-      const session = data?.session
-
-      if (!session) {
-        console.log("[LOGIN] session is null")
-        setError("Session Supabase manquante après login")
-        return
-      }
-
-      if (!session.access_token || !session.refresh_token) {
-        console.log("[LOGIN] tokens missing")
-        setError("Tokens de session manquants")
+      if (!r.ok || !result?.ok) {
+        console.log("[LOGIN] signIn error", result?.error)
+        setError(result?.error || "Erreur de connexion")
         return
       }
 
       console.log("[LOGIN] signIn ok")
-
-      const r = await fetch("/api/auth/set-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-        }),
-      })
-
-      if (!r.ok) {
-        const j = await r.json().catch(() => null)
-        console.log("[LOGIN] set-session error", j?.error)
-        setError(j?.error || "Impossible d'écrire la session serveur")
-        return
-      }
-
-      router.replace("/dashboard")
-      router.refresh()
+      window.location.href = "/dashboard"
     } catch (err) {
       console.log("[LOGIN] unexpected error", err)
       setError("Erreur inattendue. Réessaie.")
