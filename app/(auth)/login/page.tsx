@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [debug, setDebug] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
 
@@ -28,33 +29,33 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[LOGIN] submit")
-
-    if (loading) return
 
     setLoading(true)
-    setError(null)
-    setErrorMsg(null)
+    setDebug("")
 
     try {
       const res = await fetch("/api/auth/sign-in", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+        cache: "no-store",
       })
 
-      const json = await res.json().catch(() => null)
+      const text = await res.text()
+      setDebug(`HTTP ${res.status}\n${text}`)
+
+      let json: any = null
+      try { json = JSON.parse(text) } catch {}
 
       if (!res.ok || !json?.ok) {
-        setErrorMsg(json?.error || "Connexion impossible.")
+        setLoading(false)
         return
       }
 
-      window.location.assign("/dashboard")
-    } catch (err) {
-      console.log("[LOGIN] unexpected error", err)
-      setErrorMsg("Erreur inattendue. Réessaie.")
-    } finally {
+      // redirection robuste
+      window.location.href = "/dashboard/patron"
+    } catch (err: any) {
+      setDebug(`ERREUR FETCH\n${err?.message || String(err)}`)
       setLoading(false)
     }
   }
@@ -127,10 +128,12 @@ export default function LoginPage() {
                 disabled={loading}
                 className="w-full min-h-[56px] text-lg font-semibold rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Connexion...' : 'Se connecter'}
+                {loading ? "Connexion..." : "Se connecter"}
               </button>
-              {errorMsg ? (
-                <p className="mt-3 text-sm text-red-400 text-center">{errorMsg}</p>
+              {debug ? (
+                <pre className="mt-3 text-xs text-white/80 bg-white/5 border border-white/10 rounded-xl p-3 whitespace-pre-wrap">
+                  {debug}
+                </pre>
               ) : null}
             </div>
           </form>
