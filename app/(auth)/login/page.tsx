@@ -211,45 +211,58 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    // Utiliser le client Supabase avec le bon storage selon rememberMe
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
+    // 1. Appeler signInWithPassword
+    const { error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
-    console.log('[LOGIN][DATA] =>', JSON.stringify(data, null, 2))
-    console.log('[LOGIN][ERROR] =>', JSON.stringify(authError, null, 2))
-
+    // 2. Si erreur existe: afficher message clair et return
     if (authError) {
+      console.error('[LOGIN][ERROR]', authError.message, authError)
       setError(authError.message)
       setLoading(false)
       return
     }
 
-    // Attendre la session avant de naviguer
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    // 3. Sinon: récupérer explicitement la session après login
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+    console.log('[LOGIN][SESSION]', sessionData)
 
-    if (session) {
-      // Récupérer le profil pour redirection selon le rôle
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single()
+    // 4. Si erreur sur getSession: afficher message clair
+    if (sessionError) {
+      console.error('[LOGIN][SESSION_ERROR]', sessionError.message, sessionError)
+      setError('Session introuvable après login. Veuillez réessayer.')
+      setLoading(false)
+      return
+    }
 
-      if (profile) {
-        if (profile.role === 'patron') {
-          router.push('/dashboard/patron')
-        } else if (profile.role === 'employe') {
-          router.push('/dashboard/employe')
-        } else {
-          router.push('/dashboard/patron')
-        }
+    // 5. Si pas de session: afficher message clair
+    if (!sessionData?.session) {
+      console.warn('[LOGIN][SESSION_MISSING] Login OK mais session absente (cookies/storage)')
+      setError('Connexion réussie mais session absente. Vérifiez vos paramètres de cookies.')
+      setLoading(false)
+      return
+    }
+
+    // 6. Si session OK: récupérer le profil et rediriger de façon déterministe
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', sessionData.session.user.id)
+      .single()
+
+    if (profile) {
+      if (profile.role === 'patron') {
+        router.replace('/dashboard/patron')
+      } else if (profile.role === 'employe') {
+        router.replace('/dashboard/employe')
       } else {
-        router.push('/dashboard/patron')
+        router.replace('/dashboard/patron')
       }
+    } else {
+      // Profil manquant: rediriger vers dashboard par défaut
+      router.replace('/dashboard/patron')
     }
 
     setLoading(false)
