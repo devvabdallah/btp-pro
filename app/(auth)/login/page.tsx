@@ -36,20 +36,49 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (authError) {
-      setError(authError.message)
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+        return
+      }
+
+      const session = data?.session
+
+      if (!session?.access_token || !session?.refresh_token) {
+        setError("Session Supabase manquante après login")
+        setLoading(false)
+        return
+      }
+
+      const r = await fetch("/api/auth/set-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        }),
+      })
+
+      if (!r.ok) {
+        const j = await r.json().catch(() => null)
+        setError(j?.error || "Impossible d'écrire la session serveur")
+        setLoading(false)
+        return
+      }
+
+      // HARD redirect (évite les loops router)
+      window.location.assign("/dashboard/patron")
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Erreur inconnue"
+      setError(errorMessage)
       setLoading(false)
-      return
     }
-
-    await supabase.auth.getSession()
-    await new Promise((r) => setTimeout(r, 150))
-    window.location.assign("/dashboard/patron")
   }
 
   return (
