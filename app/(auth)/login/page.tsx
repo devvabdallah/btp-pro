@@ -8,12 +8,19 @@ import Input from '@/components/ui/Input'
 import ErrorMessage from '@/components/ui/ErrorMessage'
 import { createBrowserClient } from '@supabase/ssr'
 
-const REDIRECT_AFTER_LOGIN = '/dashboard/patron/abonnement'
-
 export default function LoginPage() {
+  const REDIRECT_URL = '/dashboard/patron/abonnement'
   const router = useRouter()
   const searchParams = useSearchParams()
   const didRedirect = useRef(false)
+
+  // Fonction de redirection navigateur avec garde anti-boucle
+  const hardRedirect = (url: string) => {
+    if (didRedirect.current) return
+    didRedirect.current = true
+    console.log('[LOGIN] HARD_REDIRECT ->', url)
+    window.location.assign(url)
+  }
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string>('')
@@ -83,7 +90,7 @@ export default function LoginPage() {
       ),
     ])
 
-  // Vérifier la session au mount et s'abonner aux changements d'auth
+  // Vérifier la session au mount (une seule fois)
   useEffect(() => {
     let isMounted = true
 
@@ -94,10 +101,7 @@ export default function LoginPage() {
         if (!isMounted) return
 
         if (session) {
-          // Anti-boucle: ne rediriger qu'une seule fois
-          if (didRedirect.current) return
-          didRedirect.current = true
-          router.replace(REDIRECT_AFTER_LOGIN)
+          hardRedirect(REDIRECT_URL)
           return
         }
 
@@ -113,23 +117,8 @@ export default function LoginPage() {
     // Vérifier la session une seule fois au montage
     checkSessionOnce()
 
-    // S'abonner aux changements d'état d'authentification
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!isMounted) return
-
-      if (event === 'SIGNED_IN' && session) {
-        // Anti-boucle: ne rediriger qu'une seule fois
-        if (didRedirect.current) return
-        didRedirect.current = true
-        router.replace(REDIRECT_AFTER_LOGIN)
-      }
-    })
-
     return () => {
       isMounted = false
-      subscription.unsubscribe()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -177,13 +166,9 @@ export default function LoginPage() {
 
       console.log('[LOGIN] getSession ok')
 
-      // 5. Si session existe: rediriger vers la route fixe
+      // 5. Si session existe: rediriger vers la route fixe avec navigation navigateur
       if (sessionData?.session) {
-        // Anti-boucle: ne rediriger qu'une seule fois
-        if (didRedirect.current) return
-        didRedirect.current = true
-        console.log('[LOGIN] redirect ->', REDIRECT_AFTER_LOGIN)
-        router.replace(REDIRECT_AFTER_LOGIN)
+        hardRedirect(REDIRECT_URL)
         return
       }
 
