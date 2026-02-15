@@ -6,10 +6,9 @@ import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { createClient } from '@/lib/supabase/client'
+import { createBrowserSupabase } from '@/lib/supabase/browser'
 
 export default function LoginPage() {
-  const REDIRECT_URL = '/dashboard/patron/abonnement'
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -17,7 +16,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
 
-  const supabase = createClient()
+  const supabase = createBrowserSupabase()
 
   // Lire les erreurs depuis l'URL
   useEffect(() => {
@@ -48,7 +47,9 @@ export default function LoginPage() {
       return
     }
 
-    window.location.href = "/dashboard/patron/abonnement"
+    await supabase.auth.getSession()
+    await new Promise((r) => setTimeout(r, 200))
+    window.location.href = "/dashboard/patron"
   }
 
   return (
