@@ -39,7 +39,7 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
@@ -50,7 +50,38 @@ export default function LoginPage() {
         return
       }
 
+      const session = data?.session
+
+      if (!session) {
+        console.log("[LOGIN] session is null")
+        setError("Session Supabase manquante après login")
+        return
+      }
+
+      if (!session.access_token || !session.refresh_token) {
+        console.log("[LOGIN] tokens missing")
+        setError("Tokens de session manquants")
+        return
+      }
+
       console.log("[LOGIN] signIn ok")
+
+      const r = await fetch("/api/auth/set-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        }),
+      })
+
+      if (!r.ok) {
+        const j = await r.json().catch(() => null)
+        console.log("[LOGIN] set-session error", j?.error)
+        setError(j?.error || "Impossible d'écrire la session serveur")
+        return
+      }
+
       router.replace("/dashboard")
       router.refresh()
     } catch (err) {
