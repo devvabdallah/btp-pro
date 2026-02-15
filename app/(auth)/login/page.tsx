@@ -1,21 +1,23 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const REDIRECT_URL = '/dashboard/patron/abonnement'
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string>('')
+  const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
+
+  const supabase = createClient()
 
   // Lire les erreurs depuis l'URL
   useEffect(() => {
@@ -27,139 +29,26 @@ export default function LoginPage() {
     }
   }, [searchParams])
 
-  // Créer un client Supabase avec le bon storage selon rememberMe
-  const supabase = useMemo(() => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-    if (!supabaseUrl || !supabaseAnonKey) {
-      throw new Error('Variables d\'environnement Supabase manquantes')
-    }
-
-    // Protection: window n'existe que côté client
-    if (typeof window === 'undefined') {
-      // Fallback pour SSR: utiliser sessionStorage par défaut
-      return createBrowserClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-        },
-      })
-    }
-
-    // Utiliser localStorage si rememberMe = true, sinon sessionStorage
-    const storage = rememberMe ? window.localStorage : window.sessionStorage
-
-    return createBrowserClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        storage: {
-          getItem: (key: string) => {
-            try {
-              return storage.getItem(key)
-            } catch {
-              return null
-            }
-          },
-          setItem: (key: string, value: string) => {
-            try {
-              storage.setItem(key, value)
-            } catch {
-              // Ignore errors
-            }
-          },
-          removeItem: (key: string) => {
-            try {
-              storage.removeItem(key)
-            } catch {
-              // Ignore errors
-            }
-          },
-        },
-        persistSession: true,
-        autoRefreshToken: true,
-      },
-    })
-  }, [rememberMe])
-
-  // Helper pour timeout sur les promesses
-  const withTimeout = <T,>(p: Promise<T>, ms = 8000): Promise<T> =>
-    Promise.race([
-      p,
-      new Promise<never>((_, r) =>
-        setTimeout(() => r(new Error('Timeout')), ms)
-      ),
-    ])
-
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault() // IMPORTANT : bloque le reload de page
-
-    // Empêcher les doubles clics
     if (loading) return
 
     setLoading(true)
-    setError('')
+    setError(null)
 
-    try {
-      console.log('[LOGIN] submit')
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
 
-      // 1. Appeler signInWithPassword avec timeout
-      console.log('[LOGIN] signIn start')
-      const signInPromise = supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-      const { error: authError } = await withTimeout(signInPromise)
-
-      // 2. Si erreur existe: afficher message clair et STOP
-      if (authError) {
-        console.error('[LOGIN] signIn error:', authError.message)
-        setError(authError.message)
-        return
-      }
-
-      console.log('[LOGIN] signIn ok')
-
-      // 3. Sinon: appeler immédiatement getSession() avec timeout
-      console.log('[LOGIN] getSession start')
-      const getSessionPromise = supabase.auth.getSession()
-      const { data: sessionData, error: sessionError } = await withTimeout(getSessionPromise)
-
-      // 4. Si erreur sur getSession: afficher message clair
-      if (sessionError) {
-        console.error('[LOGIN] getSession error:', sessionError.message)
-        setError('Session introuvable après login. Veuillez réessayer.')
-        return
-      }
-
-      console.log('[LOGIN] getSession ok')
-
-      // 5. Si session existe: rediriger vers la route fixe avec navigation navigateur
-      if (sessionData?.session) {
-        // Protection: window n'existe que côté client
-        if (typeof window !== 'undefined') {
-          window.location.assign(REDIRECT_URL)
-        }
-        return
-      }
-
-      // 6. Sinon: afficher erreur "Session absente après login" (rare)
-      console.warn('[LOGIN] session missing after login')
-      setError('Connexion réussie mais session absente. Vérifiez vos paramètres de cookies.')
-    } catch (err) {
-      // Gérer les timeouts et erreurs inconnues
-      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
-      console.error('[LOGIN] unexpected error:', errorMessage, err)
-      
-      if (errorMessage === 'Timeout') {
-        setError('Connexion bloquée (timeout). Réessayez.')
-      } else {
-        setError('Connexion bloquée (timeout). Réessayez.')
-      }
-    } finally {
-      // Toujours désactiver le loading, même en cas d'erreur
+    if (authError) {
+      setError(authError.message)
       setLoading(false)
+      return
     }
+
+    window.location.assign(REDIRECT_URL)
   }
 
   return (
@@ -183,7 +72,7 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-3xl p-10 md:p-12 border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.55)] bg-white/5">
-          <form onSubmit={handleLogin} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-8">
             <Input
               label="Email"
               type="email"
@@ -204,8 +93,6 @@ export default function LoginPage() {
               variant="dark"
             />
 
-            <ErrorMessage message={error} variant="dark" />
-
             {/* Checkbox "Se souvenir de moi" */}
             <div className="flex items-center gap-3 pt-2">
               <input
@@ -220,16 +107,20 @@ export default function LoginPage() {
               </label>
             </div>
 
+            {error && (
+              <div className="text-red-400 text-sm">
+                {error}
+              </div>
+            )}
+
             <div className="pt-2">
-              <Button
+              <button
                 type="submit"
-                variant="primary"
-                size="lg"
-                className="w-full min-h-[56px] text-lg font-semibold !rounded-xl"
                 disabled={loading}
+                className="w-full min-h-[56px] text-lg font-semibold rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Connexion...' : 'Se connecter'}
-              </Button>
+              </button>
             </div>
           </form>
 
