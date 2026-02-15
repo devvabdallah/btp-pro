@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
@@ -10,26 +10,12 @@ import { createBrowserClient } from '@supabase/ssr'
 
 export default function LoginPage() {
   const REDIRECT_URL = '/dashboard/patron/abonnement'
-  const router = useRouter()
   const searchParams = useSearchParams()
-  const didRedirect = useRef(false)
-
-  // Fonction de redirection navigateur avec garde anti-boucle
-  const hardRedirect = (url: string) => {
-    // Protection: window n'existe que côté client
-    if (typeof window === 'undefined') return
-    
-    if (didRedirect.current) return
-    didRedirect.current = true
-    console.log('[LOGIN] HARD_REDIRECT ->', url)
-    window.location.assign(url)
-  }
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
-  const [checkingSession, setCheckingSession] = useState(true)
 
   // Lire les erreurs depuis l'URL
   useEffect(() => {
@@ -104,46 +90,6 @@ export default function LoginPage() {
       ),
     ])
 
-  // Helper pour timeout spécifique getSession (3s)
-  const withTimeoutGetSession = <T,>(p: Promise<T>, ms = 3000): Promise<T> =>
-    Promise.race([
-      p,
-      new Promise<never>((_, r) =>
-        setTimeout(() => r(new Error('Timeout getSession')), ms)
-      ),
-    ])
-
-  // Vérifier la session au mount (une seule fois, avec timeout)
-  useEffect(() => {
-    // Protection: ne s'exécute que côté client
-    if (typeof window === 'undefined') {
-      setCheckingSession(false)
-      return
-    }
-
-    setCheckingSession(true)
-
-    async function checkSessionOnce() {
-      try {
-        const { data } = await withTimeoutGetSession(supabase.auth.getSession(), 3000)
-        
-        if (data?.session) {
-          hardRedirect(REDIRECT_URL)
-          return
-        }
-      } catch (err) {
-        // Fallback anti-crash: afficher le formulaire en cas d'erreur
-        console.warn('[LOGIN] getSession timeout/error -> show form', err)
-      } finally {
-        // Toujours afficher le formulaire après 3s max ou en cas d'erreur
-        setCheckingSession(false)
-      }
-    }
-
-    // Vérifier la session une seule fois au montage
-    checkSessionOnce()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault() // IMPORTANT : bloque le reload de page
@@ -190,7 +136,10 @@ export default function LoginPage() {
 
       // 5. Si session existe: rediriger vers la route fixe avec navigation navigateur
       if (sessionData?.session) {
-        hardRedirect(REDIRECT_URL)
+        // Protection: window n'existe que côté client
+        if (typeof window !== 'undefined') {
+          window.location.assign(REDIRECT_URL)
+        }
         return
       }
 
@@ -211,25 +160,6 @@ export default function LoginPage() {
       // Toujours désactiver le loading, même en cas d'erreur
       setLoading(false)
     }
-  }
-
-  if (checkingSession) {
-    return (
-      <main className="min-h-screen relative bg-[#0a0e27] overflow-hidden flex items-center justify-center px-4 py-16 md:py-20">
-        {/* Fond premium avec halos */}
-        <div className="fixed inset-0 -z-10">
-          <div className="absolute inset-0 bg-[#0a0e27]"></div>
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute inset-0 bg-white/[0.02]"></div>
-        </div>
-        <div className="w-full max-w-[420px]">
-          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-sm rounded-3xl p-10 md:p-12 border border-white/10 shadow-[0_20px_80px_rgba(0,0,0,0.55)] bg-white/5">
-            <p className="text-white/70 text-center text-base">Vérification de la session...</p>
-          </div>
-        </div>
-      </main>
-    )
   }
 
   return (
@@ -296,7 +226,7 @@ export default function LoginPage() {
                 variant="primary"
                 size="lg"
                 className="w-full min-h-[56px] text-lg font-semibold !rounded-xl"
-                disabled={loading || checkingSession}
+                disabled={loading}
               >
                 {loading ? 'Connexion...' : 'Se connecter'}
               </Button>
