@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
-  // IMPORTANT: ce middleware ne doit jamais impacter /login
   const { pathname } = request.nextUrl;
+
+  // Par sécurité absolue : ne jamais agir hors /dashboard
   if (!pathname.startsWith("/dashboard")) {
     return NextResponse.next();
   }
@@ -13,7 +14,7 @@ export async function middleware(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // Ne jamais planter si env manquante (évite 500)
+  // Ne jamais throw -> jamais de 500
   if (!supabaseUrl || !supabaseAnonKey) {
     return response;
   }
@@ -31,12 +32,9 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Refresh session cookies côté serveur
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Refresh SSR cookies
+  const { data: { user } } = await supabase.auth.getUser();
 
-  // Si pas connecté → redirect vers /login
   if (!user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
