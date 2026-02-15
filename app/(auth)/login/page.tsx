@@ -31,6 +31,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log("[LOGIN] submit")
 
     if (loading) return
 
@@ -44,15 +45,17 @@ export default function LoginPage() {
       })
 
       if (error) {
+        console.log("[LOGIN] signIn error", error.message)
         setError(error.message)
         return
       }
 
+      console.log("[LOGIN] signIn ok")
       router.replace("/dashboard")
       router.refresh()
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Erreur inconnue"
-      setError(errorMessage)
+      console.log("[LOGIN] unexpected error", err)
+      setError("Erreur inattendue. Réessaie.")
     } finally {
       setLoading(false)
     }
