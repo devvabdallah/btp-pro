@@ -4,27 +4,29 @@ import { createServerClient } from "@supabase/ssr";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Par sécurité absolue : ne jamais agir hors /dashboard
   if (!pathname.startsWith("/dashboard")) {
     return NextResponse.next();
   }
 
-  let response = NextResponse.next();
-
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  // Ne jamais throw -> jamais de 500
   if (!supabaseUrl || !supabaseAnonKey) {
-    return response;
+    return NextResponse.next();
   }
+
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });
@@ -32,10 +34,9 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Refresh SSR cookies
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (error || !data?.user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
