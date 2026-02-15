@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -16,6 +16,9 @@ export default function LoginPage() {
 
   // Fonction de redirection navigateur avec garde anti-boucle
   const hardRedirect = (url: string) => {
+    // Protection: window n'existe que côté client
+    if (typeof window === 'undefined') return
+    
     if (didRedirect.current) return
     didRedirect.current = true
     console.log('[LOGIN] HARD_REDIRECT ->', url)
@@ -45,6 +48,17 @@ export default function LoginPage() {
 
     if (!supabaseUrl || !supabaseAnonKey) {
       throw new Error('Variables d\'environnement Supabase manquantes')
+    }
+
+    // Protection: window n'existe que côté client
+    if (typeof window === 'undefined') {
+      // Fallback pour SSR: utiliser sessionStorage par défaut
+      return createBrowserClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+        },
+      })
     }
 
     // Utiliser localStorage si rememberMe = true, sinon sessionStorage
@@ -101,6 +115,12 @@ export default function LoginPage() {
 
   // Vérifier la session au mount (une seule fois, avec timeout)
   useEffect(() => {
+    // Protection: ne s'exécute que côté client
+    if (typeof window === 'undefined') {
+      setCheckingSession(false)
+      return
+    }
+
     setCheckingSession(true)
 
     async function checkSessionOnce() {
@@ -112,9 +132,10 @@ export default function LoginPage() {
           return
         }
       } catch (err) {
+        // Fallback anti-crash: afficher le formulaire en cas d'erreur
         console.warn('[LOGIN] getSession timeout/error -> show form', err)
       } finally {
-        // Toujours afficher le formulaire après 3s max
+        // Toujours afficher le formulaire après 3s max ou en cas d'erreur
         setCheckingSession(false)
       }
     }
