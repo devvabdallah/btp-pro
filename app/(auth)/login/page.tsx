@@ -90,36 +90,37 @@ export default function LoginPage() {
       ),
     ])
 
-  // Vérifier la session au mount (une seule fois)
+  // Helper pour timeout spécifique getSession (3s)
+  const withTimeoutGetSession = <T,>(p: Promise<T>, ms = 3000): Promise<T> =>
+    Promise.race([
+      p,
+      new Promise<never>((_, r) =>
+        setTimeout(() => r(new Error('Timeout getSession')), ms)
+      ),
+    ])
+
+  // Vérifier la session au mount (une seule fois, avec timeout)
   useEffect(() => {
-    let isMounted = true
+    setCheckingSession(true)
 
     async function checkSessionOnce() {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data } = await withTimeoutGetSession(supabase.auth.getSession(), 3000)
         
-        if (!isMounted) return
-
-        if (session) {
+        if (data?.session) {
           hardRedirect(REDIRECT_URL)
           return
         }
-
-        setCheckingSession(false)
       } catch (err) {
-        console.error('[Login] Erreur lors de la vérification de session:', err)
-        if (isMounted) {
-          setCheckingSession(false)
-        }
+        console.warn('[LOGIN] getSession timeout/error -> show form', err)
+      } finally {
+        // Toujours afficher le formulaire après 3s max
+        setCheckingSession(false)
       }
     }
 
     // Vérifier la session une seule fois au montage
     checkSessionOnce()
-
-    return () => {
-      isMounted = false
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
