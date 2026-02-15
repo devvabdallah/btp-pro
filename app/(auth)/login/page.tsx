@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
@@ -8,9 +8,12 @@ import Input from '@/components/ui/Input'
 import ErrorMessage from '@/components/ui/ErrorMessage'
 import { createBrowserClient } from '@supabase/ssr'
 
+const REDIRECT_AFTER_LOGIN = '/dashboard/patron/abonnement'
+
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const didRedirect = useRef(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string>('')
@@ -80,39 +83,6 @@ export default function LoginPage() {
       ),
     ])
 
-  // Fonction helper pour obtenir le chemin de redirection selon le rôle (non-bloquante)
-  async function getDashboardPath(session: any): Promise<string> {
-    try {
-      console.log('[LOGIN] fetchProfile start')
-      const profilePromise = supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single()
-
-      const { data: profile, error: profileError } = await withTimeout(profilePromise)
-
-      if (profileError || !profile) {
-        console.log('[LOGIN] fetchProfile error, fallback /dashboard/patron')
-        return '/dashboard/patron'
-      }
-
-      console.log('[LOGIN] fetchProfile ok, role:', profile.role)
-
-      if (profile.role === 'patron') {
-        return '/dashboard/patron'
-      } else if (profile.role === 'employe') {
-        return '/dashboard/employe'
-      } else {
-        return '/dashboard/patron'
-      }
-    } catch (err) {
-      console.error('[LOGIN] fetchProfile timeout/error:', err)
-      // Fallback vers /dashboard/patron en cas d'erreur ou timeout
-      return '/dashboard/patron'
-    }
-  }
-
   // Vérifier la session au mount et s'abonner aux changements d'auth
   useEffect(() => {
     let isMounted = true
@@ -124,8 +94,10 @@ export default function LoginPage() {
         if (!isMounted) return
 
         if (session) {
-          const dashboardPath = await getDashboardPath(session)
-          router.replace(dashboardPath)
+          // Anti-boucle: ne rediriger qu'une seule fois
+          if (didRedirect.current) return
+          didRedirect.current = true
+          router.replace(REDIRECT_AFTER_LOGIN)
           return
         }
 
@@ -138,7 +110,7 @@ export default function LoginPage() {
       }
     }
 
-    // Vérifier la session une fois au montage
+    // Vérifier la session une seule fois au montage
     checkSessionOnce()
 
     // S'abonner aux changements d'état d'authentification
@@ -148,8 +120,10 @@ export default function LoginPage() {
       if (!isMounted) return
 
       if (event === 'SIGNED_IN' && session) {
-        const dashboardPath = await getDashboardPath(session)
-        router.replace(dashboardPath)
+        // Anti-boucle: ne rediriger qu'une seule fois
+        if (didRedirect.current) return
+        didRedirect.current = true
+        router.replace(REDIRECT_AFTER_LOGIN)
       }
     })
 
@@ -203,11 +177,13 @@ export default function LoginPage() {
 
       console.log('[LOGIN] getSession ok')
 
-      // 5. Si session existe: récupérer le profil (non-bloquant) et rediriger
+      // 5. Si session existe: rediriger vers la route fixe
       if (sessionData?.session) {
-        const dashboardPath = await getDashboardPath(sessionData.session)
-        console.log('[LOGIN] redirect ->', dashboardPath)
-        router.replace(dashboardPath)
+        // Anti-boucle: ne rediriger qu'une seule fois
+        if (didRedirect.current) return
+        didRedirect.current = true
+        console.log('[LOGIN] redirect ->', REDIRECT_AFTER_LOGIN)
+        router.replace(REDIRECT_AFTER_LOGIN)
         return
       }
 
