@@ -71,31 +71,44 @@ export default function LoginPage() {
     })
   }, [rememberMe])
 
-  // Fonction helper pour obtenir le chemin de redirection selon le rôle
+  // Helper pour timeout sur les promesses
+  const withTimeout = <T,>(p: Promise<T>, ms = 8000): Promise<T> =>
+    Promise.race([
+      p,
+      new Promise<never>((_, r) =>
+        setTimeout(() => r(new Error('Timeout')), ms)
+      ),
+    ])
+
+  // Fonction helper pour obtenir le chemin de redirection selon le rôle (non-bloquante)
   async function getDashboardPath(session: any): Promise<string> {
     try {
-      const { data: profile, error: profileError } = await supabase
+      console.log('[LOGIN] fetchProfile start')
+      const profilePromise = supabase
         .from('profiles')
         .select('role')
         .eq('id', session.user.id)
         .single()
 
+      const { data: profile, error: profileError } = await withTimeout(profilePromise)
+
       if (profileError || !profile) {
-        // Fallback vers /dashboard/patron si profil manquant ou erreur
+        console.log('[LOGIN] fetchProfile error, fallback /dashboard/patron')
         return '/dashboard/patron'
       }
+
+      console.log('[LOGIN] fetchProfile ok, role:', profile.role)
 
       if (profile.role === 'patron') {
         return '/dashboard/patron'
       } else if (profile.role === 'employe') {
         return '/dashboard/employe'
       } else {
-        // Fallback vers /dashboard/patron si rôle manquant ou invalide
         return '/dashboard/patron'
       }
     } catch (err) {
-      console.error('[Login] Erreur lors de la récupération du profil:', err)
-      // Fallback vers /dashboard/patron en cas d'erreur
+      console.error('[LOGIN] fetchProfile timeout/error:', err)
+      // Fallback vers /dashboard/patron en cas d'erreur ou timeout
       return '/dashboard/patron'
     }
   }
@@ -156,42 +169,65 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    // 1. Appeler signInWithPassword
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      console.log('[LOGIN] submit')
 
-    // 2. Si erreur existe: afficher message clair et STOP
-    if (authError) {
-      console.error('[LOGIN][ERROR]', authError.message, authError)
-      setError(authError.message)
+      // 1. Appeler signInWithPassword avec timeout
+      console.log('[LOGIN] signIn start')
+      const signInPromise = supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      const { error: authError } = await withTimeout(signInPromise)
+
+      // 2. Si erreur existe: afficher message clair et STOP
+      if (authError) {
+        console.error('[LOGIN] signIn error:', authError.message)
+        setError(authError.message)
+        return
+      }
+
+      console.log('[LOGIN] signIn ok')
+
+      // 3. Sinon: appeler immédiatement getSession() avec timeout
+      console.log('[LOGIN] getSession start')
+      const getSessionPromise = supabase.auth.getSession()
+      const { data: sessionData, error: sessionError } = await withTimeout(getSessionPromise)
+
+      // 4. Si erreur sur getSession: afficher message clair
+      if (sessionError) {
+        console.error('[LOGIN] getSession error:', sessionError.message)
+        setError('Session introuvable après login. Veuillez réessayer.')
+        return
+      }
+
+      console.log('[LOGIN] getSession ok')
+
+      // 5. Si session existe: récupérer le profil (non-bloquant) et rediriger
+      if (sessionData?.session) {
+        const dashboardPath = await getDashboardPath(sessionData.session)
+        console.log('[LOGIN] redirect ->', dashboardPath)
+        router.replace(dashboardPath)
+        return
+      }
+
+      // 6. Sinon: afficher erreur "Session absente après login" (rare)
+      console.warn('[LOGIN] session missing after login')
+      setError('Connexion réussie mais session absente. Vérifiez vos paramètres de cookies.')
+    } catch (err) {
+      // Gérer les timeouts et erreurs inconnues
+      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue'
+      console.error('[LOGIN] unexpected error:', errorMessage, err)
+      
+      if (errorMessage === 'Timeout') {
+        setError('Connexion bloquée (timeout). Réessayez.')
+      } else {
+        setError('Connexion bloquée (timeout). Réessayez.')
+      }
+    } finally {
+      // Toujours désactiver le loading, même en cas d'erreur
       setLoading(false)
-      return
     }
-
-    // 3. Sinon: appeler immédiatement getSession()
-    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-
-    // 4. Si erreur sur getSession: afficher message clair
-    if (sessionError) {
-      console.error('[LOGIN][SESSION_ERROR]', sessionError.message, sessionError)
-      setError('Session introuvable après login. Veuillez réessayer.')
-      setLoading(false)
-      return
-    }
-
-    // 5. Si session existe: récupérer le profil et rediriger vers le dashboard approprié
-    if (sessionData?.session) {
-      const dashboardPath = await getDashboardPath(sessionData.session)
-      router.replace(dashboardPath)
-      return
-    }
-
-    // 6. Sinon: afficher erreur "Session absente après login" (rare)
-    console.warn('[LOGIN][SESSION_MISSING] Login OK mais session absente')
-    setError('Connexion réussie mais session absente. Vérifiez vos paramètres de cookies.')
-    setLoading(false)
   }
 
   if (checkingSession) {
