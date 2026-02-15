@@ -34,9 +34,11 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const { data, error } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getSession();
 
-  if (error || !data?.user) {
+  const session = data?.session;
+
+  if (error || !session) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
