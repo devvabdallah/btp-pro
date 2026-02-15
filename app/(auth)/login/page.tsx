@@ -71,142 +71,56 @@ export default function LoginPage() {
     })
   }, [rememberMe])
 
-  // Vérifier la session au mount et rediriger si connecté
-  // Vérifier d'abord localStorage, puis sessionStorage
+  // Vérifier la session au mount et s'abonner aux changements d'auth
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout | null = null
     let isMounted = true
 
-    async function checkSession() {
+    async function checkSessionOnce() {
       try {
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-        // Timeout anti-boucle: 4 secondes max
-        timeoutId = setTimeout(() => {
-          if (isMounted) {
-            console.warn('[Login] Timeout lors de la vérification de session, arrêt du chargement')
-            setCheckingSession(false)
-          }
-        }, 4000)
-
-        // Vérifier localStorage d'abord (rememberMe = true par défaut)
-        const localStorageClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
-          auth: {
-            storage: {
-              getItem: (key: string) => {
-                try {
-                  return window.localStorage.getItem(key)
-                } catch {
-                  return null
-                }
-              },
-              setItem: () => {},
-              removeItem: () => {},
-            },
-            persistSession: true,
-            autoRefreshToken: true,
-          },
-        })
-
-        let { data: { session } } = await localStorageClient.auth.getSession()
-
-        // Si pas de session dans localStorage, vérifier sessionStorage
-        if (!session) {
-          const sessionStorageClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
-            auth: {
-              storage: {
-                getItem: (key: string) => {
-                  try {
-                    return window.sessionStorage.getItem(key)
-                  } catch {
-                    return null
-                  }
-                },
-                setItem: () => {},
-                removeItem: () => {},
-              },
-              persistSession: true,
-              autoRefreshToken: true,
-            },
-          })
-
-          const sessionResult = await sessionStorageClient.auth.getSession()
-          session = sessionResult.data.session
-        }
-
+        const { data: { session } } = await supabase.auth.getSession()
+        
         if (!isMounted) return
 
         if (session) {
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[Login] Session trouvée, vérification du profil...')
-          }
-
-          // Utiliser le client avec le bon storage pour récupérer le profil
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', session.user.id)
-            .single()
-
-          if (!isMounted) return
-
-          if (profileError || !profile) {
-            // Profil manquant: signOut et redirection avec erreur
-            if (process.env.NODE_ENV === 'development') {
-              console.warn('[Login] Profil manquant, déconnexion et redirection')
-            }
-            await supabase.auth.signOut()
-            router.replace('/login?error=profile_missing')
-            setCheckingSession(false)
-            return
-          }
-
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[Login] Profil OK, redirection vers dashboard')
-          }
-
-          // Redirection selon le rôle
-          if (profile.role === 'patron') {
-            router.replace('/dashboard/patron')
-          } else if (profile.role === 'employe') {
-            router.replace('/dashboard/employe')
-          } else {
-            router.replace('/dashboard/patron')
-          }
-          setCheckingSession(false)
-        } else {
-          // Pas de session: on peut afficher le formulaire
-          if (process.env.NODE_ENV === 'development') {
-            console.log('[Login] Aucune session trouvée')
-          }
-          setCheckingSession(false)
+          router.replace('/dashboard')
+          return
         }
+
+        setCheckingSession(false)
       } catch (err) {
         console.error('[Login] Erreur lors de la vérification de session:', err)
         if (isMounted) {
           setCheckingSession(false)
         }
-      } finally {
-        if (timeoutId) {
-          clearTimeout(timeoutId)
-        }
       }
     }
 
-    checkSession()
+    // Vérifier la session une fois au montage
+    checkSessionOnce()
+
+    // S'abonner aux changements d'état d'authentification
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!isMounted) return
+
+      if (event === 'SIGNED_IN' && session) {
+        router.replace('/dashboard')
+      }
+    })
 
     return () => {
       isMounted = false
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
+      subscription.unsubscribe()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router])
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault() // IMPORTANT : bloque le reload de page
+
+    // Empêcher les doubles clics
+    if (loading) return
 
     setLoading(true)
     setError('')
@@ -217,7 +131,7 @@ export default function LoginPage() {
       password,
     })
 
-    // 2. Si erreur existe: afficher message clair et return
+    // 2. Si erreur existe: afficher message clair et STOP
     if (authError) {
       console.error('[LOGIN][ERROR]', authError.message, authError)
       setError(authError.message)
@@ -225,9 +139,8 @@ export default function LoginPage() {
       return
     }
 
-    // 3. Sinon: récupérer explicitement la session après login
+    // 3. Sinon: appeler immédiatement getSession()
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-    console.log('[LOGIN][SESSION]', sessionData)
 
     // 4. Si erreur sur getSession: afficher message clair
     if (sessionError) {
@@ -237,34 +150,15 @@ export default function LoginPage() {
       return
     }
 
-    // 5. Si pas de session: afficher message clair
-    if (!sessionData?.session) {
-      console.warn('[LOGIN][SESSION_MISSING] Login OK mais session absente (cookies/storage)')
-      setError('Connexion réussie mais session absente. Vérifiez vos paramètres de cookies.')
-      setLoading(false)
+    // 5. Si session existe: rediriger immédiatement vers /dashboard
+    if (sessionData?.session) {
+      router.replace('/dashboard')
       return
     }
 
-    // 6. Si session OK: récupérer le profil et rediriger de façon déterministe
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', sessionData.session.user.id)
-      .single()
-
-    if (profile) {
-      if (profile.role === 'patron') {
-        router.replace('/dashboard/patron')
-      } else if (profile.role === 'employe') {
-        router.replace('/dashboard/employe')
-      } else {
-        router.replace('/dashboard/patron')
-      }
-    } else {
-      // Profil manquant: rediriger vers dashboard par défaut
-      router.replace('/dashboard/patron')
-    }
-
+    // 6. Sinon: afficher erreur "Session absente après login" (rare)
+    console.warn('[LOGIN][SESSION_MISSING] Login OK mais session absente')
+    setError('Connexion réussie mais session absente. Vérifiez vos paramètres de cookies.')
     setLoading(false)
   }
 
