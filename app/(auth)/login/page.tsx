@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { createBrowserSupabase } from '@/lib/supabase/browser'
+import { supabaseBrowser } from '@/lib/supabase/browser'
 
 export default function LoginPage() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,7 +17,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
 
-  const supabase = createBrowserSupabase()
+  const supabase = supabaseBrowser()
 
   // Lire les erreurs depuis l'URL
   useEffect(() => {
@@ -37,46 +38,22 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
       if (error) {
         setError(error.message)
-        setLoading(false)
         return
       }
 
-      const session = data?.session
-
-      if (!session?.access_token || !session?.refresh_token) {
-        setError("Session Supabase manquante après login")
-        setLoading(false)
-        return
-      }
-
-      const r = await fetch("/api/auth/set-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-        }),
-      })
-
-      if (!r.ok) {
-        const j = await r.json().catch(() => null)
-        setError(j?.error || "Impossible d'écrire la session serveur")
-        setLoading(false)
-        return
-      }
-
-      // HARD redirect (évite les loops router)
-      window.location.assign("/dashboard/patron")
+      router.replace("/dashboard")
+      router.refresh()
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erreur inconnue"
       setError(errorMessage)
+    } finally {
       setLoading(false)
     }
   }
