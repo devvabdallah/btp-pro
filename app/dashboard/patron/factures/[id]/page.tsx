@@ -598,60 +598,84 @@ export default function InvoiceDetailPage() {
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      font-size: 12pt;
-      line-height: 1.6;
+      font-size: 11pt;
+      line-height: 1.5;
       color: #000;
       background: #fff;
     }
     .header {
       margin-bottom: 30px;
-      padding-bottom: 20px;
+      padding-bottom: 15px;
       border-bottom: 2px solid #333;
     }
     .header h1 {
-      font-size: 24pt;
+      font-size: 22pt;
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
     }
-    .header .subtitle {
-      font-size: 14pt;
-      color: #666;
+    .header-company-info {
+      font-size: 10pt;
+      line-height: 1.6;
+      margin-top: 10px;
     }
-    .info-section {
+    .header-company-info div {
+      margin-bottom: 3px;
+    }
+    .document-info {
+      display: flex;
+      justify-content: space-between;
       margin-bottom: 30px;
+      padding: 15px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
     }
-    .info-row {
+    .document-title {
+      font-size: 18pt;
+      font-weight: bold;
       margin-bottom: 10px;
     }
-    .info-label {
-      font-weight: bold;
-      display: inline-block;
-      width: 120px;
+    .document-number {
+      font-size: 11pt;
+      margin-bottom: 5px;
     }
-    .description {
-      margin: 20px 0;
-      padding: 15px;
+    .document-date {
+      font-size: 11pt;
+    }
+    .client-section {
+      margin-bottom: 25px;
+      padding: 12px;
       background: #f5f5f5;
-      border-left: 4px solid #333;
+      border-left: 3px solid #333;
+    }
+    .client-section h3 {
+      font-size: 12pt;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    .client-section p {
+      font-size: 10pt;
+      margin-bottom: 3px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       margin: 20px 0;
+      font-size: 10pt;
     }
     thead {
       background: #333;
       color: #fff;
     }
     th, td {
-      padding: 10px;
+      padding: 8px 10px;
       text-align: left;
-      border-bottom: 1px solid #ddd;
+      border: 1px solid #ddd;
     }
     th {
       font-weight: bold;
+      font-size: 10pt;
     }
-    tbody tr:hover {
+    tbody tr:nth-child(even) {
       background: #f9f9f9;
     }
     .text-right {
@@ -660,106 +684,105 @@ export default function InvoiceDetailPage() {
     .totals {
       margin-top: 20px;
       margin-left: auto;
-      width: 300px;
+      width: 320px;
+      font-size: 10pt;
     }
     .totals-row {
       display: flex;
       justify-content: space-between;
-      padding: 8px 0;
+      padding: 6px 0;
       border-bottom: 1px solid #ddd;
     }
     .totals-row.total {
       font-weight: bold;
-      font-size: 14pt;
+      font-size: 12pt;
       border-top: 2px solid #333;
       border-bottom: 2px solid #333;
-      padding-top: 10px;
-      margin-top: 10px;
+      padding-top: 8px;
+      margin-top: 8px;
     }
-    .status {
-      display: inline-block;
-      padding: 5px 15px;
-      border-radius: 20px;
-      font-size: 10pt;
-      font-weight: bold;
-      margin-left: 10px;
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      font-size: 9pt;
+      color: #666;
+      line-height: 1.6;
     }
-    .status-draft { background: #e0e0e0; color: #333; }
-    .status-sent { background: #2196F3; color: #fff; }
-    .status-paid { background: #4CAF50; color: #fff; }
+    .footer-section {
+      margin-bottom: 12px;
+    }
+    .footer-section strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #000;
+    }
+    .page-break {
+      page-break-inside: avoid;
+    }
   </style>
 </head>
 <body>
-  <div class="header">
+  <div class="header page-break">
     <h1>${companyName}</h1>
-    <div style="margin-top: 15px; font-size: 11pt; line-height: 1.8;">
+    <div class="header-company-info">
       ${addressLine1 ? `<div>${addressLine1}</div>` : ''}
       ${addressLine2 ? `<div>${addressLine2}</div>` : ''}
       ${postalCode && city ? `<div>${postalCode} ${city}</div>` : ''}
-      ${siret ? `<div style="margin-top: 8px;"><strong>SIRET:</strong> ${siret}</div>` : ''}
-      ${vatNumber ? `<div><strong>TVA:</strong> ${vatNumber}</div>` : vatExemptionText ? `<div>${vatExemptionText}</div>` : ''}
+      ${siret ? `<div style="margin-top: 6px;"><strong>SIRET:</strong> ${siret}</div>` : ''}
+      ${vatNumber ? `<div><strong>TVA:</strong> ${vatNumber}</div>` : vatExemptionText ? `<div style="margin-top: 6px;">${vatExemptionText}</div>` : '<div style="margin-top: 6px;">TVA non applicable, art. 293 B du CGI</div>'}
     </div>
   </div>
 
-  <div style="text-align: right; margin-bottom: 30px;">
-    <h2 style="font-size: 20pt; margin-bottom: 10px;">FACTURE</h2>
-    <div style="margin-bottom: 5px;">
-      <strong>Facture n°:</strong> ${invoice.number || '—'}
+  <div class="document-info page-break">
+    <div>
+      <div class="document-title">FACTURE</div>
+      <div class="document-number"><strong>Facture n°:</strong> ${invoice.number || '—'}</div>
+      <div class="document-date"><strong>Date:</strong> ${date}</div>
     </div>
-    <div>Date: ${date}</div>
   </div>
 
-  <div class="info-section">
-    <div class="info-row">
-      <span class="info-label">Client:</span>
-      <span>${invoice.client || '—'}</span>
-    </div>
-    ${invoice.contact ? `
-    <div class="info-row">
-      <span class="info-label">Contact:</span>
-      <span>${invoice.contact}</span>
-    </div>
-    ` : ''}
-    <div class="info-row">
-      <span class="info-label">Statut:</span>
-      <span>${statusLabel}</span>
-      <span class="status status-${invoice.status}">${statusLabel}</span>
-    </div>
+  <div class="client-section page-break">
+    <h3>Facturé à :</h3>
+    <p><strong>${invoice.client || '—'}</strong></p>
+    ${invoice.contact ? `<p>${invoice.contact}</p>` : ''}
   </div>
 
   ${invoice.description ? `
-  <div class="description">
+  <div class="page-break" style="margin: 20px 0; padding: 12px; background: #f5f5f5; border-left: 4px solid #333; font-size: 10pt;">
     <strong>Description des travaux:</strong><br>
     ${invoice.description.replace(/\n/g, '<br>')}
   </div>
   ` : ''}
 
   ${formattedLines.length > 0 ? `
-  <table>
-    <thead>
-      <tr>
-        <th>Description</th>
-        <th class="text-right">Qté</th>
-        <th>Unité</th>
-        <th class="text-right">PU HT</th>
-        <th class="text-right">Total HT</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${formattedLines.map(line => `
-      <tr>
-        <td>${line.description}</td>
-        <td class="text-right">${line.quantity}</td>
-        <td>${line.unit}</td>
-        <td class="text-right">${line.unitPrice}</td>
-        <td class="text-right">${line.total}</td>
-      </tr>
-      `).join('')}
-    </tbody>
-  </table>
+  <div class="page-break">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 40%;">Description</th>
+          <th style="width: 10%;" class="text-right">Qté</th>
+          <th style="width: 15%;">Unité</th>
+          <th style="width: 17%;" class="text-right">Prix Unitaire HT</th>
+          <th style="width: 18%;" class="text-right">Total Ligne HT</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${formattedLines.map(line => `
+        <tr>
+          <td>${line.description}</td>
+          <td class="text-right">${line.quantity}</td>
+          <td>${line.unit}</td>
+          <td class="text-right">${line.unitPrice}</td>
+          <td class="text-right">${line.total}</td>
+        </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  </div>
   ` : ''}
 
-  <div class="totals">
+  <div class="totals page-break">
     <div class="totals-row">
       <span>Total HT:</span>
       <span>${formattedTotalHT}</span>
@@ -771,6 +794,24 @@ export default function InvoiceDetailPage() {
     <div class="totals-row total">
       <span>Total TTC:</span>
       <span>${formattedTotalTTC}</span>
+    </div>
+  </div>
+
+  <div class="footer page-break">
+    <div class="footer-section">
+      <strong>Coordonnées de l'entreprise :</strong>
+      ${companyName}<br>
+      ${addressLine1 || ''}${addressLine2 ? ` ${addressLine2}` : ''}<br>
+      ${postalCode && city ? `${postalCode} ${city}` : ''}
+      ${siret ? `<br>SIRET: ${siret}` : ''}
+    </div>
+    <div class="footer-section">
+      <strong>Modalités de paiement :</strong>
+      Paiement à réception de facture. Virement bancaire ou chèque accepté.
+    </div>
+    <div class="footer-section">
+      <strong>Mentions légales :</strong>
+      En cas de retard de paiement, des pénalités de 3 fois le taux d'intérêt légal seront appliquées, ainsi qu'une indemnité forfaitaire pour frais de recouvrement de 40€.
     </div>
   </div>
 </body>
