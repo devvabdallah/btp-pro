@@ -211,12 +211,12 @@ export default function FacturesPage() {
                       </h3>
                       {getStatusBadge(invoice.status)}
                     </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-sm">
-                      <span className="text-gray-300 font-medium">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-base md:text-sm">
+                      <span className="text-gray-300 font-medium leading-relaxed">
                         {invoice.client}
                       </span>
                       <span className="hidden sm:inline text-gray-500">•</span>
-                      <span className="text-gray-400">
+                      <span className="text-gray-400 leading-relaxed">
                         {formatDate(invoice.created_at)}
                       </span>
                     </div>

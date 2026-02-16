@@ -1186,11 +1186,11 @@ export default function InvoiceDetailPage() {
                 <tbody>
                   {invoiceLines.map((line) => (
                     <tr key={line.id} className="border-b border-[#2a2f4a]">
-                      <td className="py-3 px-4 text-gray-200">{line.description || '—'}</td>
-                      <td className="py-3 px-4 text-gray-200 text-right">{line.quantity || '—'}</td>
-                      <td className="py-3 px-4 text-gray-200">{line.unit || '—'}</td>
-                      <td className="py-3 px-4 text-gray-200 text-right">{formatAmount(line.unit_price_ht || 0)}</td>
-                      <td className="py-3 px-4 text-white font-semibold text-right">{formatAmount(line.total_ht || 0)}</td>
+                      <td className="py-3 md:py-1 px-4 text-base md:text-sm text-gray-200 leading-relaxed whitespace-normal break-words">{line.description || '—'}</td>
+                      <td className="py-3 md:py-1 px-4 text-base md:text-sm text-gray-200 text-right">{line.quantity || '—'}</td>
+                      <td className="py-3 md:py-1 px-4 text-base md:text-sm text-gray-200">{line.unit || '—'}</td>
+                      <td className="py-3 md:py-1 px-4 text-base md:text-sm text-gray-200 text-right">{formatAmount(line.unit_price_ht || 0)}</td>
+                      <td className="py-3 md:py-1 px-4 text-base md:text-sm text-white font-semibold text-right">{formatAmount(line.total_ht || 0)}</td>
                     </tr>
                   ))}
                 </tbody>

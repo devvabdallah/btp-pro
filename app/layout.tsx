@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'BTP PRO - Devis et factures pour artisans',
   description: 'Faites vos devis et vos factures très rapidement.',
   manifest: '/manifest.webmanifest',
-  themeColor: '#f97316',
+  themeColor: '#0B1B3A',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

@@ -223,7 +223,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Composant Sidebar réutilisable
   const SidebarContent = () => (
     <>
-      <div className="p-7 md:p-8 border-b border-white/[0.08] flex items-center justify-start">
+      <div className="hidden md:flex p-7 md:p-8 border-b border-white/[0.08] items-center justify-start">
         <Logo size="lg" showText={false} />
       </div>
 
@@ -271,7 +271,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </svg>
         </button>
         <div className="flex-1 flex justify-center">
-          <Logo size="sm" showText={true} />
+          <Logo size="md" showText={false} />
         </div>
         <div className="w-10" /> {/* Spacer pour centrer le logo */}
       </header>
@@ -291,8 +291,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           />
           {/* Sidebar mobile */}
           <aside className="md:hidden fixed left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-[#111827]/98 backdrop-blur-md border-r border-white/[0.08] flex flex-col z-50 overflow-y-auto">
-            <div className="p-4 border-b border-white/[0.08] flex items-center justify-between">
-              <Logo size="lg" showText={false} />
+            <div className="p-4 border-b border-white/[0.08] flex items-center justify-end">
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-2 text-gray-400 hover:text-white transition-colors duration-200"
