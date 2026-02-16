@@ -89,8 +89,45 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             setIsCompanyActive(active)
 
-            // Si entreprise inactive, rediriger vers abonnement-expire
-            if (active === false) {
+            // Si entreprise inactive, synchroniser avec Stripe avant de rediriger
+            // Bypass uniquement en développement local si DEV_BYPASS_SUBSCRIPTION=1
+            const isDevBypass = process.env.NEXT_PUBLIC_DEV_BYPASS_SUBSCRIPTION === "true" && process.env.NODE_ENV !== "production"
+            
+            if (active === false && !isDevBypass) {
+              // Synchroniser avec Stripe pour vérifier si un abonnement actif existe
+              try {
+                const syncResponse = await Promise.race([
+                  fetch('/api/stripe/sync-subscription', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                  }),
+                  new Promise<Response>((_, reject) =>
+                    setTimeout(() => reject(new Error('Timeout')), 3000)
+                  ),
+                ])
+
+                if (syncResponse.ok) {
+                  const syncData = await syncResponse.json()
+                  
+                  if (syncData.synced && syncData.active) {
+                    // Re-vérifier le statut après synchronisation
+                    const { active: recheckActive } = await checkCompanyActive(supabase, profile.entreprise_id)
+                    
+                    if (recheckActive) {
+                      setIsCompanyActive(true)
+                      setLoading(false)
+                      return
+                    }
+                  }
+                }
+              } catch (syncError) {
+                // En cas d'erreur de synchronisation, continuer avec la redirection normale
+                console.warn('[Dashboard Layout] Erreur synchronisation Stripe:', syncError)
+              }
+
               setLoading(false)
               router.replace('/abonnement-expire')
               return

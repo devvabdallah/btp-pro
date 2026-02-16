@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createSupabaseAdminClient } from '@/lib/supabase/admin'
 
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 export async function POST(request: NextRequest) {
   let step = 'start'
   try {
@@ -222,9 +225,11 @@ export async function POST(request: NextRequest) {
         .eq('id', entreprise.id)
     }
 
-    // 10. Récupérer APP_URL depuis les variables d'environnement
+    // 10. Récupérer APP_URL depuis les variables d'environnement ou utiliser localhost en dev
     step = 'check_app_url'
-    const appUrl = process.env.APP_URL
+    const appUrl = process.env.NODE_ENV === 'production' 
+      ? (process.env.APP_URL || 'https://your-domain.com')
+      : 'http://localhost:3000'
 
     if (!appUrl) {
       console.error('[Stripe Checkout] APP_URL manquant')
@@ -268,11 +273,43 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 11. Vérifier explicitement les variables d'environnement Stripe avant l'appel
+    step = 'stripe_init'
+    if (!stripeSecretKey) {
+      return NextResponse.json(
+        {
+          error: 'Config Stripe manquante: STRIPE_SECRET_KEY',
+          step,
+          details: {
+            missing: 'STRIPE_SECRET_KEY'
+          }
+        },
+        { status: 500 }
+      )
+    }
+
+    if (!priceId) {
+      return NextResponse.json(
+        {
+          error: 'Config Stripe manquante: STRIPE_PRICE_ID',
+          step,
+          details: {
+            missing: 'STRIPE_PRICE_ID'
+          }
+        },
+        { status: 500 }
+      )
+    }
+
     // 12. Log avant l'appel Stripe (safe, sans secrets)
-    console.log('[Stripe Checkout] Creating session', {
+    const successUrl = `${appUrl}/stripe/success?session_id={CHECKOUT_SESSION_ID}`
+    const cancelUrl = `${appUrl}/abonnement-expire?canceled=1`
+    
+    console.log('[stripe-checkout] creating session', {
+      userId: user.id,
       companyId,
-      priceId: priceId || 'MISSING',
-      mode: 'subscription'
+      success_url: successUrl,
+      cancel_url: cancelUrl,
     })
 
     // 13. Créer la session Stripe Checkout avec gestion d'erreur détaillée
@@ -280,16 +317,17 @@ export async function POST(request: NextRequest) {
     let session
     try {
       session = await stripe.checkout.sessions.create({
-        customer: customerId,
         mode: 'subscription',
+        locale: 'fr',
+        payment_method_types: ['card'],
         line_items: [
           {
             price: priceId,
             quantity: 1,
           },
         ],
-        success_url: `${appUrl}/dashboard/patron/abonnement?success=1`,
-        cancel_url: `${appUrl}/dashboard/patron/abonnement?canceled=1`,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
         client_reference_id: companyId,
         metadata: {
           companyId: companyId,

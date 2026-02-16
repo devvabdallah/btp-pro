@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation'
-import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { createSupabaseServer } from '@/lib/supabase/server'
 
 export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseServer()
 
   const {
     data: { user },

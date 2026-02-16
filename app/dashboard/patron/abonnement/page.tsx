@@ -219,8 +219,9 @@ export default function AbonnementPage() {
         throw new Error('URL de paiement non reçue')
       }
 
-      // Rediriger vers Stripe Checkout
-      window.location.href = url
+      // Rediriger vers Stripe Checkout (toujours créer une nouvelle session)
+      console.log('[subscribe] redirecting to', url)
+      window.location.assign(url)
     } catch (err) {
       console.error('[Abonnement] Erreur checkout:', err)
       setCheckoutError(err instanceof Error ? err.message : 'Erreur lors du démarrage du paiement')
