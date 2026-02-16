@@ -604,57 +604,59 @@ export default function InvoiceDetailPage() {
       background: #fff;
     }
     .header {
-      margin-bottom: 30px;
+      margin-bottom: 35px;
       padding-bottom: 15px;
-      border-bottom: 2px solid #333;
+      border-bottom: 1px solid #333;
     }
-    .header h1 {
-      font-size: 22pt;
+    .header-company-name {
+      font-size: 16pt;
       font-weight: bold;
       margin-bottom: 8px;
+      color: #000;
     }
     .header-company-info {
       font-size: 10pt;
       line-height: 1.6;
-      margin-top: 10px;
+      color: #333;
     }
     .header-company-info div {
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
     .document-info {
-      display: flex;
-      justify-content: space-between;
       margin-bottom: 30px;
-      padding: 15px;
-      background: #f9f9f9;
-      border: 1px solid #ddd;
+      padding: 12px 0;
     }
     .document-title {
-      font-size: 18pt;
+      font-size: 16pt;
       font-weight: bold;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      color: #000;
     }
     .document-number {
-      font-size: 11pt;
-      margin-bottom: 5px;
+      font-size: 10pt;
+      margin-bottom: 4px;
+      color: #333;
     }
     .document-date {
-      font-size: 11pt;
+      font-size: 10pt;
+      color: #333;
     }
     .client-section {
       margin-bottom: 25px;
-      padding: 12px;
-      background: #f5f5f5;
-      border-left: 3px solid #333;
+      padding: 10px 0;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
     }
     .client-section h3 {
-      font-size: 12pt;
+      font-size: 11pt;
       font-weight: bold;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      color: #000;
     }
     .client-section p {
       font-size: 10pt;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
+      color: #333;
     }
     table {
       width: 100%;
@@ -669,11 +671,14 @@ export default function InvoiceDetailPage() {
     th, td {
       padding: 8px 10px;
       text-align: left;
-      border: 1px solid #ddd;
+      border: 1px solid #333;
     }
     th {
       font-weight: bold;
       font-size: 10pt;
+    }
+    tbody tr {
+      border-bottom: 1px solid #ddd;
     }
     tbody tr:nth-child(even) {
       background: #f9f9f9;
@@ -682,9 +687,9 @@ export default function InvoiceDetailPage() {
       text-align: right;
     }
     .totals {
-      margin-top: 20px;
+      margin-top: 25px;
       margin-left: auto;
-      width: 320px;
+      width: 300px;
       font-size: 10pt;
     }
     .totals-row {
@@ -702,20 +707,15 @@ export default function InvoiceDetailPage() {
       margin-top: 8px;
     }
     .footer {
-      margin-top: 40px;
-      padding-top: 20px;
+      margin-top: 50px;
+      padding-top: 15px;
       border-top: 1px solid #ddd;
-      font-size: 9pt;
-      color: #666;
-      line-height: 1.6;
+      font-size: 8pt;
+      color: #555;
+      line-height: 1.5;
     }
-    .footer-section {
-      margin-bottom: 12px;
-    }
-    .footer-section strong {
-      display: block;
-      margin-bottom: 4px;
-      color: #000;
+    .footer-text {
+      margin-bottom: 6px;
     }
     .page-break {
       page-break-inside: avoid;
@@ -724,22 +724,20 @@ export default function InvoiceDetailPage() {
 </head>
 <body>
   <div class="header page-break">
-    <h1>${companyName}</h1>
+    <div class="header-company-name">${companyName}</div>
     <div class="header-company-info">
       ${addressLine1 ? `<div>${addressLine1}</div>` : ''}
       ${addressLine2 ? `<div>${addressLine2}</div>` : ''}
       ${postalCode && city ? `<div>${postalCode} ${city}</div>` : ''}
-      ${siret ? `<div style="margin-top: 6px;"><strong>SIRET:</strong> ${siret}</div>` : ''}
-      ${vatNumber ? `<div><strong>TVA:</strong> ${vatNumber}</div>` : vatExemptionText ? `<div style="margin-top: 6px;">${vatExemptionText}</div>` : '<div style="margin-top: 6px;">TVA non applicable, art. 293 B du CGI</div>'}
+      ${siret ? `<div style="margin-top: 6px;">SIRET : ${siret}</div>` : ''}
+      ${vatNumber ? `<div>TVA : ${vatNumber}</div>` : '<div>TVA non applicable, art. 293 B du CGI</div>'}
     </div>
   </div>
 
   <div class="document-info page-break">
-    <div>
-      <div class="document-title">FACTURE</div>
-      <div class="document-number"><strong>Facture n°:</strong> ${invoice.number || '—'}</div>
-      <div class="document-date"><strong>Date:</strong> ${date}</div>
-    </div>
+    <div class="document-title">FACTURE</div>
+    <div class="document-number"><strong>Facture n°</strong> : ${invoice.number || '—'}</div>
+    <div class="document-date"><strong>Date</strong> : ${date}</div>
   </div>
 
   <div class="client-section page-break">
@@ -749,9 +747,9 @@ export default function InvoiceDetailPage() {
   </div>
 
   ${invoice.description ? `
-  <div class="page-break" style="margin: 20px 0; padding: 12px; background: #f5f5f5; border-left: 4px solid #333; font-size: 10pt;">
-    <strong>Description des travaux:</strong><br>
-    ${invoice.description.replace(/\n/g, '<br>')}
+  <div class="page-break" style="margin: 20px 0; padding: 10px 0; font-size: 10pt; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">
+    <strong>Description des travaux :</strong><br>
+    <div style="margin-top: 6px;">${invoice.description.replace(/\n/g, '<br>')}</div>
   </div>
   ` : ''}
 
@@ -784,35 +782,23 @@ export default function InvoiceDetailPage() {
 
   <div class="totals page-break">
     <div class="totals-row">
-      <span>Total HT:</span>
+      <span>Total HT</span>
       <span>${formattedTotalHT}</span>
     </div>
     <div class="totals-row">
-      <span>TVA (20%):</span>
+      <span>TVA (20%)</span>
       <span>${formattedTVA}</span>
     </div>
     <div class="totals-row total">
-      <span>Total TTC:</span>
+      <span>Total TTC</span>
       <span>${formattedTotalTTC}</span>
     </div>
   </div>
 
   <div class="footer page-break">
-    <div class="footer-section">
-      <strong>Coordonnées de l'entreprise :</strong>
-      ${companyName}<br>
-      ${addressLine1 || ''}${addressLine2 ? ` ${addressLine2}` : ''}<br>
-      ${postalCode && city ? `${postalCode} ${city}` : ''}
-      ${siret ? `<br>SIRET: ${siret}` : ''}
-    </div>
-    <div class="footer-section">
-      <strong>Modalités de paiement :</strong>
-      Paiement à réception de facture. Virement bancaire ou chèque accepté.
-    </div>
-    <div class="footer-section">
-      <strong>Mentions légales :</strong>
-      En cas de retard de paiement, des pénalités de 3 fois le taux d'intérêt légal seront appliquées, ainsi qu'une indemnité forfaitaire pour frais de recouvrement de 40€.
-    </div>
+    <div class="footer-text">Conditions de paiement : Paiement à 30 jours.</div>
+    <div class="footer-text">Pénalités de retard exigibles au taux légal en vigueur.</div>
+    <div class="footer-text">Indemnité forfaitaire pour frais de recouvrement : 40 € (art. L441-10 du Code de commerce).</div>
   </div>
 </body>
 </html>
