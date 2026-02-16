@@ -750,7 +750,7 @@ export default function QuoteDetailPage() {
   const handlePrintPdf = () => {
     if (!quote) return
 
-    const companyName = entrepriseInfo?.legal_name || entrepriseInfo?.name || "Nom de l'entreprise"
+    const companyName = entrepriseInfo?.legal_name || entrepriseInfo?.name || "Entreprise"
     const companyCode = entrepriseInfo?.siret || entrepriseInfo?.code || ''
     const addressLine1 = entrepriseInfo?.address_line1 || ''
     const addressLine2 = entrepriseInfo?.address_line2 || ''

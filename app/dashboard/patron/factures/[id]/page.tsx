@@ -539,7 +539,7 @@ export default function InvoiceDetailPage() {
   const handlePrintPdf = () => {
     if (!invoice) return
 
-    const companyName = company?.legal_name || company?.name || "Nom de l'entreprise"
+    const companyName = company?.legal_name || company?.name || "Entreprise"
     const companyCode = company?.siret || company?.code || ''
     const addressLine1 = company?.address_line1 || ''
     const addressLine2 = company?.address_line2 || ''
