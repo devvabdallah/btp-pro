@@ -348,11 +348,11 @@ export default function QuoteDetailPage() {
     setInvoiceSuccess(null)
 
     try {
-      // Créer un client Supabase frais
-      const sb = createSupabaseBrowserClient()
+      // Créer un client Supabase frais pour une session cohérente
+      const supabaseClient = createSupabaseBrowserClient()
 
       // Récupérer le profil pour obtenir entreprise_id
-      const { data: { user }, error: userError } = await sb.auth.getUser()
+      const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
       
       if (userError || !user) {
         setInvoiceError('Utilisateur non connecté')
@@ -360,7 +360,7 @@ export default function QuoteDetailPage() {
         return
       }
 
-      const { data: profile, error: profileError } = await sb
+      const { data: profile, error: profileError } = await supabaseClient
         .from('profiles')
         .select('entreprise_id')
         .eq('id', user.id)
@@ -372,9 +372,9 @@ export default function QuoteDetailPage() {
         return
       }
 
-      // Vérification abonnement / essai
+      // Vérification abonnement / essai avec le même client pour cohérence de session
       const { checkCompanyActive } = await import('@/lib/subscription-check')
-      const { active } = await checkCompanyActive(sb)
+      const { active } = await checkCompanyActive(supabaseClient)
 
       console.log("[subscription] active=", active)
 
@@ -386,7 +386,7 @@ export default function QuoteDetailPage() {
       }
 
       // 1. Vérifier si une facture existe déjà pour ce devis
-      const { data: existingInvoice, error: checkError } = await sb
+      const { data: existingInvoice, error: checkError } = await supabaseClient
         .from('invoices')
         .select('id')
         .eq('quote_id', quote.id)
@@ -402,7 +402,7 @@ export default function QuoteDetailPage() {
       }
 
       // 2. Créer la facture
-      const { data: invoiceData, error: invoiceError } = await sb
+      const { data: invoiceData, error: invoiceError } = await supabaseClient
         .from('invoices')
         .insert({
           entreprise_id: quote.entreprise_id,
@@ -447,7 +447,7 @@ export default function QuoteDetailPage() {
           total_ht: line.total_ht || 0
         }))
 
-        const { error: linesError } = await sb
+        const { error: linesError } = await supabaseClient
           .from('invoice_lines')
           .insert(invoiceLinesPayload)
 
@@ -977,18 +977,19 @@ export default function QuoteDetailPage() {
 </head>
 <body>
   <div class="header page-break">
-    ${companyName ? `<div class="header-company-name">${companyName}</div>` : ''}
+    <div style="font-size: 10pt; font-weight: bold; color: #333; margin-bottom: 8px;">ÉMIS PAR :</div>
     <div class="header-company-info">
+      ${companyName ? `<div class="header-company-name">${companyName}</div>` : ''}
       ${(addressLine1 || addressLine2 || postalCode || city) ? `
-      <div style="margin-bottom: 4px;">
+      <div style="margin-top: 4px; margin-bottom: 4px;">
         ${addressLine1 ? `<div>${addressLine1}</div>` : ''}
         ${addressLine2 ? `<div>${addressLine2}</div>` : ''}
         ${(postalCode || city) ? `<div>${[postalCode, city].filter(Boolean).join(' ')}</div>` : ''}
       </div>
       ` : ''}
-      ${siret ? `<div style="margin-top: 6px;">SIRET : ${siret}</div>` : ''}
-      ${vatNumber ? `<div>TVA : ${vatNumber}</div>` : '<div>TVA non applicable, art. 293 B du CGI</div>'}
-      ${profileFullName ? `<div style="margin-top: 6px;">Établi par : ${profileFullName}</div>` : ''}
+      ${siret ? `<div style="margin-top: 6px; font-size: 10pt;">SIRET : ${siret}</div>` : ''}
+      ${vatNumber ? `<div style="font-size: 10pt;">TVA : ${vatNumber}</div>` : '<div style="font-size: 10pt;">TVA non applicable, art. 293 B du CGI</div>'}
+      ${profileFullName ? `<div style="margin-top: 6px; font-size: 9pt; color: #666;">Établi par : ${profileFullName}</div>` : ''}
     </div>
   </div>
 
@@ -999,14 +1000,14 @@ export default function QuoteDetailPage() {
   </div>
 
   <div class="client-section page-break">
-    <h3>Devis pour :</h3>
-    ${quote.client ? `<p><strong>${quote.client}</strong></p>` : ''}
-    ${quote.contact ? `<p>${quote.contact}</p>` : ''}
+    <h3 style="font-size: 10pt; font-weight: bold; color: #333; margin-bottom: 8px;">DEVIS POUR :</h3>
+    ${quote.client ? `<p style="font-weight: bold; font-size: 11pt; margin-bottom: 4px;">${quote.client}</p>` : ''}
+    ${quote.contact ? `<p style="font-size: 10pt; margin-bottom: 4px; color: #555;">${quote.contact}</p>` : ''}
     ${(quote.client_address_line1 || quote.client_address_line2 || quote.client_postal_code || quote.client_city) ? `
     <div style="margin-top: 8px;">
-      ${quote.client_address_line1 ? `<p>${quote.client_address_line1}</p>` : ''}
-      ${quote.client_address_line2 ? `<p>${quote.client_address_line2}</p>` : ''}
-      ${(quote.client_postal_code || quote.client_city) ? `<p>${[quote.client_postal_code, quote.client_city].filter(Boolean).join(' ')}</p>` : ''}
+      ${quote.client_address_line1 ? `<p style="font-size: 10pt; margin-bottom: 2px;">${quote.client_address_line1}</p>` : ''}
+      ${quote.client_address_line2 ? `<p style="font-size: 10pt; margin-bottom: 2px;">${quote.client_address_line2}</p>` : ''}
+      ${(quote.client_postal_code || quote.client_city) ? `<p style="font-size: 10pt; margin-bottom: 2px;">${[quote.client_postal_code, quote.client_city].filter(Boolean).join(' ')}</p>` : ''}
     </div>
     ` : ''}
   </div>

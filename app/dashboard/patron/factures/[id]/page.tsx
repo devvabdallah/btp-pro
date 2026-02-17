@@ -20,6 +20,7 @@ export default function InvoiceDetailPage() {
   const [actionError, setActionError] = useState<string>('')
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editedInvoice, setEditedInvoice] = useState<any>(null)
   const [editedLines, setEditedLines] = useState<any[]>([])
@@ -505,20 +506,21 @@ export default function InvoiceDetailPage() {
 
   const displayInvoice = isEditing && editedInvoice ? editedInvoice : invoice
 
+  // Ouvrir la modale de suppression
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true)
+  }
+
   // Supprimer la facture
   const handleDelete = async () => {
     if (!invoice?.id) {
       setDeleteError('Facture introuvable')
-      return
-    }
-
-    // Confirmation
-    const confirmed = window.confirm('Supprimer cette facture ? Cette action est irréversible.')
-    if (!confirmed) {
+      setIsDeleteModalOpen(false)
       return
     }
 
     setDeleting(true)
+    setIsDeleteModalOpen(false)
     setDeleteError(null)
 
     try {
@@ -761,18 +763,19 @@ export default function InvoiceDetailPage() {
 </head>
 <body>
   <div class="header page-break">
-    ${companyName ? `<div class="header-company-name">${companyName}</div>` : ''}
+    <div style="font-size: 10pt; font-weight: bold; color: #333; margin-bottom: 8px;">ÉMIS PAR :</div>
     <div class="header-company-info">
+      ${companyName ? `<div class="header-company-name">${companyName}</div>` : ''}
       ${(addressLine1 || addressLine2 || postalCode || city) ? `
-      <div style="margin-bottom: 4px;">
+      <div style="margin-top: 4px; margin-bottom: 4px;">
         ${addressLine1 ? `<div>${addressLine1}</div>` : ''}
         ${addressLine2 ? `<div>${addressLine2}</div>` : ''}
         ${(postalCode || city) ? `<div>${[postalCode, city].filter(Boolean).join(' ')}</div>` : ''}
       </div>
       ` : ''}
-      ${siret ? `<div style="margin-top: 6px;">SIRET : ${siret}</div>` : ''}
-      ${vatNumber ? `<div>TVA : ${vatNumber}</div>` : '<div>TVA non applicable, art. 293 B du CGI</div>'}
-      ${profileFullName ? `<div style="margin-top: 6px;">Établi par : ${profileFullName}</div>` : ''}
+      ${siret ? `<div style="margin-top: 6px; font-size: 10pt;">SIRET : ${siret}</div>` : ''}
+      ${vatNumber ? `<div style="font-size: 10pt;">TVA : ${vatNumber}</div>` : '<div style="font-size: 10pt;">TVA non applicable, art. 293 B du CGI</div>'}
+      ${profileFullName ? `<div style="margin-top: 6px; font-size: 9pt; color: #666;">Établi par : ${profileFullName}</div>` : ''}
     </div>
   </div>
 
@@ -783,14 +786,14 @@ export default function InvoiceDetailPage() {
   </div>
 
   <div class="client-section page-break">
-    <h3>Facturé à :</h3>
-    ${invoice.client ? `<p><strong>${invoice.client}</strong></p>` : ''}
-    ${invoice.contact ? `<p>${invoice.contact}</p>` : ''}
+    <h3 style="font-size: 10pt; font-weight: bold; color: #333; margin-bottom: 8px;">FACTURÉ À :</h3>
+    ${invoice.client ? `<p style="font-weight: bold; font-size: 11pt; margin-bottom: 4px;">${invoice.client}</p>` : ''}
+    ${invoice.contact ? `<p style="font-size: 10pt; margin-bottom: 4px; color: #555;">${invoice.contact}</p>` : ''}
     ${(invoice.client_address_line1 || invoice.client_address_line2 || invoice.client_postal_code || invoice.client_city) ? `
     <div style="margin-top: 8px;">
-      ${invoice.client_address_line1 ? `<p>${invoice.client_address_line1}</p>` : ''}
-      ${invoice.client_address_line2 ? `<p>${invoice.client_address_line2}</p>` : ''}
-      ${(invoice.client_postal_code || invoice.client_city) ? `<p>${[invoice.client_postal_code, invoice.client_city].filter(Boolean).join(' ')}</p>` : ''}
+      ${invoice.client_address_line1 ? `<p style="font-size: 10pt; margin-bottom: 2px;">${invoice.client_address_line1}</p>` : ''}
+      ${invoice.client_address_line2 ? `<p style="font-size: 10pt; margin-bottom: 2px;">${invoice.client_address_line2}</p>` : ''}
+      ${(invoice.client_postal_code || invoice.client_city) ? `<p style="font-size: 10pt; margin-bottom: 2px;">${[invoice.client_postal_code, invoice.client_city].filter(Boolean).join(' ')}</p>` : ''}
     </div>
     ` : ''}
   </div>
@@ -1491,7 +1494,7 @@ export default function InvoiceDetailPage() {
               <Button
                 variant="secondary"
                 size="md"
-                onClick={handleDelete}
+                onClick={handleDeleteClick}
                 disabled={deleting}
                 className="w-full sm:w-auto min-h-[48px] px-6 text-base font-semibold border-red-500/50 text-red-300 hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -1501,6 +1504,40 @@ export default function InvoiceDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Modale de confirmation de suppression */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 rounded-2xl p-6 md:p-8 border border-white/10 shadow-xl shadow-black/50 backdrop-blur-sm max-w-md w-full">
+            <h3 className="text-xl md:text-2xl font-semibold text-white mb-4">
+              Supprimer cette facture ?
+            </h3>
+            <p className="text-gray-300 mb-6 text-sm md:text-base">
+              Cette action est irréversible.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => setIsDeleteModalOpen(false)}
+                disabled={deleting}
+                className="w-full sm:w-auto min-h-[44px] px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="primary"
+                size="md"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="w-full sm:w-auto min-h-[44px] px-6 bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleting ? 'Suppression...' : 'Supprimer'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
