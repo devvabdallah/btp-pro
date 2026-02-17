@@ -1091,41 +1091,42 @@ export default function QuoteDetailPage() {
   };
 
   return (
-    <QuoteDetailView
-      quote={quote}
-      loading={loading}
-      error={error}
-      quoteNotFound={quoteNotFound}
-      quoteId={quoteId}
-      formatDate={formatDate}
-      getStatusBadge={getStatusBadge}
-      formatAmount={formatAmount}
-      existingInvoiceId={existingInvoiceId}
-      handleCreateInvoice={handleCreateInvoice}
-      creatingInvoice={creatingInvoice}
-      isCompanyActive={isCompanyActive}
-      invoiceError={invoiceError}
-      statusError={statusError}
-      handleStatusChange={handleStatusChange}
-      updatingStatus={updatingStatus}
-      handlePrintPdf={handlePrintPdf}
-      isEditing={isEditing}
-      editedQuote={editedQuote}
-      editedLines={editedLines}
-      quoteLines={quoteLines}
-      saving={saving}
-      saveError={saveError}
-      onEdit={handleEdit}
-      onCancel={handleCancel}
-      onSave={handleSave}
-      updateEditedQuote={updateEditedQuote}
-      updateEditedLine={updateEditedLine}
-      addEditedLine={addEditedLine}
-      removeEditedLine={removeEditedLine}
-      onDelete={handleDeleteClick}
-      deleting={deleting}
-      deleteError={deleteError}
-    />
+    <>
+      <QuoteDetailView
+        quote={quote}
+        loading={loading}
+        error={error}
+        quoteNotFound={quoteNotFound}
+        quoteId={quoteId}
+        formatDate={formatDate}
+        getStatusBadge={getStatusBadge}
+        formatAmount={formatAmount}
+        existingInvoiceId={existingInvoiceId}
+        handleCreateInvoice={handleCreateInvoice}
+        creatingInvoice={creatingInvoice}
+        isCompanyActive={isCompanyActive}
+        invoiceError={invoiceError}
+        statusError={statusError}
+        handleStatusChange={handleStatusChange}
+        updatingStatus={updatingStatus}
+        handlePrintPdf={handlePrintPdf}
+        isEditing={isEditing}
+        editedQuote={editedQuote}
+        editedLines={editedLines}
+        quoteLines={quoteLines}
+        saving={saving}
+        saveError={saveError}
+        onEdit={handleEdit}
+        onCancel={handleCancel}
+        onSave={handleSave}
+        updateEditedQuote={updateEditedQuote}
+        updateEditedLine={updateEditedLine}
+        addEditedLine={addEditedLine}
+        removeEditedLine={removeEditedLine}
+        onDelete={handleDeleteClick}
+        deleting={deleting}
+        deleteError={deleteError}
+      />
 
       {/* Modale de confirmation de suppression */}
       {isDeleteModalOpen && (
@@ -1160,5 +1161,6 @@ export default function QuoteDetailPage() {
           </div>
         </div>
       )}
+    </>
   )
 }
