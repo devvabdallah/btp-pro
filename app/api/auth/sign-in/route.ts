@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { email, password } = await request.json().catch(() => ({}));
+  const { email, password, rememberMe = true } = await request.json().catch(() => ({}));
 
   if (!email || !password) {
     return NextResponse.json(
@@ -38,7 +38,17 @@ export async function POST(request: Request) {
       },
       setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
         cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, options);
+          // Préserver les options par défaut de Supabase (path, sameSite, secure, httpOnly)
+          const cookieOptions = { ...options };
+          
+          // Si rememberMe est true, ajouter maxAge pour rendre le cookie persistant (30 jours)
+          // Si rememberMe est false, ne pas mettre maxAge (cookie de session qui expire à la fermeture du navigateur)
+          if (rememberMe === true) {
+            cookieOptions.maxAge = 30 * 24 * 60 * 60; // 30 jours en secondes
+          }
+          // Si rememberMe est false, cookieOptions n'a pas de maxAge => cookie de session
+          
+          response.cookies.set(name, value, cookieOptions);
         });
       },
     },
