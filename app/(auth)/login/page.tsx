@@ -6,7 +6,6 @@ import Link from "next/link";
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -27,7 +26,6 @@ export default function LoginPage() {
         body: JSON.stringify({
           email,
           password,
-          rememberMe,
         }),
       })
 
@@ -96,19 +94,6 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 className="w-full px-4 py-3 rounded-xl bg-[#1a1f3a] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-0 focus:ring-offset-transparent transition-all"
               />
-            </div>
-
-            <div className="flex items-center">
-              <input
-                id="rememberMe"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-white/20 bg-[#1a1f3a] text-orange-500 focus:ring-2 focus:ring-orange-400 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
-              />
-              <label htmlFor="rememberMe" className="ml-3 text-sm text-gray-300 cursor-pointer">
-                Se souvenir de moi
-              </label>
             </div>
 
             {error && (
