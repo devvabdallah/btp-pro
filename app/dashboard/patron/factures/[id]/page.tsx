@@ -539,7 +539,13 @@ export default function InvoiceDetailPage() {
   const handlePrintPdf = () => {
     if (!invoice) return
 
-    const companyName = company?.legal_name || company?.name || "Entreprise"
+    // Calculer companyName en évitant "BTP PRO" comme placeholder
+    let companyName = "Nom de l'entreprise"
+    if (company?.legal_name && company.legal_name.trim() !== '') {
+      companyName = company.legal_name
+    } else if (company?.name && company.name.trim() !== '' && company.name !== "BTP PRO") {
+      companyName = company.name
+    }
     const companyCode = company?.siret || company?.code || ''
     const addressLine1 = company?.address_line1 || ''
     const addressLine2 = company?.address_line2 || ''
@@ -806,6 +812,9 @@ export default function InvoiceDetailPage() {
 
     printWindow.document.write(htmlContent)
     printWindow.document.close()
+    
+    // Forcer le titre de l'onglet
+    printWindow.document.title = `Facture - ${invoice.title || invoice.client}`
 
     // Attendre que le contenu soit chargé puis imprimer
     setTimeout(() => {
@@ -881,7 +890,9 @@ export default function InvoiceDetailPage() {
             <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
               <span className="text-2xl font-bold text-[#0a0e27]">B</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-white">
+              {company?.legal_name || (company?.name && company.name !== "BTP PRO" ? company.name : "BTP PRO")}
+            </h1>
           </div>
           <Link href="/dashboard/patron/factures">
             <Button variant="secondary" size="sm" className="min-h-[48px] px-6 text-base font-semibold">

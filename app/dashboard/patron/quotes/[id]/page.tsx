@@ -750,7 +750,13 @@ export default function QuoteDetailPage() {
   const handlePrintPdf = () => {
     if (!quote) return
 
-    const companyName = entrepriseInfo?.legal_name || entrepriseInfo?.name || "Entreprise"
+    // Calculer companyName en évitant "BTP PRO" comme placeholder
+    let companyName = "Nom de l'entreprise"
+    if (entrepriseInfo?.legal_name && entrepriseInfo.legal_name.trim() !== '') {
+      companyName = entrepriseInfo.legal_name
+    } else if (entrepriseInfo?.name && entrepriseInfo.name.trim() !== '' && entrepriseInfo.name !== "BTP PRO") {
+      companyName = entrepriseInfo.name
+    }
     const companyCode = entrepriseInfo?.siret || entrepriseInfo?.code || ''
     const addressLine1 = entrepriseInfo?.address_line1 || ''
     const addressLine2 = entrepriseInfo?.address_line2 || ''
@@ -1018,6 +1024,9 @@ export default function QuoteDetailPage() {
 
     printWindow.document.write(htmlContent)
     printWindow.document.close()
+    
+    // Forcer le titre de l'onglet
+    printWindow.document.title = `Devis - ${quote.title}`
 
     // Attendre que le contenu soit chargé puis imprimer
     setTimeout(() => {
