@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -26,32 +26,15 @@ export async function POST(request: Request) {
   // Créer la réponse qui recevra les cookies
   const res = NextResponse.json({ ok: true });
 
-  // Parser les cookies existants depuis les headers pour getAll()
-  const cookieHeader = request.headers.get("cookie") ?? "";
-  const existingCookies: Array<{ name: string; value: string }> = [];
-  if (cookieHeader) {
-    cookieHeader.split(";").forEach((cookie) => {
-      const trimmed = cookie.trim();
-      const equalIndex = trimmed.indexOf("=");
-      if (equalIndex > 0) {
-        const name = trimmed.substring(0, equalIndex).trim();
-        const value = trimmed.substring(equalIndex + 1).trim();
-        if (name && value) {
-          existingCookies.push({ name, value });
-        }
-      }
-    });
-  }
-
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        // Retourner les cookies existants parsés
-        return existingCookies;
+        // Utiliser request.cookies.getAll() au lieu du parsing manuel
+        return request.cookies.getAll();
       },
       setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
-        cookiesToSet.forEach(({ name, value, options = {} }) => {
-          // Laisser Supabase écrire ses cookies avec les options qu'il fournit, sans modification
+        cookiesToSet.forEach(({ name, value, options }) => {
+          // Respecter exactement les options fournies par Supabase, sans modification
           res.cookies.set(name, value, options);
         });
       },
