@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import Link from "next/link";
+import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -18,26 +20,49 @@ export default function LoginPage() {
     setError(null)
 
     try {
-      const response = await fetch('/api/auth/sign-in', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+      // Créer le client Supabase avec le bon storage selon rememberMe
+      const supabase = createSupabaseBrowserClient(rememberMe)
+      
+      // Connexion côté client avec Supabase
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
 
-      const data = await response.json()
-
-      if (!response.ok || !data.ok) {
-        setError(data.error || 'Erreur de connexion')
+      if (authError) {
+        setError(authError.message || 'Erreur de connexion')
         setLoading(false)
         return
       }
 
-      window.location.href = "/dashboard/patron"
+      if (!authData.user) {
+        setError('Connexion échouée')
+        setLoading(false)
+        return
+      }
+
+      // Récupérer le profil pour déterminer le rôle et rediriger
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', authData.user.id)
+        .single()
+
+      if (profileError || !profile) {
+        setError('Profil introuvable')
+        setLoading(false)
+        return
+      }
+
+      // Rediriger selon le rôle avec window.location.href pour forcer un reload propre
+      let redirectPath = '/dashboard/patron'
+      if (profile.role === 'patron') {
+        redirectPath = '/dashboard/patron'
+      } else if (profile.role === 'employe') {
+        redirectPath = '/dashboard/employe'
+      }
+
+      window.location.href = redirectPath
     } catch (err) {
       setError("Erreur inattendue. Réessaie.")
       setLoading(false)
@@ -94,6 +119,19 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 className="w-full px-4 py-3 rounded-xl bg-[#1a1f3a] border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-0 focus:ring-offset-transparent transition-all"
               />
+            </div>
+
+            <div className="flex items-center">
+              <input
+                id="rememberMe"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-white/20 bg-[#1a1f3a] text-orange-500 focus:ring-2 focus:ring-orange-400 focus:ring-offset-0 focus:ring-offset-transparent cursor-pointer"
+              />
+              <label htmlFor="rememberMe" className="ml-3 text-sm text-gray-300 cursor-pointer">
+                Se souvenir de moi
+              </label>
             </div>
 
             {error && (

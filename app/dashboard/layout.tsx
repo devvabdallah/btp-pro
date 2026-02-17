@@ -25,7 +25,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     async function checkAuth() {
       try {
-        const supabase = createSupabaseBrowserClient()
+        const supabase = createSupabaseBrowserClient(true)
         const { data: { user }, error: userError } = await supabase.auth.getUser()
 
         // Timeout anti-boucle: 4 secondes max

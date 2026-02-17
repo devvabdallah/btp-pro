@@ -1,55 +1,25 @@
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 
-function parseCookies() {
-  const out: { name: string; value: string }[] = [];
-  if (typeof document === "undefined") return out;
-  const parts = document.cookie ? document.cookie.split("; ") : [];
-  for (const p of parts) {
-    const eq = p.indexOf("=");
-    const name = eq >= 0 ? decodeURIComponent(p.slice(0, eq)) : decodeURIComponent(p);
-    const value = eq >= 0 ? decodeURIComponent(p.slice(eq + 1)) : "";
-    out.push({ name, value });
-  }
-  return out;
-}
+/**
+ * Crée un client Supabase pour le navigateur avec gestion du storage selon rememberMe
+ * @param rememberMe - Si true, utilise localStorage (persistant). Si false, utilise sessionStorage (session only)
+ * @returns Instance du client Supabase
+ */
+export function createSupabaseBrowserClient(rememberMe: boolean = true) {
+  const storage = rememberMe 
+    ? (typeof window !== 'undefined' ? window.localStorage : undefined)
+    : (typeof window !== 'undefined' ? window.sessionStorage : undefined);
 
-function setCookie(name: string, value: string, options: any = {}) {
-  if (typeof document === "undefined") return;
-
-  const opt = {
-    path: "/",
-    sameSite: "Lax",
-    ...options,
-  };
-
-  let cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
-
-  if (opt.maxAge != null) cookie += `; Max-Age=${opt.maxAge}`;
-  if (opt.expires) cookie += `; Expires=${(opt.expires instanceof Date ? opt.expires : new Date(opt.expires)).toUTCString()}`;
-  if (opt.path) cookie += `; Path=${opt.path}`;
-  if (opt.domain) cookie += `; Domain=${opt.domain}`;
-  if (opt.sameSite) cookie += `; SameSite=${opt.sameSite}`;
-  if (opt.secure) cookie += `; Secure`;
-
-  document.cookie = cookie;
-}
-
-export function createClient() {
-  return createBrowserClient(
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
-        getAll() {
-          return parseCookies();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => setCookie(name, value, options));
-        },
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: storage,
       },
     }
   );
 }
-
-// Alias pour compatibilité avec le code existant
-export const createSupabaseBrowserClient = createClient;
