@@ -51,22 +51,17 @@ export async function POST(request: Request) {
       },
       setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
         cookiesToSet.forEach(({ name, value, options = {} }) => {
-          // Préserver les options par défaut de Supabase
-          const cookieOptions: any = {
-            path: options.path ?? "/",
-            sameSite: options.sameSite ?? "lax",
-            secure: options.secure ?? process.env.NODE_ENV === "production",
-            httpOnly: options.httpOnly ?? true,
-          };
+          // Préserver exactement les options fournies par Supabase
+          const finalOptions = { ...options };
 
-          // Si rememberMe est true, ajouter maxAge pour rendre le cookie persistant (30 jours)
-          // Si rememberMe est false, ne pas mettre maxAge (cookie de session)
-          if (rememberMe === true) {
-            cookieOptions.maxAge = 60 * 60 * 24 * 30; // 30 jours en secondes
+          // Si rememberMe === false, supprimer maxAge et expires pour rendre les cookies de session
+          if (rememberMe === false) {
+            delete finalOptions.maxAge;
+            delete finalOptions.expires;
           }
-          // Si rememberMe est false, cookieOptions n'a pas de maxAge => cookie de session
+          // Si rememberMe === true, ne rien modifier (laisser Supabase gérer la persistance)
 
-          res.cookies.set(name, value, cookieOptions);
+          res.cookies.set(name, value, finalOptions);
         });
       },
     },
