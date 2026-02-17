@@ -134,7 +134,7 @@ export default function QuoteDetailPage() {
 
       // 2.6 Vérifier si une facture existe déjà pour ce devis
       try {
-        const { data: existingInvoice, error: checkError } = await supabase
+        const { data: existingInvoice, error: existingInvoiceError } = await supabase
           .from('invoices')
           .select('id')
           .eq('quote_id', quoteId)
@@ -142,7 +142,7 @@ export default function QuoteDetailPage() {
           .limit(1)
           .maybeSingle()
 
-        if (!checkError && existingInvoice) {
+        if (!existingInvoiceError && existingInvoice) {
           setExistingInvoiceId(existingInvoice.id)
         } else {
           setExistingInvoiceId(null)
@@ -403,7 +403,7 @@ export default function QuoteDetailPage() {
       }
 
       // 1. Vérifier si une facture existe déjà pour ce devis
-      const { data: existingInvoice, error: checkError } = await supabaseClient
+      const { data: existingInvoice, error: existingInvoiceError } = await supabaseClient
         .from('invoices')
         .select('id')
         .eq('quote_id', quote.id)
@@ -411,7 +411,7 @@ export default function QuoteDetailPage() {
         .limit(1)
         .maybeSingle()
 
-      if (!checkError && existingInvoice) {
+      if (!existingInvoiceError && existingInvoice) {
         // Facture existe déjà, stocker l'ID et afficher le message
         setExistingInvoiceId(existingInvoice.id)
         setCreatingInvoice(false)
