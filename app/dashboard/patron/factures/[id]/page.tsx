@@ -81,7 +81,7 @@ export default function InvoiceDetailPage() {
         // 2. Charger la facture
         const { data: invoiceData, error: invoiceError } = await supabase
           .from('invoices')
-          .select('id, entreprise_id, quote_id, title, client, contact, description, amount_ht, status, created_at, updated_at, number')
+          .select('id, entreprise_id, quote_id, title, client, contact, description, amount_ht, status, created_at, updated_at, number, client_address_line1, client_address_line2, client_postal_code, client_city, due_date, payment_method')
           .eq('id', invoiceId)
           .single()
 
@@ -337,6 +337,12 @@ export default function InvoiceDetailPage() {
           client: editedInvoice.client?.trim() || '',
           contact: editedInvoice.contact?.trim() || null,
           description: editedInvoice.description?.trim() || null,
+          client_address_line1: editedInvoice.client_address_line1?.trim() || null,
+          client_address_line2: editedInvoice.client_address_line2?.trim() || null,
+          client_postal_code: editedInvoice.client_postal_code?.trim() || null,
+          client_city: editedInvoice.client_city?.trim() || null,
+          due_date: editedInvoice.due_date || null,
+          payment_method: editedInvoice.payment_method?.trim() || null,
           amount_ht: totalHT,
           updated_at: new Date().toISOString()
         })
@@ -394,7 +400,7 @@ export default function InvoiceDetailPage() {
       // Recharger manuellement les données
       const { data: updatedInvoice } = await supabase
         .from('invoices')
-        .select('id, entreprise_id, quote_id, title, client, contact, description, amount_ht, status, created_at, updated_at, number')
+        .select('id, entreprise_id, quote_id, title, client, contact, description, amount_ht, status, created_at, updated_at, number, client_address_line1, client_address_line2, client_postal_code, client_city, due_date, payment_method')
         .eq('id', invoice.id)
         .single()
 
@@ -575,6 +581,20 @@ export default function InvoiceDetailPage() {
       year: 'numeric'
     })
 
+    // Calculer la date d'échéance (si vide, created_at + 30 jours)
+    const dueDate = invoice.due_date 
+      ? new Date(invoice.due_date)
+      : (() => {
+          const d = new Date(invoice.created_at)
+          d.setDate(d.getDate() + 30)
+          return d
+        })()
+    const formattedDueDate = dueDate.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    })
+
     // Calculer les totaux : utiliser les lignes si disponibles, sinon fallback sur invoice.amount_ht
     const totalHT = invoiceLines.length > 0
       ? invoiceLines.reduce((sum, line) => sum + (parseFloat(line.total_ht) || 0), 0)
@@ -747,9 +767,13 @@ export default function InvoiceDetailPage() {
   <div class="header page-break">
     <div class="header-company-name">${companyName}</div>
     <div class="header-company-info">
-      ${addressLine1 ? `<div>${addressLine1}</div>` : ''}
-      ${addressLine2 ? `<div>${addressLine2}</div>` : ''}
-      ${postalCode && city ? `<div>${postalCode} ${city}</div>` : ''}
+      ${(addressLine1 || addressLine2 || postalCode || city) ? `
+      <div style="margin-bottom: 4px;">
+        ${addressLine1 ? `<div>${addressLine1}</div>` : ''}
+        ${addressLine2 ? `<div>${addressLine2}</div>` : ''}
+        ${(postalCode || city) ? `<div>${[postalCode, city].filter(Boolean).join(' ')}</div>` : ''}
+      </div>
+      ` : ''}
       ${siret ? `<div style="margin-top: 6px;">SIRET : ${siret}</div>` : ''}
       ${vatNumber ? `<div>TVA : ${vatNumber}</div>` : '<div>TVA non applicable, art. 293 B du CGI</div>'}
       ${profileFullName ? `<div style="margin-top: 6px;">Établi par : ${profileFullName}</div>` : ''}
@@ -766,6 +790,13 @@ export default function InvoiceDetailPage() {
     <h3>Facturé à :</h3>
     <p><strong>${invoice.client || '—'}</strong></p>
     ${invoice.contact ? `<p>${invoice.contact}</p>` : ''}
+    ${(invoice.client_address_line1 || invoice.client_address_line2 || invoice.client_postal_code || invoice.client_city) ? `
+    <div style="margin-top: 8px;">
+      ${invoice.client_address_line1 ? `<p>${invoice.client_address_line1}</p>` : ''}
+      ${invoice.client_address_line2 ? `<p>${invoice.client_address_line2}</p>` : ''}
+      ${(invoice.client_postal_code || invoice.client_city) ? `<p>${[invoice.client_postal_code, invoice.client_city].filter(Boolean).join(' ')}</p>` : ''}
+    </div>
+    ` : ''}
   </div>
 
   ${invoice.description ? `
@@ -818,7 +849,8 @@ export default function InvoiceDetailPage() {
   </div>
 
   <div class="footer page-break">
-    <div class="footer-text">Conditions de paiement : Paiement à 30 jours.</div>
+    ${invoice.payment_method ? `<div class="footer-text"><strong>Mode de paiement :</strong> ${invoice.payment_method}</div>` : ''}
+    <div class="footer-text"><strong>Échéance :</strong> ${formattedDueDate}</div>
     <div class="footer-text">Pénalités de retard exigibles au taux légal en vigueur.</div>
     <div class="footer-text">Indemnité forfaitaire pour frais de recouvrement : 40 € (art. L441-10 du Code de commerce).</div>
   </div>
@@ -968,7 +1000,7 @@ export default function InvoiceDetailPage() {
                   value={displayInvoice.client || ''}
                   onChange={(e) => updateEditedInvoice('client', e.target.value)}
                   placeholder="Nom du client"
-                  className="text-white"
+                  className="text-white placeholder:text-gray-500"
                   variant="dark"
                 />
                 <Input
@@ -976,15 +1008,58 @@ export default function InvoiceDetailPage() {
                   value={displayInvoice.contact || ''}
                   onChange={(e) => updateEditedInvoice('contact', e.target.value)}
                   placeholder="Contact (optionnel)"
-                  className="text-gray-300 text-sm"
+                  className="text-white text-sm placeholder:text-gray-500"
                   variant="dark"
                 />
+                <Input
+                  label=""
+                  value={displayInvoice.client_address_line1 || ''}
+                  onChange={(e) => updateEditedInvoice('client_address_line1', e.target.value)}
+                  placeholder="Adresse ligne 1"
+                  className="text-white text-sm placeholder:text-gray-500"
+                  variant="dark"
+                />
+                <Input
+                  label=""
+                  value={displayInvoice.client_address_line2 || ''}
+                  onChange={(e) => updateEditedInvoice('client_address_line2', e.target.value)}
+                  placeholder="Adresse ligne 2 (optionnel)"
+                  className="text-white text-sm placeholder:text-gray-500"
+                  variant="dark"
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <Input
+                    label=""
+                    value={displayInvoice.client_postal_code || ''}
+                    onChange={(e) => updateEditedInvoice('client_postal_code', e.target.value)}
+                    placeholder="Code postal"
+                    className="text-white text-sm placeholder:text-gray-500"
+                    variant="dark"
+                  />
+                  <Input
+                    label=""
+                    value={displayInvoice.client_city || ''}
+                    onChange={(e) => updateEditedInvoice('client_city', e.target.value)}
+                    placeholder="Ville"
+                    className="text-white text-sm placeholder:text-gray-500"
+                    variant="dark"
+                  />
+                </div>
               </div>
             ) : (
               <>
                 <p className="text-white mb-2 font-medium">{invoice.client}</p>
                 {invoice.contact && (
                   <p className="text-gray-400 text-sm">{invoice.contact}</p>
+                )}
+                {(invoice.client_address_line1 || invoice.client_postal_code || invoice.client_city) && (
+                  <div className="mt-3 text-gray-400 text-sm">
+                    {invoice.client_address_line1 && <p>{invoice.client_address_line1}</p>}
+                    {invoice.client_address_line2 && <p>{invoice.client_address_line2}</p>}
+                    {(invoice.client_postal_code || invoice.client_city) && (
+                      <p>{[invoice.client_postal_code, invoice.client_city].filter(Boolean).join(' ')}</p>
+                    )}
+                  </div>
                 )}
               </>
             )}
@@ -1006,6 +1081,54 @@ export default function InvoiceDetailPage() {
             {invoice.updated_at !== invoice.created_at && (
               <p className="text-gray-400 text-xs mt-3">
                 Modifiée le {formatDate(invoice.updated_at)}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Informations de paiement */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-10 md:mb-12">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
+            <h3 className="text-lg font-semibold text-white mb-4">Date d'échéance</h3>
+            {isEditing ? (
+              <Input
+                type="date"
+                label=""
+                value={displayInvoice.due_date ? new Date(displayInvoice.due_date).toISOString().split('T')[0] : ''}
+                onChange={(e) => updateEditedInvoice('due_date', e.target.value || null)}
+                className="text-white placeholder:text-gray-500"
+                variant="dark"
+              />
+            ) : (
+              <p className="text-white">
+                {invoice.due_date 
+                  ? formatDate(invoice.due_date)
+                  : (() => {
+                      const dueDate = new Date(invoice.created_at)
+                      dueDate.setDate(dueDate.getDate() + 30)
+                      return formatDate(dueDate.toISOString())
+                    })()}
+              </p>
+            )}
+          </div>
+
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
+            <h3 className="text-lg font-semibold text-white mb-4">Mode de paiement</h3>
+            {isEditing ? (
+              <select
+                value={displayInvoice.payment_method || ''}
+                onChange={(e) => updateEditedInvoice('payment_method', e.target.value || null)}
+                className="w-full px-5 py-4 bg-[#0f1429] border border-[#2a2f4a] rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all"
+              >
+                <option value="">Sélectionner...</option>
+                <option value="Virement">Virement</option>
+                <option value="Chèque">Chèque</option>
+                <option value="Espèces">Espèces</option>
+                <option value="CB">CB</option>
+              </select>
+            ) : (
+              <p className="text-white">
+                {invoice.payment_method || '—'}
               </p>
             )}
           </div>

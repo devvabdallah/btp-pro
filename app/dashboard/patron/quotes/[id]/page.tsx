@@ -145,7 +145,7 @@ export default function QuoteDetailPage() {
       // 3. Charger le devis avec les filtres id et entreprise_id
       const { data: quoteData, error: quoteError } = await supabase
         .from('quotes')
-        .select('id, entreprise_id, title, client, contact, description, amount_ht, status, created_at, number')
+        .select('id, entreprise_id, title, client, contact, description, amount_ht, status, created_at, number, client_address_line1, client_address_line2, client_postal_code, client_city, payment_method, deposit_amount, deposit_percent')
         .eq('id', quoteId)
         .eq('entreprise_id', profile.entreprise_id)
         .single()
@@ -406,6 +406,10 @@ export default function QuoteDetailPage() {
           client: quote.client,
           contact: quote.contact ?? null,
           description: quote.description ?? null,
+          client_address_line1: quote.client_address_line1 ?? null,
+          client_address_line2: quote.client_address_line2 ?? null,
+          client_postal_code: quote.client_postal_code ?? null,
+          client_city: quote.client_city ?? null,
           amount_ht: quote.amount_ht ?? 0,
           status: 'draft'
         })
@@ -542,6 +546,13 @@ export default function QuoteDetailPage() {
           client: editedQuote.client?.trim() || '',
           contact: editedQuote.contact?.trim() || null,
           description: editedQuote.description?.trim() || null,
+          client_address_line1: editedQuote.client_address_line1?.trim() || null,
+          client_address_line2: editedQuote.client_address_line2?.trim() || null,
+          client_postal_code: editedQuote.client_postal_code?.trim() || null,
+          client_city: editedQuote.client_city?.trim() || null,
+          payment_method: editedQuote.payment_method?.trim() || null,
+          deposit_amount: editedQuote.deposit_amount ? parseFloat(editedQuote.deposit_amount) : null,
+          deposit_percent: editedQuote.deposit_percent ? parseFloat(editedQuote.deposit_percent) : null,
           amount_ht: totalHT,
           updated_at: new Date().toISOString()
         })
@@ -599,7 +610,7 @@ export default function QuoteDetailPage() {
       // Recharger manuellement les données
       const { data: updatedQuote } = await supabase
         .from('quotes')
-        .select('id, entreprise_id, title, client, contact, description, amount_ht, status, created_at, number')
+        .select('id, entreprise_id, title, client, contact, description, amount_ht, status, created_at, number, client_address_line1, client_address_line2, client_postal_code, client_city, payment_method, deposit_amount, deposit_percent')
         .eq('id', quote.id)
         .single()
 
@@ -967,9 +978,13 @@ export default function QuoteDetailPage() {
   <div class="header page-break">
     <div class="header-company-name">${companyName}</div>
     <div class="header-company-info">
-      ${addressLine1 ? `<div>${addressLine1}</div>` : ''}
-      ${addressLine2 ? `<div>${addressLine2}</div>` : ''}
-      ${postalCode && city ? `<div>${postalCode} ${city}</div>` : ''}
+      ${(addressLine1 || addressLine2 || postalCode || city) ? `
+      <div style="margin-bottom: 4px;">
+        ${addressLine1 ? `<div>${addressLine1}</div>` : ''}
+        ${addressLine2 ? `<div>${addressLine2}</div>` : ''}
+        ${(postalCode || city) ? `<div>${[postalCode, city].filter(Boolean).join(' ')}</div>` : ''}
+      </div>
+      ` : ''}
       ${siret ? `<div style="margin-top: 6px;">SIRET : ${siret}</div>` : ''}
       ${vatNumber ? `<div>TVA : ${vatNumber}</div>` : '<div>TVA non applicable, art. 293 B du CGI</div>'}
       ${profileFullName ? `<div style="margin-top: 6px;">Établi par : ${profileFullName}</div>` : ''}
@@ -986,6 +1001,13 @@ export default function QuoteDetailPage() {
     <h3>Devis pour :</h3>
     <p><strong>${quote.client || '—'}</strong></p>
     ${quote.contact ? `<p>${quote.contact}</p>` : ''}
+    ${(quote.client_address_line1 || quote.client_address_line2 || quote.client_postal_code || quote.client_city) ? `
+    <div style="margin-top: 8px;">
+      ${quote.client_address_line1 ? `<p>${quote.client_address_line1}</p>` : ''}
+      ${quote.client_address_line2 ? `<p>${quote.client_address_line2}</p>` : ''}
+      ${(quote.client_postal_code || quote.client_city) ? `<p>${[quote.client_postal_code, quote.client_city].filter(Boolean).join(' ')}</p>` : ''}
+    </div>
+    ` : ''}
   </div>
 
   ${quote.description ? `
@@ -1030,7 +1052,16 @@ export default function QuoteDetailPage() {
   </div>
 
   <div class="footer page-break">
-    <div class="footer-text">Conditions de paiement : Paiement à 30 jours.</div>
+    ${quote.payment_method ? `<div class="footer-text"><strong>Mode de paiement :</strong> ${quote.payment_method}</div>` : ''}
+    ${(quote.deposit_amount || quote.deposit_percent) ? `
+    <div class="footer-text">
+      <strong>Acompte :</strong> 
+      ${quote.deposit_amount ? `${formatAmountForPrint(parseFloat(quote.deposit_amount))} HT` : ''}
+      ${quote.deposit_amount && quote.deposit_percent ? ' (' : ''}
+      ${quote.deposit_percent ? `${quote.deposit_percent}%` : ''}
+      ${quote.deposit_amount && quote.deposit_percent ? ')' : ''}
+    </div>
+    ` : ''}
     <div class="footer-text">Pénalités de retard exigibles au taux légal en vigueur.</div>
     <div class="footer-text">Indemnité forfaitaire pour frais de recouvrement : 40 € (art. L441-10 du Code de commerce).</div>
   </div>

@@ -303,7 +303,7 @@ export default function QuoteDetailView({
                   value={displayQuote.client || ''}
                   onChange={(e) => updateEditedQuote('client', e.target.value)}
                   placeholder="Nom du client"
-                  className="text-white"
+                  className="text-white placeholder:text-gray-500"
                   variant="dark"
                 />
                 <Input
@@ -311,15 +311,58 @@ export default function QuoteDetailView({
                   value={displayQuote.contact || ''}
                   onChange={(e) => updateEditedQuote('contact', e.target.value)}
                   placeholder="Contact (optionnel)"
-                  className="text-gray-300 text-sm"
+                  className="text-white text-sm placeholder:text-gray-500"
                   variant="dark"
                 />
+                <Input
+                  label=""
+                  value={displayQuote.client_address_line1 || ''}
+                  onChange={(e) => updateEditedQuote('client_address_line1', e.target.value)}
+                  placeholder="Adresse ligne 1"
+                  className="text-white text-sm placeholder:text-gray-500"
+                  variant="dark"
+                />
+                <Input
+                  label=""
+                  value={displayQuote.client_address_line2 || ''}
+                  onChange={(e) => updateEditedQuote('client_address_line2', e.target.value)}
+                  placeholder="Adresse ligne 2 (optionnel)"
+                  className="text-white text-sm placeholder:text-gray-500"
+                  variant="dark"
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <Input
+                    label=""
+                    value={displayQuote.client_postal_code || ''}
+                    onChange={(e) => updateEditedQuote('client_postal_code', e.target.value)}
+                    placeholder="Code postal"
+                    className="text-white text-sm placeholder:text-gray-500"
+                    variant="dark"
+                  />
+                  <Input
+                    label=""
+                    value={displayQuote.client_city || ''}
+                    onChange={(e) => updateEditedQuote('client_city', e.target.value)}
+                    placeholder="Ville"
+                    className="text-white text-sm placeholder:text-gray-500"
+                    variant="dark"
+                  />
+                </div>
               </div>
             ) : (
               <>
                 <p className="text-white mb-2 font-medium">{quote.client}</p>
                 {quote.contact && (
                   <p className="text-gray-400 text-sm">{quote.contact}</p>
+                )}
+                {(quote.client_address_line1 || quote.client_postal_code || quote.client_city) && (
+                  <div className="mt-3 text-gray-400 text-sm">
+                    {quote.client_address_line1 && <p>{quote.client_address_line1}</p>}
+                    {quote.client_address_line2 && <p>{quote.client_address_line2}</p>}
+                    {(quote.client_postal_code || quote.client_city) && (
+                      <p>{[quote.client_postal_code, quote.client_city].filter(Boolean).join(' ')}</p>
+                    )}
+                  </div>
                 )}
               </>
             )}
@@ -336,6 +379,72 @@ export default function QuoteDetailView({
           <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
             <h3 className="text-lg font-semibold text-white mb-4">Statut</h3>
             {getStatusBadge(quote.status)}
+          </div>
+        </div>
+
+        {/* Informations de paiement */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-10 md:mb-12">
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
+            <h3 className="text-lg font-semibold text-white mb-4">Mode de paiement</h3>
+            {isEditing && updateEditedQuote ? (
+              <select
+                value={displayQuote.payment_method || ''}
+                onChange={(e) => updateEditedQuote('payment_method', e.target.value || null)}
+                className="w-full px-5 py-4 bg-[#0f1429] border border-[#2a2f4a] rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all"
+              >
+                <option value="">Sélectionner...</option>
+                <option value="Virement">Virement</option>
+                <option value="Chèque">Chèque</option>
+                <option value="Espèces">Espèces</option>
+                <option value="CB">CB</option>
+              </select>
+            ) : (
+              <p className="text-white">
+                {quote.payment_method || '—'}
+              </p>
+            )}
+          </div>
+
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
+            <h3 className="text-lg font-semibold text-white mb-4">Acompte (montant)</h3>
+            {isEditing && updateEditedQuote ? (
+              <Input
+                type="number"
+                step="0.01"
+                label=""
+                value={displayQuote.deposit_amount || ''}
+                onChange={(e) => updateEditedQuote('deposit_amount', e.target.value || null)}
+                placeholder="Montant en €"
+                className="text-white placeholder:text-gray-500"
+                variant="dark"
+              />
+            ) : (
+              <p className="text-white">
+                {quote.deposit_amount ? `${formatAmount(parseFloat(quote.deposit_amount))}` : '—'}
+              </p>
+            )}
+          </div>
+
+          <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-7 md:p-8 border border-white/10 shadow-lg shadow-black/30 backdrop-blur-sm">
+            <h3 className="text-lg font-semibold text-white mb-4">Acompte (%)</h3>
+            {isEditing && updateEditedQuote ? (
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                label=""
+                value={displayQuote.deposit_percent || ''}
+                onChange={(e) => updateEditedQuote('deposit_percent', e.target.value || null)}
+                placeholder="Pourcentage"
+                className="text-white placeholder:text-gray-500"
+                variant="dark"
+              />
+            ) : (
+              <p className="text-white">
+                {quote.deposit_percent ? `${quote.deposit_percent}%` : '—'}
+              </p>
+            )}
           </div>
         </div>
 

@@ -33,7 +33,7 @@ export default function Input({
       <input
         className={`w-full px-5 py-4 rounded-2xl focus:outline-none focus:ring-2 transition-all text-base ${
           isDark
-            ? `bg-[#1a1f3a] border border-gray-600 text-gray-200 placeholder-gray-500 focus:ring-yellow-400 focus:border-transparent ${error ? 'border-red-500' : ''}`
+            ? `bg-[#0f1429] border border-[#2a2f4a] text-white placeholder:text-gray-500 focus:ring-yellow-400 focus:border-transparent ${error ? 'border-red-500' : ''}`
             : `bg-white border-2 text-gray-900 placeholder-gray-400 focus:ring-orange-500 focus:border-orange-500 ${error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300'}`
         } ${className}`}
         {...props}

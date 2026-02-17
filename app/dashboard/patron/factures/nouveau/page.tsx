@@ -25,6 +25,10 @@ export default function NouvelleFacturePage() {
   const [title, setTitle] = useState('')
   const [clientName, setClientName] = useState('')
   const [clientContact, setClientContact] = useState('')
+  const [clientAddressLine1, setClientAddressLine1] = useState('')
+  const [clientAddressLine2, setClientAddressLine2] = useState('')
+  const [clientPostalCode, setClientPostalCode] = useState('')
+  const [clientCity, setClientCity] = useState('')
   const [description, setDescription] = useState('')
   const [lines, setLines] = useState<DraftInvoiceLine[]>([])
   const [tva, setTva] = useState(20)
@@ -172,6 +176,10 @@ export default function NouvelleFacturePage() {
           client: clientName.trim(),
           contact: clientContact.trim() || null,
           description: description.trim() || null,
+          client_address_line1: clientAddressLine1.trim() || null,
+          client_address_line2: clientAddressLine2.trim() || null,
+          client_postal_code: clientPostalCode.trim() || null,
+          client_city: clientCity.trim() || null,
           amount_ht: totalHT,
           status: 'draft'
         })
@@ -269,15 +277,41 @@ export default function NouvelleFacturePage() {
               required
               placeholder="Nom complet"
             />
-            <div className="md:col-span-2">
-              <Input
-                label="Contact client (optionnel)"
-                type="text"
-                value={clientContact}
-                onChange={(e) => setClientContact(e.target.value)}
-                placeholder="Téléphone ou email"
-              />
-            </div>
+            <Input
+              label="Contact client (optionnel)"
+              type="text"
+              value={clientContact}
+              onChange={(e) => setClientContact(e.target.value)}
+              placeholder="Téléphone ou email"
+            />
+            <Input
+              label="Adresse ligne 1 (optionnel)"
+              type="text"
+              value={clientAddressLine1}
+              onChange={(e) => setClientAddressLine1(e.target.value)}
+              placeholder="Adresse"
+            />
+            <Input
+              label="Adresse ligne 2 (optionnel)"
+              type="text"
+              value={clientAddressLine2}
+              onChange={(e) => setClientAddressLine2(e.target.value)}
+              placeholder="Complément d'adresse"
+            />
+            <Input
+              label="Code postal (optionnel)"
+              type="text"
+              value={clientPostalCode}
+              onChange={(e) => setClientPostalCode(e.target.value)}
+              placeholder="Code postal"
+            />
+            <Input
+              label="Ville (optionnel)"
+              type="text"
+              value={clientCity}
+              onChange={(e) => setClientCity(e.target.value)}
+              placeholder="Ville"
+            />
           </div>
         </div>
 
