@@ -299,51 +299,51 @@ export default function QuoteDetailView({
             {isEditing && updateEditedQuote ? (
               <div className="space-y-4">
                 <Input
-                  label=""
+                  label="Nom complet (obligatoire)"
                   value={displayQuote.client || ''}
                   onChange={(e) => updateEditedQuote('client', e.target.value)}
-                  placeholder="Nom du client"
+                  placeholder="Jean Dupont"
                   className="text-white placeholder:text-gray-500"
                   variant="dark"
                 />
                 <Input
-                  label=""
+                  label="Téléphone ou email (optionnel)"
                   value={displayQuote.contact || ''}
                   onChange={(e) => updateEditedQuote('contact', e.target.value)}
-                  placeholder="Contact (optionnel)"
+                  placeholder="06..."
                   className="text-white text-sm placeholder:text-gray-500"
                   variant="dark"
                 />
                 <Input
-                  label=""
+                  label="Adresse"
                   value={displayQuote.client_address_line1 || ''}
                   onChange={(e) => updateEditedQuote('client_address_line1', e.target.value)}
-                  placeholder="Adresse ligne 1"
+                  placeholder="12 rue..."
                   className="text-white text-sm placeholder:text-gray-500"
                   variant="dark"
                 />
                 <Input
-                  label=""
+                  label="Complément d'adresse (optionnel)"
                   value={displayQuote.client_address_line2 || ''}
                   onChange={(e) => updateEditedQuote('client_address_line2', e.target.value)}
-                  placeholder="Adresse ligne 2 (optionnel)"
+                  placeholder="Complément d'adresse"
                   className="text-white text-sm placeholder:text-gray-500"
                   variant="dark"
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    label=""
+                    label="Code postal"
                     value={displayQuote.client_postal_code || ''}
                     onChange={(e) => updateEditedQuote('client_postal_code', e.target.value)}
-                    placeholder="Code postal"
+                    placeholder="75000"
                     className="text-white text-sm placeholder:text-gray-500"
                     variant="dark"
                   />
                   <Input
-                    label=""
+                    label="Ville"
                     value={displayQuote.client_city || ''}
                     onChange={(e) => updateEditedQuote('client_city', e.target.value)}
-                    placeholder="Ville"
+                    placeholder="Paris"
                     className="text-white text-sm placeholder:text-gray-500"
                     variant="dark"
                   />

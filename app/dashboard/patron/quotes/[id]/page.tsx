@@ -348,8 +348,11 @@ export default function QuoteDetailPage() {
     setInvoiceSuccess(null)
 
     try {
+      // Créer un client Supabase frais
+      const sb = createSupabaseBrowserClient()
+
       // Récupérer le profil pour obtenir entreprise_id
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      const { data: { user }, error: userError } = await sb.auth.getUser()
       
       if (userError || !user) {
         setInvoiceError('Utilisateur non connecté')
@@ -357,7 +360,7 @@ export default function QuoteDetailPage() {
         return
       }
 
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile, error: profileError } = await sb
         .from('profiles')
         .select('entreprise_id')
         .eq('id', user.id)
@@ -371,7 +374,9 @@ export default function QuoteDetailPage() {
 
       // Vérification abonnement / essai
       const { checkCompanyActive } = await import('@/lib/subscription-check')
-      const { active } = await checkCompanyActive(supabase)
+      const { active } = await checkCompanyActive(sb)
+
+      console.log("[subscription] active=", active)
 
       if (!active) {
         setInvoiceError("Votre essai est expiré. Abonnez-vous pour continuer.")
@@ -381,7 +386,7 @@ export default function QuoteDetailPage() {
       }
 
       // 1. Vérifier si une facture existe déjà pour ce devis
-      const { data: existingInvoice, error: checkError } = await supabase
+      const { data: existingInvoice, error: checkError } = await sb
         .from('invoices')
         .select('id')
         .eq('quote_id', quote.id)
@@ -397,7 +402,7 @@ export default function QuoteDetailPage() {
       }
 
       // 2. Créer la facture
-      const { data: invoiceData, error: invoiceError } = await supabase
+      const { data: invoiceData, error: invoiceError } = await sb
         .from('invoices')
         .insert({
           entreprise_id: quote.entreprise_id,
@@ -442,7 +447,7 @@ export default function QuoteDetailPage() {
           total_ht: line.total_ht || 0
         }))
 
-        const { error: linesError } = await supabase
+        const { error: linesError } = await sb
           .from('invoice_lines')
           .insert(invoiceLinesPayload)
 
@@ -779,18 +784,14 @@ export default function QuoteDetailPage() {
   const handlePrintPdf = () => {
     if (!quote) return
 
-    const companyName =
-      (entrepriseInfo?.legal_name ?? '').trim()
-      || (entrepriseInfo?.name ?? '').trim()
-      || "Nom de l'entreprise"
-    const companyCode = entrepriseInfo?.siret || entrepriseInfo?.code || ''
+    // Nom de l'entreprise : legal_name si présent, sinon name (pas de fallback)
+    const companyName = (entrepriseInfo?.legal_name ?? '').trim() || (entrepriseInfo?.name ?? '').trim()
     const addressLine1 = entrepriseInfo?.address_line1 || ''
     const addressLine2 = entrepriseInfo?.address_line2 || ''
     const postalCode = entrepriseInfo?.postal_code || ''
     const city = entrepriseInfo?.city || ''
     const siret = entrepriseInfo?.siret || ''
     const vatNumber = entrepriseInfo?.vat_number || ''
-    const vatExemptionText = entrepriseInfo?.vat_exemption_text || ''
     const date = new Date(quote.created_at).toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: 'long',
@@ -976,7 +977,7 @@ export default function QuoteDetailPage() {
 </head>
 <body>
   <div class="header page-break">
-    <div class="header-company-name">${companyName}</div>
+    ${companyName ? `<div class="header-company-name">${companyName}</div>` : ''}
     <div class="header-company-info">
       ${(addressLine1 || addressLine2 || postalCode || city) ? `
       <div style="margin-bottom: 4px;">
@@ -999,7 +1000,7 @@ export default function QuoteDetailPage() {
 
   <div class="client-section page-break">
     <h3>Devis pour :</h3>
-    <p><strong>${quote.client || '—'}</strong></p>
+    ${quote.client ? `<p><strong>${quote.client}</strong></p>` : ''}
     ${quote.contact ? `<p>${quote.contact}</p>` : ''}
     ${(quote.client_address_line1 || quote.client_address_line2 || quote.client_postal_code || quote.client_city) ? `
     <div style="margin-top: 8px;">

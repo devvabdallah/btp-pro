@@ -257,6 +257,56 @@ export default function NouvelleFacturePage() {
       </div>
 
       <div className="space-y-6 md:space-y-8">
+        {/* Informations client */}
+        <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm">
+          <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-6 tracking-tight">Informations client</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Input
+              label="Nom complet (obligatoire)"
+              type="text"
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              required
+              placeholder="Jean Dupont"
+            />
+            <Input
+              label="Téléphone ou email (optionnel)"
+              type="text"
+              value={clientContact}
+              onChange={(e) => setClientContact(e.target.value)}
+              placeholder="06..."
+            />
+            <Input
+              label="Adresse"
+              type="text"
+              value={clientAddressLine1}
+              onChange={(e) => setClientAddressLine1(e.target.value)}
+              placeholder="12 rue..."
+            />
+            <Input
+              label="Complément d'adresse (optionnel)"
+              type="text"
+              value={clientAddressLine2}
+              onChange={(e) => setClientAddressLine2(e.target.value)}
+              placeholder="Complément d'adresse"
+            />
+            <Input
+              label="Code postal"
+              type="text"
+              value={clientPostalCode}
+              onChange={(e) => setClientPostalCode(e.target.value)}
+              placeholder="75000"
+            />
+            <Input
+              label="Ville"
+              type="text"
+              value={clientCity}
+              onChange={(e) => setClientCity(e.target.value)}
+              placeholder="Paris"
+            />
+          </div>
+        </div>
+
         {/* Informations de base */}
         <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm">
           <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-6 tracking-tight">Informations de base</h2>
@@ -268,49 +318,6 @@ export default function NouvelleFacturePage() {
               onChange={(e) => setTitle(e.target.value)}
               required
               placeholder="Ex: Facture travaux rénovation"
-            />
-            <Input
-              label="Nom du client"
-              type="text"
-              value={clientName}
-              onChange={(e) => setClientName(e.target.value)}
-              required
-              placeholder="Nom complet"
-            />
-            <Input
-              label="Contact client (optionnel)"
-              type="text"
-              value={clientContact}
-              onChange={(e) => setClientContact(e.target.value)}
-              placeholder="Téléphone ou email"
-            />
-            <Input
-              label="Adresse ligne 1 (optionnel)"
-              type="text"
-              value={clientAddressLine1}
-              onChange={(e) => setClientAddressLine1(e.target.value)}
-              placeholder="Adresse"
-            />
-            <Input
-              label="Adresse ligne 2 (optionnel)"
-              type="text"
-              value={clientAddressLine2}
-              onChange={(e) => setClientAddressLine2(e.target.value)}
-              placeholder="Complément d'adresse"
-            />
-            <Input
-              label="Code postal (optionnel)"
-              type="text"
-              value={clientPostalCode}
-              onChange={(e) => setClientPostalCode(e.target.value)}
-              placeholder="Code postal"
-            />
-            <Input
-              label="Ville (optionnel)"
-              type="text"
-              value={clientCity}
-              onChange={(e) => setClientCity(e.target.value)}
-              placeholder="Ville"
             />
           </div>
         </div>

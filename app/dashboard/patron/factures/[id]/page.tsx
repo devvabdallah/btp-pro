@@ -563,18 +563,14 @@ export default function InvoiceDetailPage() {
   const handlePrintPdf = () => {
     if (!invoice) return
 
-    const companyName =
-      (company?.legal_name ?? '').trim()
-      || (company?.name ?? '').trim()
-      || "Nom de l'entreprise"
-    const companyCode = company?.siret || company?.code || ''
+    // Nom de l'entreprise : legal_name si présent, sinon name (pas de fallback)
+    const companyName = (company?.legal_name ?? '').trim() || (company?.name ?? '').trim()
     const addressLine1 = company?.address_line1 || ''
     const addressLine2 = company?.address_line2 || ''
     const postalCode = company?.postal_code || ''
     const city = company?.city || ''
     const siret = company?.siret || ''
     const vatNumber = company?.vat_number || ''
-    const vatExemptionText = company?.vat_exemption_text || ''
     const date = new Date(invoice.created_at).toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: 'long',
@@ -765,7 +761,7 @@ export default function InvoiceDetailPage() {
 </head>
 <body>
   <div class="header page-break">
-    <div class="header-company-name">${companyName}</div>
+    ${companyName ? `<div class="header-company-name">${companyName}</div>` : ''}
     <div class="header-company-info">
       ${(addressLine1 || addressLine2 || postalCode || city) ? `
       <div style="margin-bottom: 4px;">
@@ -788,7 +784,7 @@ export default function InvoiceDetailPage() {
 
   <div class="client-section page-break">
     <h3>Facturé à :</h3>
-    <p><strong>${invoice.client || '—'}</strong></p>
+    ${invoice.client ? `<p><strong>${invoice.client}</strong></p>` : ''}
     ${invoice.contact ? `<p>${invoice.contact}</p>` : ''}
     ${(invoice.client_address_line1 || invoice.client_address_line2 || invoice.client_postal_code || invoice.client_city) ? `
     <div style="margin-top: 8px;">
@@ -996,51 +992,51 @@ export default function InvoiceDetailPage() {
             {isEditing ? (
               <div className="space-y-4">
                 <Input
-                  label=""
+                  label="Nom complet (obligatoire)"
                   value={displayInvoice.client || ''}
                   onChange={(e) => updateEditedInvoice('client', e.target.value)}
-                  placeholder="Nom du client"
+                  placeholder="Jean Dupont"
                   className="text-white placeholder:text-gray-500"
                   variant="dark"
                 />
                 <Input
-                  label=""
+                  label="Téléphone ou email (optionnel)"
                   value={displayInvoice.contact || ''}
                   onChange={(e) => updateEditedInvoice('contact', e.target.value)}
-                  placeholder="Contact (optionnel)"
+                  placeholder="06..."
                   className="text-white text-sm placeholder:text-gray-500"
                   variant="dark"
                 />
                 <Input
-                  label=""
+                  label="Adresse"
                   value={displayInvoice.client_address_line1 || ''}
                   onChange={(e) => updateEditedInvoice('client_address_line1', e.target.value)}
-                  placeholder="Adresse ligne 1"
+                  placeholder="12 rue..."
                   className="text-white text-sm placeholder:text-gray-500"
                   variant="dark"
                 />
                 <Input
-                  label=""
+                  label="Complément d'adresse (optionnel)"
                   value={displayInvoice.client_address_line2 || ''}
                   onChange={(e) => updateEditedInvoice('client_address_line2', e.target.value)}
-                  placeholder="Adresse ligne 2 (optionnel)"
+                  placeholder="Complément d'adresse"
                   className="text-white text-sm placeholder:text-gray-500"
                   variant="dark"
                 />
                 <div className="grid grid-cols-2 gap-3">
                   <Input
-                    label=""
+                    label="Code postal"
                     value={displayInvoice.client_postal_code || ''}
                     onChange={(e) => updateEditedInvoice('client_postal_code', e.target.value)}
-                    placeholder="Code postal"
+                    placeholder="75000"
                     className="text-white text-sm placeholder:text-gray-500"
                     variant="dark"
                   />
                   <Input
-                    label=""
+                    label="Ville"
                     value={displayInvoice.client_city || ''}
                     onChange={(e) => updateEditedInvoice('client_city', e.target.value)}
-                    placeholder="Ville"
+                    placeholder="Paris"
                     className="text-white text-sm placeholder:text-gray-500"
                     variant="dark"
                   />
