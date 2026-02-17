@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import Button from '@/components/ui/Button'
 import QuoteDetailView from './QuoteDetailView'
 
 type QuoteStatus = 'brouillon' | 'envoye' | 'accepte' | 'refuse'
@@ -58,6 +59,7 @@ export default function QuoteDetailPage() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   useEffect(() => {
     if (!quoteId) return
@@ -719,43 +721,27 @@ export default function QuoteDetailPage() {
     setEditedQuote({ ...editedQuote, amount_ht: totalHT })
   }
 
+  // Ouvrir la modale de suppression
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true)
+  }
+
   // Supprimer le devis
   const handleDelete = async () => {
     if (!quote?.id) {
       setDeleteError('Devis introuvable')
+      setIsDeleteModalOpen(false)
       return
     }
 
     setDeleting(true)
     setDeleteError(null)
+    setIsDeleteModalOpen(false)
 
     try {
-      // Vérifier si des factures sont liées à ce devis pour la confirmation
+      // Vérifier si des factures sont liées à ce devis
       if (!quote.entreprise_id) {
         setDeleteError('Devis sans entreprise associée')
-        setDeleting(false)
-        return
-      }
-
-      const { data: linkedInvoices, error: invoicesCheckError } = await supabase
-        .from('invoices')
-        .select('id')
-        .eq('quote_id', quote.id)
-        .eq('entreprise_id', quote.entreprise_id)
-
-      let confirmed = false
-
-      if (!invoicesCheckError && linkedInvoices && linkedInvoices.length > 0) {
-        // Confirmation explicite si des factures sont liées
-        confirmed = window.confirm(
-          `Ce devis a déjà ${linkedInvoices.length} facture${linkedInvoices.length > 1 ? 's' : ''} liée${linkedInvoices.length > 1 ? 's' : ''}. Supprimer le devis supprimera aussi ${linkedInvoices.length > 1 ? 'les factures' : 'la facture'}. Continuer ?`
-        )
-      } else {
-        // Confirmation standard si pas de factures liées
-        confirmed = window.confirm('Supprimer ce devis ? Cette action est irréversible.')
-      }
-
-      if (!confirmed) {
         setDeleting(false)
         return
       }
@@ -1136,9 +1122,43 @@ export default function QuoteDetailPage() {
       updateEditedLine={updateEditedLine}
       addEditedLine={addEditedLine}
       removeEditedLine={removeEditedLine}
-      onDelete={handleDelete}
+      onDelete={handleDeleteClick}
       deleting={deleting}
       deleteError={deleteError}
     />
+
+      {/* Modale de confirmation de suppression */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 rounded-2xl p-6 md:p-8 border border-white/10 shadow-xl shadow-black/50 backdrop-blur-sm max-w-md w-full">
+            <h3 className="text-xl md:text-2xl font-semibold text-white mb-4">
+              Supprimer ce devis ?
+            </h3>
+            <p className="text-gray-300 mb-6 text-sm md:text-base">
+              Cette action est irréversible.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 sm:justify-end">
+              <Button
+                variant="secondary"
+                size="md"
+                onClick={() => setIsDeleteModalOpen(false)}
+                disabled={deleting}
+                className="w-full sm:w-auto min-h-[44px] px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Annuler
+              </Button>
+              <Button
+                variant="primary"
+                size="md"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="w-full sm:w-auto min-h-[44px] px-6 bg-red-600 hover:bg-red-700 border-red-600 text-white font-semibold disabled:opacity-70 disabled:bg-red-600/70 disabled:text-white/90 disabled:cursor-not-allowed transition-colors"
+              >
+                {deleting ? 'Suppression...' : 'Supprimer'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
   )
 }
