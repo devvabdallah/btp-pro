@@ -23,32 +23,50 @@ export async function POST(request: Request) {
     );
   }
 
-  // IMPORTANT: response qui recevra les cookies
-  const response = NextResponse.json({ ok: true });
+  // Créer la réponse qui recevra les cookies
+  const res = NextResponse.json({ ok: true });
+
+  // Parser les cookies existants depuis les headers pour getAll()
+  const cookieHeader = request.headers.get("cookie") ?? "";
+  const existingCookies: Array<{ name: string; value: string }> = [];
+  if (cookieHeader) {
+    cookieHeader.split(";").forEach((cookie) => {
+      const trimmed = cookie.trim();
+      const equalIndex = trimmed.indexOf("=");
+      if (equalIndex > 0) {
+        const name = trimmed.substring(0, equalIndex).trim();
+        const value = trimmed.substring(equalIndex + 1).trim();
+        if (name && value) {
+          existingCookies.push({ name, value });
+        }
+      }
+    });
+  }
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
       getAll() {
-        // Next route handler: cookies via headers
-        const cookie = request.headers.get("cookie") ?? "";
-        // @supabase/ssr attend getAll() -> tableau, mais il sait aussi lire via cookie string
-        // On renvoie vide ici et on laisse supabase gérer via setAll
-        // (la vraie partie critique est setAll)
-        return [];
+        // Retourner les cookies existants parsés
+        return existingCookies;
       },
       setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          // Préserver les options par défaut de Supabase (path, sameSite, secure, httpOnly)
-          const cookieOptions = { ...options };
-          
+        cookiesToSet.forEach(({ name, value, options = {} }) => {
+          // Préserver les options par défaut de Supabase
+          const cookieOptions: any = {
+            path: options.path ?? "/",
+            sameSite: options.sameSite ?? "lax",
+            secure: options.secure ?? process.env.NODE_ENV === "production",
+            httpOnly: options.httpOnly ?? true,
+          };
+
           // Si rememberMe est true, ajouter maxAge pour rendre le cookie persistant (30 jours)
-          // Si rememberMe est false, ne pas mettre maxAge (cookie de session qui expire à la fermeture du navigateur)
+          // Si rememberMe est false, ne pas mettre maxAge (cookie de session)
           if (rememberMe === true) {
-            cookieOptions.maxAge = 30 * 24 * 60 * 60; // 30 jours en secondes
+            cookieOptions.maxAge = 60 * 60 * 24 * 30; // 30 jours en secondes
           }
           // Si rememberMe est false, cookieOptions n'a pas de maxAge => cookie de session
-          
-          response.cookies.set(name, value, cookieOptions);
+
+          res.cookies.set(name, value, cookieOptions);
         });
       },
     },
@@ -63,6 +81,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // Recréer la réponse OK (avec cookies déjà posés)
-  return response;
+  // Retourner la réponse avec les cookies déjà posés
+  return res;
 }
