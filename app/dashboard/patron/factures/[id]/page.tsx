@@ -933,13 +933,10 @@ export default function InvoiceDetailPage() {
       {/* Header */}
       <header className="w-full px-4 py-6 md:px-8 border-b border-[#2a2f4a]">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
             <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
               <span className="text-2xl font-bold text-[#0a0e27]">B</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">
-              {company?.legal_name || (company?.name && company.name !== "BTP PRO" ? company.name : "BTP PRO")}
-            </h1>
           </div>
           <Link href="/dashboard/patron/factures">
             <Button variant="secondary" size="sm" className="min-h-[48px] px-6 text-base font-semibold">
@@ -1530,7 +1527,7 @@ export default function InvoiceDetailPage() {
                 size="md"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="w-full sm:w-auto min-h-[44px] px-6 bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto min-h-[44px] px-6 bg-red-600 hover:bg-red-700 border-red-600 text-white font-semibold disabled:opacity-70 disabled:bg-red-600/70 disabled:text-white/90 disabled:cursor-not-allowed transition-colors"
               >
                 {deleting ? 'Suppression...' : 'Supprimer'}
               </Button>

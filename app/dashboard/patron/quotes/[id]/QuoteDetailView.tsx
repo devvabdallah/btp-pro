@@ -112,11 +112,10 @@ export default function QuoteDetailView({
       <main className="min-h-screen bg-[#0a0e27]">
         <header className="w-full px-4 py-6 md:px-8 border-b border-[#2a2f4a]">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
                 <span className="text-2xl font-bold text-[#0a0e27]">B</span>
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
             </div>
             <Link href="/dashboard/patron/devis">
               <Button variant="secondary" size="sm" className="min-h-[48px] px-6 text-base font-semibold">
@@ -145,11 +144,10 @@ export default function QuoteDetailView({
       <main className="min-h-screen bg-[#0a0e27]">
         <header className="w-full px-4 py-6 md:px-8 border-b border-[#2a2f4a]">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center">
               <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
                 <span className="text-2xl font-bold text-[#0a0e27]">B</span>
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
             </div>
             <Link href="/dashboard/patron/devis">
               <Button variant="secondary" size="sm" className="min-h-[48px] px-6 text-base font-semibold">
@@ -189,11 +187,10 @@ export default function QuoteDetailView({
       {/* Header */}
       <header className="w-full px-4 py-6 md:px-8 border-b border-[#2a2f4a]">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
             <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
               <span className="text-2xl font-bold text-[#0a0e27]">B</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
           </div>
           <Link href="/dashboard/patron">
             <Button variant="secondary" size="sm" className="min-h-[48px] px-6 text-base font-semibold">

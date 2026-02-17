@@ -112,14 +112,24 @@ export default function QuoteDetailPage() {
         return
       }
 
-      // 2.5 Vérifier si l'entreprise est active (abonnement/essai)
+      // 2.5 Vérifier si l'entreprise est active (abonnement/essai) via RPC is_company_active
       try {
         const { checkCompanyActive } = await import('@/lib/subscription-check')
-        const { active } = await checkCompanyActive(supabase)
-        setIsCompanyActive(active)
+        const { active, error: checkError } = await checkCompanyActive(supabase, profile.entreprise_id)
+        
+        if (checkError) {
+          // En cas d'erreur RPC, bloquer par sécurité et afficher un message d'erreur clair
+          console.error('[QuoteDetail] Erreur vérification abonnement:', checkError)
+          setIsCompanyActive(false)
+          setError(`Erreur de vérification d'abonnement: ${checkError}`)
+        } else {
+          setIsCompanyActive(active)
+        }
       } catch (err) {
-        // En cas d'erreur, on laisse null (comportement par défaut)
-        setIsCompanyActive(null)
+        // En cas d'exception, bloquer par sécurité
+        console.error('[QuoteDetail] Exception lors de la vérification abonnement:', err)
+        setIsCompanyActive(false)
+        setError('Erreur lors de la vérification de l\'abonnement. Veuillez réessayer.')
       }
 
       // 2.6 Vérifier si une facture existe déjà pour ce devis
@@ -372,11 +382,18 @@ export default function QuoteDetailPage() {
         return
       }
 
-      // Vérification abonnement / essai avec le même client pour cohérence de session
+      // Vérification abonnement / essai via RPC is_company_active avec le même client pour cohérence de session
       const { checkCompanyActive } = await import('@/lib/subscription-check')
-      const { active } = await checkCompanyActive(supabaseClient)
+      const { active, error: checkError } = await checkCompanyActive(supabaseClient, profile.entreprise_id)
 
-      console.log("[subscription] active=", active)
+      console.log("[subscription] active=", active, "error=", checkError)
+
+      if (checkError) {
+        // En cas d'erreur RPC, bloquer par sécurité
+        setInvoiceError(`Erreur de vérification d'abonnement: ${checkError}`)
+        setCreatingInvoice(false)
+        return
+      }
 
       if (!active) {
         setInvoiceError("Votre essai est expiré. Abonnez-vous pour continuer.")
