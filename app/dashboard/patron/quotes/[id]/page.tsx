@@ -41,6 +41,7 @@ export default function QuoteDetailPage() {
     vat_number?: string | null;
     vat_exemption_text?: string | null;
   } | null>(null)
+  const [profileFullName, setProfileFullName] = useState<string | null>(null)
   const [quoteNotFound, setQuoteNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [statusError, setStatusError] = useState<string | null>(null)
@@ -73,6 +74,23 @@ export default function QuoteDetailPage() {
         setError('Non connecté')
         setLoading(false)
         return
+      }
+
+      // 1.1. Charger le profil utilisateur pour le nom complet
+      try {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single()
+
+        if (!profileError && profileData) {
+          setProfileFullName(profileData?.full_name ?? null)
+        } else {
+          setProfileFullName(null)
+        }
+      } catch (err) {
+        setProfileFullName(null)
       }
 
       // 2. Récupérer entreprise_id via profiles
@@ -954,6 +972,7 @@ export default function QuoteDetailPage() {
       ${postalCode && city ? `<div>${postalCode} ${city}</div>` : ''}
       ${siret ? `<div style="margin-top: 6px;">SIRET : ${siret}</div>` : ''}
       ${vatNumber ? `<div>TVA : ${vatNumber}</div>` : '<div>TVA non applicable, art. 293 B du CGI</div>'}
+      ${profileFullName ? `<div style="margin-top: 6px;">Établi par : ${profileFullName}</div>` : ''}
     </div>
   </div>
 
