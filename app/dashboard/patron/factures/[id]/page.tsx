@@ -539,13 +539,10 @@ export default function InvoiceDetailPage() {
   const handlePrintPdf = () => {
     if (!invoice) return
 
-    // Calculer companyName en évitant "BTP PRO" comme placeholder
-    let companyName = "Nom de l'entreprise"
-    if (company?.legal_name && company.legal_name.trim() !== '') {
-      companyName = company.legal_name
-    } else if (company?.name && company.name.trim() !== '' && company.name !== "BTP PRO") {
-      companyName = company.name
-    }
+    const companyName =
+      (company?.legal_name ?? '').trim()
+      || (company?.name ?? '').trim()
+      || "Nom de l'entreprise"
     const companyCode = company?.siret || company?.code || ''
     const addressLine1 = company?.address_line1 || ''
     const addressLine2 = company?.address_line2 || ''

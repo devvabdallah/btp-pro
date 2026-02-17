@@ -750,13 +750,10 @@ export default function QuoteDetailPage() {
   const handlePrintPdf = () => {
     if (!quote) return
 
-    // Calculer companyName en évitant "BTP PRO" comme placeholder
-    let companyName = "Nom de l'entreprise"
-    if (entrepriseInfo?.legal_name && entrepriseInfo.legal_name.trim() !== '') {
-      companyName = entrepriseInfo.legal_name
-    } else if (entrepriseInfo?.name && entrepriseInfo.name.trim() !== '' && entrepriseInfo.name !== "BTP PRO") {
-      companyName = entrepriseInfo.name
-    }
+    const companyName =
+      (entrepriseInfo?.legal_name ?? '').trim()
+      || (entrepriseInfo?.name ?? '').trim()
+      || "Nom de l'entreprise"
     const companyCode = entrepriseInfo?.siret || entrepriseInfo?.code || ''
     const addressLine1 = entrepriseInfo?.address_line1 || ''
     const addressLine2 = entrepriseInfo?.address_line2 || ''
