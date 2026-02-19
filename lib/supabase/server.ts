@@ -13,10 +13,11 @@ export function createSupabaseServer() {
       getAll() {
         return cookieStore.getAll();
       },
-      setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          cookieStore.set(name, value, options);
-        });
+      setAll() {
+        // IMPORTANT: Interdit dans Server Components (Next.js).
+        // Les cookies Supabase doivent être écrits uniquement dans:
+        // - Route Handlers (app/api/*)
+        // - Middleware (via NextResponse)
       },
     },
   });
@@ -34,10 +35,11 @@ export async function createSupabaseServerClient() {
       getAll() {
         return cookieStore.getAll();
       },
-      setAll(cookiesToSet: Array<{ name: string; value: string; options?: any }>) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          cookieStore.set(name, value, options);
-        });
+      setAll() {
+        // IMPORTANT: Interdit dans Server Components (Next.js).
+        // Les cookies Supabase doivent être écrits uniquement dans:
+        // - Route Handlers (app/api/*)
+        // - Middleware (via NextResponse)
       },
     },
   });

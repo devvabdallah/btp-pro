@@ -1,25 +1,15 @@
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
 /**
- * Crée un client Supabase pour le navigateur avec gestion du storage selon rememberMe
- * @param rememberMe - Si true, utilise localStorage (persistant). Si false, utilise sessionStorage (session only)
- * @returns Instance du client Supabase
+ * Crée un client Supabase pour le navigateur.
+ * Utilise @supabase/ssr (cookies) pour rester cohérent avec la route API de login
+ * qui pose des cookies via createServerClient.
+ * Le paramètre rememberMe est conservé pour compatibilité mais ne change pas le storage
+ * (le session lifetime est contrôlé par Supabase, défaut ~7 jours).
  */
-export function createSupabaseBrowserClient(rememberMe: boolean = true) {
-  const storage = rememberMe 
-    ? (typeof window !== 'undefined' ? window.localStorage : undefined)
-    : (typeof window !== 'undefined' ? window.sessionStorage : undefined);
-
-  return createClient(
+export function createSupabaseBrowserClient(_rememberMe: boolean = true) {
+  return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storage: storage,
-      },
-    }
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 }
