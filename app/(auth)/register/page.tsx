@@ -80,15 +80,13 @@ export default function RegisterPage() {
 
     try {
       // Étape 2.2 : Création de l'utilisateur dans Supabase Auth
+      console.log('[Register] signUp', { email: email.trim() })
       const { data, error: authError } = await supabase.auth.signUp({
         email: email.trim(),
         password,
       })
 
-      console.log('[Signup] auth result:', { data, error: authError })
-
       if (authError) {
-        // Gestion d'un email déjà utilisé
         if (
           authError.code === '23505' ||
           authError.message?.toLowerCase().includes('already registered')
@@ -97,15 +95,29 @@ export default function RegisterPage() {
         } else {
           setError(authError.message || 'Erreur lors de la création du compte.')
         }
-        setLoading(false)
         return
       }
 
       const user = data.user
       if (!user) {
         setError("Impossible de récupérer l'utilisateur après inscription.")
-        setLoading(false)
         return
+      }
+
+      // Si pas de session après signUp (confirmation email requise), tenter un signIn immédiat
+      let session = data.session
+      if (!session) {
+        console.log('[Register] signIn (no session after signUp, attempting immediate signIn)')
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        })
+        if (signInError || !signInData.session) {
+          setError('Compte créé. Vérifie ta boîte mail pour confirmer, puis reconnecte-toi.')
+          return
+        }
+        session = signInData.session
+        console.log('[Register] signIn success', { userId: session.user.id })
       }
 
       // Étape 2.3 : Création de l'entreprise + profil
@@ -116,6 +128,7 @@ export default function RegisterPage() {
         const trialEndDate = new Date()
         trialEndDate.setDate(trialEndDate.getDate() + 5)
 
+        console.log('[Register] entreprise insert', { name: enterpriseName.trim(), code })
         const { data: entrepriseData, error: entrepriseError } = await supabase
           .from('entreprises')
           .insert({
@@ -129,34 +142,31 @@ export default function RegisterPage() {
           .select('id')
           .single()
 
-        console.log('[Signup] entreprise insert:', { entrepriseData, entrepriseError })
-
-        if (entrepriseError) {
-          setError(entrepriseError.message || "Erreur lors de la création de l'entreprise.")
-          setLoading(false)
+        if (entrepriseError || !entrepriseData) {
+          setError(entrepriseError?.message || "Erreur lors de la création de l'entreprise.")
           return
         }
 
-        // 2) Créer le profil
-        const { error: profileError } = await supabase.from('profiles').insert({
-          id: user.id,
-          role: 'patron',
-          entreprise_id: entrepriseData.id,
-        })
-
-        console.log('[Signup] profile insert:', { profileError })
+        console.log('[Register] profile upsert', { userId: user.id, entrepriseId: entrepriseData.id })
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert(
+            { id: user.id, role: 'patron', entreprise_id: entrepriseData.id },
+            { onConflict: 'id' }
+          )
+          .select()
+          .single()
 
         if (profileError) {
           setError(profileError.message || 'Erreur lors de la création du profil.')
-          setLoading(false)
           return
         }
 
-        // Redirection vers le dashboard patron
-        router.push('/dashboard/patron')
+        await supabase.auth.refreshSession()
+        router.replace('/dashboard/patron')
       } else {
-        // Rôle employé
-        // Chercher l'entreprise avec le code
+        // Rôle employé — chercher l'entreprise avec le code
+        console.log('[Register] entreprise lookup', { code: companyCode })
         const { data: entrepriseData, error: entrepriseError } = await supabase
           .from('entreprises')
           .select('id')
@@ -165,30 +175,29 @@ export default function RegisterPage() {
 
         if (entrepriseError || !entrepriseData) {
           setError('Code entreprise invalide.')
-          setLoading(false)
           return
         }
 
-        // Créer le profil
-        const { error: profileError } = await supabase.from('profiles').insert({
-          id: user.id,
-          role: 'employe',
-          entreprise_id: entrepriseData.id,
-        })
-
-        console.log('[Signup] profile insert:', { profileError })
+        console.log('[Register] profile upsert', { userId: user.id, entrepriseId: entrepriseData.id })
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert(
+            { id: user.id, role: 'employe', entreprise_id: entrepriseData.id },
+            { onConflict: 'id' }
+          )
+          .select()
+          .single()
 
         if (profileError) {
           setError(profileError.message || 'Erreur lors de la création du profil.')
-          setLoading(false)
           return
         }
 
-        // Redirection vers le dashboard employé
-        router.push('/dashboard/employe')
+        await supabase.auth.refreshSession()
+        router.replace('/dashboard/employe')
       }
     } catch (err) {
-      console.error('[Signup] unexpected error:', err)
+      console.error('[Register] unexpected error:', err)
       setError('Une erreur inattendue est survenue.')
     } finally {
       setLoading(false)
