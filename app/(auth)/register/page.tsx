@@ -187,7 +187,7 @@ export default function RegisterPage() {
                   onClick={() => setRole('patron')}
                   className={`flex-1 px-6 py-4 rounded-2xl font-semibold text-base transition-all ${
                     role === 'patron'
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] shadow-lg shadow-orange-500/25'
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg shadow-orange-500/25'
                       : 'bg-white/5 border-2 border-white/10 text-gray-300 hover:border-white/20'
                   }`}
                 >
@@ -198,7 +198,7 @@ export default function RegisterPage() {
                   onClick={() => setRole('employe')}
                   className={`flex-1 px-6 py-4 rounded-2xl font-semibold text-base transition-all ${
                     role === 'employe'
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] shadow-lg shadow-orange-500/25'
+                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg shadow-orange-500/25'
                       : 'bg-white/5 border-2 border-white/10 text-gray-300 hover:border-white/20'
                   }`}
                 >
@@ -236,7 +236,7 @@ export default function RegisterPage() {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full h-14 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-14 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={loading}
               >
                 {loading ? 'Création en cours...' : 'Créer mon compte'}

@@ -124,7 +124,7 @@ export default function UpdatePasswordPage() {
               </div>
               <Link
                 href="/forgot-password"
-                className="inline-flex w-full items-center justify-center min-h-[52px] rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200"
+                className="inline-flex w-full items-center justify-center min-h-[52px] rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200"
               >
                 Renvoyer un email
               </Link>
@@ -188,7 +188,7 @@ export default function UpdatePasswordPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full min-h-[56px] text-lg font-semibold rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full min-h-[56px] text-lg font-semibold rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
                 </button>

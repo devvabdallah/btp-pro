@@ -64,7 +64,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 backdrop-blur-md bg-[#0a0e27]/70 border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
           <Link href="/" className="shrink-0">
-            <div className="w-10 h-10 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl bg-white shadow-md flex items-center justify-center">
+            <div className="w-10 h-10 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-white flex items-center justify-center">
               <Image
                 src="/brand/logo.png"
                 alt="BTP PRO"
@@ -72,7 +72,7 @@ export default function Home() {
                 height={160}
                 quality={100}
                 priority
-                className="w-[90%] h-[90%] object-contain"
+                className="block w-[90%] h-[90%] object-contain"
                 style={{ imageRendering: "auto" }}
               />
             </div>
@@ -84,7 +84,7 @@ export default function Home() {
               </button>
             </Link>
             <Link href="/register">
-              <button className="px-3 py-2 sm:px-6 sm:py-2.5 text-sm sm:text-base h-9 sm:h-auto rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold hover:scale-[1.03] transition">
+              <button className="px-3 py-2 sm:px-6 sm:py-2.5 text-sm sm:text-base h-9 sm:h-auto rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold hover:scale-[1.03] transition">
                 Inscription
               </button>
             </Link>
@@ -107,7 +107,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col items-center gap-3">
             <Link href="/register" className="w-full sm:w-auto">
-              <button className="w-full sm:w-auto px-12 py-3 sm:py-5 h-auto sm:h-14 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 text-base sm:text-lg md:text-xl">
+              <button className="w-full sm:w-auto px-12 py-3 sm:py-5 h-auto sm:h-14 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 text-base sm:text-lg md:text-xl">
                 Essayer gratuitement 5 jours
               </button>
             </Link>
@@ -264,7 +264,7 @@ export default function Home() {
             </div>
             <div className="text-center">
               <Link href="/register" className="inline-block w-full sm:w-auto">
-                <button className="w-full sm:w-auto px-12 py-3 sm:py-5 h-auto sm:h-14 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 text-base sm:text-lg md:text-xl">
+                <button className="w-full sm:w-auto px-12 py-3 sm:py-5 h-auto sm:h-14 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 text-base sm:text-lg md:text-xl">
                   Essayer gratuitement 5 jours
                 </button>
               </Link>
@@ -283,7 +283,7 @@ export default function Home() {
             Essayez BTP PRO gratuitement pendant 5 jours. Sans carte bancaire.
           </p>
           <Link href="/register" className="inline-block w-full sm:w-auto">
-            <button className="w-full sm:w-auto px-12 py-3 sm:py-5 h-auto sm:h-14 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-[#0a0e27] font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 text-base sm:text-lg md:text-xl">
+            <button className="w-full sm:w-auto px-12 py-3 sm:py-5 h-auto sm:h-14 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 text-base sm:text-lg md:text-xl">
               Essayer gratuitement 5 jours
             </button>
           </Link>
