@@ -110,11 +110,16 @@ function LoginForm() {
         </div>
       </form>
 
-      <div className="mt-8 pt-6 border-t border-white/10 text-center">
+      <div className="mt-8 pt-6 border-t border-white/10 text-center space-y-3">
         <p className="text-base text-gray-300">
           Pas encore de compte ?{' '}
           <Link href="/register" className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
             Créer un compte
+          </Link>
+        </p>
+        <p className="text-sm text-gray-500">
+          <Link href="/reset-password" className="text-orange-400 hover:text-orange-300 font-semibold transition-colors">
+            Mot de passe oublié ?
           </Link>
         </p>
       </div>
