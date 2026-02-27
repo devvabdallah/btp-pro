@@ -25,6 +25,8 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
   const [loading, setLoading] = useState(false)
   const [loadingChantiers, setLoadingChantiers] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
   const [chantiers, setChantiers] = useState<Chantier[]>([])
 
   const [formData, setFormData] = useState({
@@ -210,15 +212,17 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!event || !event.id) {
       setError('Impossible de supprimer : événement invalide.')
       return
     }
+    setSelectedEventId(event.id)
+    setIsDeleteOpen(true)
+  }
 
-    // Demander confirmation avant suppression
-    const confirmed = window.confirm('Supprimer ce rendez-vous ? Cette action est irréversible.')
-    if (!confirmed) return
+  const confirmDelete = async () => {
+    if (!selectedEventId) return
 
     setLoading(true)
     setError(null)
@@ -229,7 +233,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
       const { error: deleteError } = await supabase
         .from('agenda_events')
         .delete()
-        .eq('id', event.id)
+        .eq('id', selectedEventId)
 
       if (deleteError) {
         setError(deleteError.message || 'Erreur lors de la suppression de l\'événement.')
@@ -237,7 +241,8 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
         return
       }
 
-      // Succès
+      setIsDeleteOpen(false)
+      setSelectedEventId(null)
       onSuccess()
       onClose()
     } catch (err: any) {
@@ -443,6 +448,39 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
           </form>
         </div>
       </div>
+
+      {/* Modale de confirmation de suppression */}
+      {isDeleteOpen && (
+        <div
+          className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          onClick={() => { setIsDeleteOpen(false); setSelectedEventId(null) }}
+        >
+          <div
+            className="bg-gradient-to-br from-slate-800/95 to-slate-900/95 rounded-2xl border border-white/10 shadow-2xl w-full max-w-sm p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold text-white mb-2">Supprimer ce rendez-vous ?</h2>
+            <p className="text-gray-400 text-sm mb-6">Cette action est définitive.</p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setIsDeleteOpen(false); setSelectedEventId(null) }}
+                className="flex-1 px-4 py-3 rounded-xl border border-white/15 text-gray-300 hover:bg-white/5 transition text-sm font-medium"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={loading}
+                className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Suppression…' : 'Supprimer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 
