@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from "next/link";
 import { createBrowserClient } from "@supabase/ssr";
+import { APP_NAME } from "@/lib/app-config";
 
 function LoginForm() {
   const searchParams = useSearchParams()
@@ -148,7 +149,7 @@ export default function LoginPage() {
             Connexion
           </h1>
           <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-            Accédez à votre espace BTP PRO
+            Accédez à votre espace {APP_NAME}
           </p>
         </div>
 

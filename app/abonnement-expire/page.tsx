@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { APP_NAME } from "@/lib/app-config";
 
 export default function AbonnementExpirePage() {
   return (
@@ -6,7 +7,7 @@ export default function AbonnementExpirePage() {
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl">
         <h1 className="text-2xl font-bold">Abonnement expiré</h1>
         <p className="mt-2 text-white/70">
-          Votre accès est suspendu. Réactivez l'abonnement pour continuer à utiliser BTP PRO.
+          Votre accès est suspendu. Réactivez l'abonnement pour continuer à utiliser {APP_NAME}.
         </p>
 
         <Link

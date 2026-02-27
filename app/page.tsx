@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import Button from '@/components/ui/Button'
+import { APP_NAME } from '@/lib/app-config'
 
 interface ScreenshotImgProps {
   src: string
@@ -67,7 +68,7 @@ export default function Home() {
             <div className="w-10 h-10 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl overflow-hidden bg-white flex items-center justify-center">
               <Image
                 src="/brand/logo.png"
-                alt="BTP PRO"
+                alt={APP_NAME}
                 width={160}
                 height={160}
                 quality={100}
@@ -192,7 +193,7 @@ export default function Home() {
                 <div className="rounded-xl border border-white/10 shadow-xl shadow-black/30 overflow-hidden w-full max-w-[115%] lg:max-w-[120%]">
                   <img
                     src="/screens/chantiers.png"
-                    alt="Écran chantiers BTP PRO"
+                    alt={`Écran chantiers ${APP_NAME}`}
                     className="w-full h-auto block"
                   />
                 </div>
@@ -205,7 +206,7 @@ export default function Home() {
                 <div className="rounded-xl border border-white/10 shadow-xl shadow-black/30 overflow-hidden w-full max-w-[115%] lg:max-w-[120%]">
                   <img
                     src="/screens/devis.png"
-                    alt="Écran devis BTP PRO"
+                    alt={`Écran devis ${APP_NAME}`}
                     className="w-full h-auto block"
                   />
                 </div>
@@ -234,7 +235,7 @@ export default function Home() {
                 <div className="rounded-xl border border-white/10 shadow-xl shadow-black/30 overflow-hidden w-full max-w-[115%] lg:max-w-[120%]">
                   <img
                     src="/clients.png"
-                    alt="Écran clients BTP PRO"
+                    alt={`Écran clients ${APP_NAME}`}
                     className="w-full h-auto block"
                   />
                 </div>
@@ -280,7 +281,7 @@ export default function Home() {
             Prêt à gagner du temps dès aujourd'hui ?
           </h2>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 opacity-90 sm:opacity-100 mb-8 md:mb-10 leading-relaxed">
-            Essayez BTP PRO gratuitement pendant 5 jours. Sans carte bancaire.
+            Essayez {APP_NAME} gratuitement pendant 5 jours. Sans carte bancaire.
           </p>
           <Link href="/register" className="inline-block w-full sm:w-auto">
             <button className="w-full sm:w-auto px-12 py-3 sm:py-5 h-auto sm:h-14 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold shadow-lg shadow-orange-500/25 hover:brightness-105 transition-all duration-200 text-base sm:text-lg md:text-xl">
@@ -295,7 +296,7 @@ export default function Home() {
         <div className="max-w-full sm:max-w-7xl mx-auto">
           <div className="flex flex-col items-center gap-6 text-center space-y-4 sm:space-y-0">
             <p className="text-sm sm:text-sm md:text-base text-white/60 opacity-90 sm:opacity-100 leading-relaxed">
-              © {new Date().getFullYear()} BTP PRO. Tous droits réservés.
+              © {new Date().getFullYear()} {APP_NAME}. Tous droits réservés.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
               <Link href="/login" className="text-white/50 hover:text-white/70 text-sm md:text-base transition opacity-90 sm:opacity-100">

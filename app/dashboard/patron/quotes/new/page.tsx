@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import ErrorMessage from '@/components/ui/ErrorMessage'
+import { APP_NAME } from '@/lib/app-config'
 import { createQuote } from '@/lib/quotes-actions'
 
 export default function NewQuotePage() {
@@ -59,7 +60,7 @@ export default function NewQuotePage() {
             <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
               <span className="text-2xl font-bold text-[#0a0e27]">B</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-white">{APP_NAME}</h1>
           </div>
           <Link href="/dashboard/patron">
             <Button variant="secondary" size="sm">

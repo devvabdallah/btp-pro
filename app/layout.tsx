@@ -3,14 +3,14 @@ import './globals.css'
 import { ClientProviders } from '@/components/ClientProviders'
 
 export const metadata: Metadata = {
-  title: 'BTP PRO - Devis et factures pour artisans',
+  title: 'BEXORIA - Devis et factures pour artisans',
   description: 'Faites vos devis et vos factures très rapidement.',
   manifest: '/manifest.webmanifest',
   themeColor: '#0B1B3A',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'BTP PRO',
+    title: 'BEXORIA',
   },
   icons: {
     icon: [

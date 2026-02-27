@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/Button'
+import { APP_NAME } from '@/lib/app-config'
 
 export default function AbonnementPage() {
   const router = useRouter()
@@ -255,7 +256,7 @@ export default function AbonnementPage() {
               Mon abonnement
             </h1>
             <p className="text-sm md:text-[15px] text-gray-400/90 leading-relaxed font-normal">
-              Gérez votre abonnement BTP PRO
+              Gérez votre abonnement {APP_NAME}
             </p>
           </div>
         </div>
@@ -278,7 +279,7 @@ export default function AbonnementPage() {
             Mon abonnement
           </h1>
           <p className="text-sm md:text-[15px] text-gray-400/80 leading-relaxed font-normal">
-            Gérez votre abonnement BTP PRO
+            Gérez votre abonnement {APP_NAME}
           </p>
         </div>
       </div>

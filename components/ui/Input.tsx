@@ -23,8 +23,8 @@ export default function Input({
         <label
           {...labelProps}
           className={`block mb-3 ${isDark 
-            ? 'text-sm font-medium text-gray-300' 
-            : 'text-base font-semibold text-gray-900'
+            ? 'text-sm font-medium tracking-wide text-white/80' 
+            : 'text-sm font-medium tracking-wide text-gray-700'
           } ${labelProps?.className || ''}`}
         >
           {label}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { APP_NAME } from '@/lib/app-config'
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg'
@@ -45,7 +46,7 @@ export default function Logo({ size = 'md', showText = true }: LogoProps) {
         ) : (
           <Image
             src="/brand/logo.png"
-            alt="BTP PRO"
+            alt={APP_NAME}
             width={imageSizes[size]}
             height={imageSizes[size]}
             className="w-full h-full object-contain rounded-xl"
@@ -56,7 +57,7 @@ export default function Logo({ size = 'md', showText = true }: LogoProps) {
         )}
       </div>
       {showText && (
-        <h1 className={`${textSizeClasses[size]} font-bold text-white`}>BTP PRO</h1>
+        <h1 className={`${textSizeClasses[size]} font-bold text-white`}>{APP_NAME}</h1>
       )}
     </div>
   )

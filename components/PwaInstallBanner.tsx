@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Button from './ui/Button'
+import { APP_NAME } from '@/lib/app-config'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -150,7 +151,7 @@ export default function PwaInstallBanner() {
           {/* Texte */}
           <div className="flex-1">
             <h3 className="text-white font-semibold text-base md:text-lg mb-1">
-              Installer BTP PRO
+              Installer {APP_NAME}
             </h3>
             <p className="text-gray-300 text-sm md:text-base">
               Accédez rapidement à vos devis et factures depuis votre écran d'accueil
