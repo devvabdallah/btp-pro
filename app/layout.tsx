@@ -3,6 +3,7 @@ import './globals.css'
 import { ClientProviders } from '@/components/ClientProviders'
 
 export const metadata: Metadata = {
+  applicationName: 'BEXORIA',
   title: 'BEXORIA - Devis et factures pour artisans',
   description: 'Faites vos devis et vos factures très rapidement.',
   manifest: '/manifest.webmanifest',

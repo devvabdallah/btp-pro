@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
+import { APP_NAME } from '@/lib/app-config'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
 import { getQuoteById } from '@/lib/quotes-actions'
@@ -111,7 +112,7 @@ export default function QuoteDetailPage({ params }: PageProps) {
             <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center">
               <span className="text-2xl font-bold text-[#0a0e27]">B</span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">BTP PRO</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-white">{APP_NAME}</h1>
           </div>
           <Link href="/dashboard/employe">
             <Button variant="secondary" size="sm">
