@@ -474,7 +474,7 @@ export default function QuoteDetailView({
                   {/* Mobile: Card layout */}
                   <div className="md:hidden space-y-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">
+                      <label className="block text-sm font-semibold text-white/90 mb-2">
                         Description
                       </label>
                       <input
@@ -487,7 +487,7 @@ export default function QuoteDetailView({
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
+                        <label className="block text-sm font-semibold text-white/90 mb-2">
                           Quantité
                         </label>
                         <input
@@ -500,7 +500,7 @@ export default function QuoteDetailView({
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
+                        <label className="block text-sm font-semibold text-white/90 mb-2">
                           Unité
                         </label>
                         <input
@@ -514,7 +514,7 @@ export default function QuoteDetailView({
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
+                        <label className="block text-sm font-semibold text-white/90 mb-2">
                           Prix HT
                         </label>
                         <input
@@ -527,7 +527,7 @@ export default function QuoteDetailView({
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
+                        <label className="block text-sm font-semibold text-white/90 mb-2">
                           Total ligne
                         </label>
                         <div className="px-4 py-3 bg-[#1a1f3a] border border-gray-600 rounded-xl text-base text-white font-semibold">
@@ -548,7 +548,7 @@ export default function QuoteDetailView({
                   {/* Desktop: Grid layout */}
                   <div className="hidden md:grid md:grid-cols-12 gap-4 items-start">
                     <div className="md:col-span-5">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-white/90 mb-2">
                         Description
                       </label>
                       <input
@@ -560,7 +560,7 @@ export default function QuoteDetailView({
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-white/90 mb-2">
                         Quantité
                       </label>
                       <input
@@ -573,7 +573,7 @@ export default function QuoteDetailView({
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-white/90 mb-2">
                         Unité
                       </label>
                       <input
@@ -585,7 +585,7 @@ export default function QuoteDetailView({
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-white/90 mb-2">
                         Prix unitaire (€)
                       </label>
                       <input

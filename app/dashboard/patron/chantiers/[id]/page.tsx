@@ -893,31 +893,31 @@ export default function ChantierDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Adresse */}
               <div>
-                <label className="text-gray-400/80 text-sm font-medium mb-2 block">Adresse</label>
+                <label className="text-white/70 text-sm font-medium mb-2 block">Adresse</label>
                 <p className="text-white/95 text-base md:text-lg">{chantier.address || '—'}</p>
               </div>
 
               {/* Métier */}
               <div>
-                <label className="text-gray-400/80 text-sm font-medium mb-2 block">Métier</label>
+                <label className="text-white/70 text-sm font-medium mb-2 block">Métier</label>
                 <p className="text-white/95 text-base md:text-lg">{getTradeLabel(chantier.trade)}</p>
               </div>
 
               {/* Statut */}
               <div>
-                <label className="text-gray-400/80 text-sm font-medium mb-2 block">Statut</label>
+                <label className="text-white/70 text-sm font-medium mb-2 block">Statut</label>
                 <StatusBadge status={chantier.status} />
               </div>
 
               {/* Client */}
               <div>
-                <label className="text-gray-400/80 text-sm font-medium mb-2 block">Client</label>
+                <label className="text-white/70 text-sm font-medium mb-2 block">Client</label>
                 <p className="text-white/95 text-base md:text-lg font-semibold">{getClientName(chantier.client)}</p>
               </div>
 
               {/* Téléphone client */}
               <div>
-                <label className="text-gray-400/80 text-sm font-medium mb-2 block">Téléphone</label>
+                <label className="text-white/70 text-sm font-medium mb-2 block">Téléphone</label>
                 {chantier.client?.phone ? (
                   <p className="text-white/95 text-base md:text-lg font-semibold">{chantier.client.phone}</p>
                 ) : (

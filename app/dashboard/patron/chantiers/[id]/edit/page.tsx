@@ -240,7 +240,7 @@ export default function EditChantierPage() {
 
             {/* Client - Select searchable */}
             <div className="w-full">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Client *
               </label>
               <div className="relative">
@@ -319,7 +319,7 @@ export default function EditChantierPage() {
 
             {/* Statut */}
             <div className="w-full">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Statut *
               </label>
               <select
@@ -354,7 +354,7 @@ export default function EditChantierPage() {
 
             {/* Métier du chantier */}
             <div className="w-full">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Métier du chantier *
               </label>
               <select
@@ -373,7 +373,7 @@ export default function EditChantierPage() {
 
             {/* Notes */}
             <div className="w-full">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Notes
               </label>
               <textarea

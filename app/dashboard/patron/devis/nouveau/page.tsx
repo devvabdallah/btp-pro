@@ -317,7 +317,7 @@ export default function NouveauDevisPage() {
           <h1 className="text-[28px] md:text-4xl font-semibold text-white/95 mb-3.5 tracking-[-0.02em] leading-[1.15]">
             Créer un devis
           </h1>
-          <p className="text-sm md:text-[15px] text-gray-400/80 leading-relaxed font-normal">
+          <p className="text-sm md:text-[15px] text-white/70 leading-relaxed font-normal">
             Remplissez les informations pour créer un nouveau devis
           </p>
         </div>
@@ -417,7 +417,7 @@ export default function NouveauDevisPage() {
         {lines.length > 0 && (
           <div className="bg-white/[0.02] backdrop-blur-sm rounded-xl p-6 md:p-8 border border-white/[0.06] shadow-sm">
             <div className="mb-6">
-              <p className="text-gray-400/80 text-sm mb-6 leading-relaxed">
+              <p className="text-white/70 text-sm mb-6 leading-relaxed">
                 Ce devis est automatiquement pré-rempli pour vous faire gagner du temps. Vous pouvez ajuster librement les quantités et les prix avant validation.
               </p>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -437,7 +437,7 @@ export default function NouveauDevisPage() {
                   {/* Mobile: Card layout */}
                   <div className="md:hidden space-y-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-300 mb-2">
+                      <label className="block text-sm font-semibold text-white/90 mb-2">
                         Description
                       </label>
                       <input
@@ -452,7 +452,7 @@ export default function NouveauDevisPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
+                        <label className="block text-sm font-semibold text-white/90 mb-2">
                           Quantité
                         </label>
                         <input
@@ -465,7 +465,7 @@ export default function NouveauDevisPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
+                        <label className="block text-sm font-semibold text-white/90 mb-2">
                           Unité
                         </label>
                         <input
@@ -479,7 +479,7 @@ export default function NouveauDevisPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
+                        <label className="block text-sm font-semibold text-white/90 mb-2">
                           Prix HT
                         </label>
                         <input
@@ -492,7 +492,7 @@ export default function NouveauDevisPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-300 mb-2">
+                        <label className="block text-sm font-semibold text-white/90 mb-2">
                           Total ligne
                         </label>
                         <div className="px-4 py-3 bg-white/[0.05] border border-white/[0.1] rounded-xl text-base text-white/95 font-semibold tabular-nums">
@@ -516,7 +516,7 @@ export default function NouveauDevisPage() {
                   {/* Desktop: Grid layout */}
                   <div className="hidden md:grid md:grid-cols-12 gap-4 items-start">
                     <div className="md:col-span-5">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-white/90 mb-2">
                         Description
                       </label>
                       <input
@@ -530,7 +530,7 @@ export default function NouveauDevisPage() {
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-white/90 mb-2">
                         Quantité
                       </label>
                       <input
@@ -543,7 +543,7 @@ export default function NouveauDevisPage() {
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-white/90 mb-2">
                         Unité
                       </label>
                       <input
@@ -555,7 +555,7 @@ export default function NouveauDevisPage() {
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm font-medium text-white/90 mb-2">
                         Prix unitaire (€)
                       </label>
                       <input
@@ -580,7 +580,7 @@ export default function NouveauDevisPage() {
                   </div>
                   <div className="hidden md:block mt-4 pt-4 border-t border-white/[0.08]">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400/80 text-sm font-medium">Total ligne:</span>
+                      <span className="text-white/70 text-sm font-medium">Total ligne:</span>
                       <span className="text-white/95 font-semibold text-base tabular-nums">
                         {new Intl.NumberFormat('fr-FR', {
                           style: 'currency',
@@ -616,7 +616,7 @@ export default function NouveauDevisPage() {
             <h2 className="text-lg md:text-xl font-semibold text-white/95 mb-6 tracking-tight">Résumé</h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2">
-                <span className="text-gray-400/80 text-sm md:text-base">Total HT:</span>
+                  <span className="text-white/70 text-sm md:text-base">Total HT:</span>
                 <span className="text-white/95 font-semibold text-base md:text-lg tabular-nums">
                   {new Intl.NumberFormat('fr-FR', {
                     style: 'currency',
@@ -626,7 +626,7 @@ export default function NouveauDevisPage() {
               </div>
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-2">
-                  <label className="text-gray-400/80 text-sm md:text-base">TVA (%):</label>
+                  <label className="text-white/70 text-sm md:text-base">TVA (%):</label>
                   <input
                     type="number"
                     value={tva}
@@ -636,7 +636,7 @@ export default function NouveauDevisPage() {
                     max="100"
                   />
                 </div>
-                <span className="text-gray-400/70 text-sm tabular-nums">
+                <span className="text-white/60 text-sm tabular-nums">
                   TVA: {new Intl.NumberFormat('fr-FR', {
                     style: 'currency',
                     currency: 'EUR',

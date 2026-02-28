@@ -320,7 +320,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block mb-3 text-sm font-medium text-gray-300">
+                <label className="block mb-3 text-sm font-medium text-white/90">
                   Date et heure de début *
                 </label>
                 <input
@@ -333,7 +333,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
               </div>
 
               <div>
-                <label className="block mb-3 text-sm font-medium text-gray-300">
+                <label className="block mb-3 text-sm font-medium text-white/90">
                   Durée (minutes) *
                 </label>
                 <select
@@ -351,7 +351,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
             </div>
 
             <div>
-              <label className="block mb-3 text-sm font-medium text-gray-300">
+              <label className="block mb-3 text-sm font-medium text-white/90">
                 Chantier (optionnel)
               </label>
               <select
@@ -370,7 +370,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
             </div>
 
             <div>
-              <label className="block mb-3 text-sm font-medium text-gray-300">
+              <label className="block mb-3 text-sm font-medium text-white/90">
                 Notes (optionnel)
               </label>
               <textarea
@@ -390,7 +390,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess, mode = 'c
                   </div>
                 ) : (
                   <div>
-                    <label className="block mb-3 text-sm font-medium text-gray-300">
+                    <label className="block mb-3 text-sm font-medium text-white/90">
                       Statut *
                     </label>
                     <select

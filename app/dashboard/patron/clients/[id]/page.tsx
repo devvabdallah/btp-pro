@@ -390,7 +390,7 @@ export default function ClientDetailPage() {
             />
 
             <div className="w-full">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Notes
               </label>
               <textarea

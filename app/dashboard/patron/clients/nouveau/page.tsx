@@ -94,7 +94,7 @@ export default function NewClientPage() {
           <h1 className="text-[28px] md:text-4xl font-semibold text-white/95 mb-3.5 tracking-[-0.02em] leading-[1.15]">
             Ajouter un client
           </h1>
-          <p className="text-sm md:text-[15px] text-gray-400/80 leading-relaxed font-normal">
+          <p className="text-sm md:text-[15px] text-white/70 leading-relaxed font-normal">
             Remplissez les informations pour créer un nouveau client
           </p>
         </div>
@@ -155,7 +155,7 @@ export default function NewClientPage() {
           />
 
             <div className="w-full">
-              <label className="block text-sm font-medium text-gray-300/90 mb-2">
+              <label className="block text-sm font-medium text-white/90 mb-2">
                 Notes
               </label>
               <textarea

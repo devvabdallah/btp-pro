@@ -153,20 +153,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div style={{
-          position: "fixed",
-          bottom: 8,
-          right: 8,
-          zIndex: 999999,
-          padding: "6px 10px",
-          borderRadius: 8,
-          background: "rgba(0,0,0,0.7)",
-          color: "white",
-          fontSize: 12,
-        }}>
-          LOGIN PAGE ACTIVE
-        </div>
-
         <Suspense fallback={
           <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/90 rounded-3xl p-10 md:p-12 border border-white/10">
             <div className="h-64 flex items-center justify-center">

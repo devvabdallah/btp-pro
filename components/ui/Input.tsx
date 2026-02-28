@@ -12,7 +12,7 @@ export default function Input({
   labelProps,
   error,
   className = '',
-  variant = 'light',
+  variant = 'dark',
   ...props
 }: InputProps) {
   const isDark = variant === 'dark'
